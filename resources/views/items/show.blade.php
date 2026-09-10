@@ -145,7 +145,7 @@
                     @forelse ($item->saleListings as $listing)
                         <div class="text-sm">
                             <p class="text-gray-800">{{ $listing->title }} — {{ $listing->price ? number_format((float) $listing->price, 2, ',', ' ').' zł' : 'bez ceny' }}</p>
-                            <p class="text-gray-400 text-xs uppercase">{{ $listing->platform }} · {{ $listing->status }}</p>
+                            <p class="text-gray-400 text-xs uppercase">{{ $listing->platform }} · {{ $listing->statusLabel() }}</p>
                         </div>
                     @empty
                         <p class="text-sm text-gray-400">Przedmiot nie jest jeszcze wystawiony na sprzedaż.</p>

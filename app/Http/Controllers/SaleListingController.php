@@ -9,15 +9,41 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SaleListingController extends Controller
 {
-    /** Zakładka "Sprzedaż" — wszystko przygotowane do wystawienia i historia eksportów. */
+    /** Podstrona "Przygotowane" — oferty-szkice, jeszcze nie wyeksportowane. */
     public function index()
     {
+        $draft = SaleListing::with('item.category', 'item.storageLocation.warehouse')
+            ->where('status', 'szkic')->latest()->get();
+
         return view('sale-listings.index', [
-            'draft' => SaleListing::with('item.category', 'item.storageLocation.warehouse')
-                ->where('status', 'szkic')->latest()->get(),
-            'exported' => SaleListing::with('item.category', 'item.storageLocation.warehouse')
-                ->where('status', 'wyeksportowana')->latest('exported_at')->take(20)->get(),
+            'draft' => $draft,
+            'draftCount' => $draft->count(),
+            'exportedCount' => SaleListing::where('status', 'wyeksportowana')->count(),
         ]);
+    }
+
+    /**
+     * Podstrona "Wystawione" — oferty już wyeksportowane do CSV (status
+     * ustawiany automatycznie w exportCsv()), czyli faktycznie wystawione
+     * na sprzedaż. Stąd można oznaczyć przedmiot jako sprzedany.
+     */
+    public function exported()
+    {
+        return view('sale-listings.exported', [
+            'exported' => SaleListing::with('item.category', 'item.storageLocation.warehouse')
+                ->where('status', 'wyeksportowana')->latest('exported_at')->paginate(24),
+            'draftCount' => SaleListing::where('status', 'szkic')->count(),
+            'exportedCount' => SaleListing::where('status', 'wyeksportowana')->count(),
+        ]);
+    }
+
+    /** Oznacza wystawioną ofertę jako sprzedaną — kończy jej cykl życia. */
+    public function markSold(SaleListing $listing)
+    {
+        $listing->update(['status' => 'sprzedana']);
+        $listing->item->update(['status' => 'sprzedany']);
+
+        return back()->with('status', 'Przedmiot oznaczony jako sprzedany.');
     }
 
     /** Formularz z podpowiedzianą treścią ogłoszenia (krok B z koncepcji: asystent treści). */
@@ -79,6 +105,12 @@ class SaleListingController extends Controller
         };
 
         $listings->each->update(['status' => 'wyeksportowana', 'exported_at' => now()]);
+
+        // Niezależnie od tego, jak powstała oferta, przedmiot faktycznie
+        // wystawiony na sprzedaż ma mieć taki status (chyba że już sprzedany).
+        Item::whereIn('id', $listings->pluck('item_id'))
+            ->where('status', '!=', 'sprzedany')
+            ->update(['status' => 'do_sprzedazy']);
 
         return response()->streamDownload(
             $callback,

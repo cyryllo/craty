@@ -14,8 +14,19 @@ class SaleListing extends Model
         'exported_at' => 'datetime',
     ];
 
+    public const STATUSES = [
+        'szkic' => 'Przygotowana',
+        'wyeksportowana' => 'Wystawiona',
+        'sprzedana' => 'Sprzedana',
+    ];
+
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function statusLabel(): string
+    {
+        return self::STATUSES[$this->status] ?? $this->status;
     }
 }
