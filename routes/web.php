@@ -36,9 +36,10 @@ Route::middleware('auth')->group(function () {
         Route::post('items/{item}/loans', [LoanController::class, 'store'])->name('items.loans.store');
         Route::post('loans/{loan}/return', [LoanController::class, 'returnLoan'])->name('loans.return');
 
+        Route::get('sprzedaz', [SaleListingController::class, 'index'])->name('sale-listings.index');
         Route::get('items/{item}/sale-listing/create', [SaleListingController::class, 'create'])->name('items.sale-listing.create');
         Route::post('items/{item}/sale-listing', [SaleListingController::class, 'store'])->name('items.sale-listing.store');
-        Route::get('exports/oferty-sprzedazy.csv', [SaleListingController::class, 'exportCsv'])->name('sale-listings.export');
+        Route::get('sprzedaz/eksport.csv', [SaleListingController::class, 'exportCsv'])->name('sale-listings.export');
 
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('warehouses', WarehouseController::class)->except('show');

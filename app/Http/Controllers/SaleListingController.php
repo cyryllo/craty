@@ -9,6 +9,17 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SaleListingController extends Controller
 {
+    /** Zakładka "Sprzedaż" — wszystko przygotowane do wystawienia i historia eksportów. */
+    public function index()
+    {
+        return view('sale-listings.index', [
+            'draft' => SaleListing::with('item.category', 'item.storageLocation.warehouse')
+                ->where('status', 'szkic')->latest()->get(),
+            'exported' => SaleListing::with('item.category', 'item.storageLocation.warehouse')
+                ->where('status', 'wyeksportowana')->latest('exported_at')->take(20)->get(),
+        ]);
+    }
+
     /** Formularz z podpowiedzianą treścią ogłoszenia (krok B z koncepcji: asystent treści). */
     public function create(Item $item)
     {
@@ -33,10 +44,10 @@ class SaleListingController extends Controller
         $item->saleListings()->create($data);
         $item->update(['status' => 'do_sprzedazy']);
 
-        return redirect()->route('items.show', $item)->with('status', 'Oferta sprzedaży przygotowana.');
+        return redirect()->route('sale-listings.index')->with('status', 'Oferta sprzedaży przygotowana.');
     }
 
-    /** Krok A z koncepcji: uniwersalny eksport CSV wszystkich przygotowanych ofert. */
+    /** Krok A z koncepcji: uniwersalny eksport CSV wszystkich przygotowanych ofert (zakładka Sprzedaż). */
     public function exportCsv(): StreamedResponse
     {
         $listings = SaleListing::with('item.category', 'item.storageLocation.warehouse', 'item.photos')

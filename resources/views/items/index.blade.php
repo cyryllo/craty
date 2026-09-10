@@ -3,14 +3,9 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Przedmioty</h2>
             @if (auth()->user()->isMagazynier())
-                <div class="flex gap-2">
-                    <a href="{{ route('sale-listings.export') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50">
-                        Eksportuj oferty (CSV)
-                    </a>
-                    <a href="{{ route('items.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">
-                        + Dodaj przedmiot
-                    </a>
-                </div>
+                <a href="{{ route('items.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">
+                    + Dodaj przedmiot
+                </a>
             @endif
         </div>
     </x-slot>

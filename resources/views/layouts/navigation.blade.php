@@ -19,6 +19,9 @@
                         {{ __('Przedmioty') }}
                     </x-nav-link>
                     @if (auth()->user()->isMagazynier())
+                        <x-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
+                            {{ __('Sprzedaż') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                             {{ __('Kategorie') }}
                         </x-nav-link>
@@ -93,6 +96,9 @@
                 {{ __('Przedmioty') }}
             </x-responsive-nav-link>
             @if (auth()->user()->isMagazynier())
+                <x-responsive-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
+                    {{ __('Sprzedaż') }}
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                     {{ __('Kategorie') }}
                 </x-responsive-nav-link>
