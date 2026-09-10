@@ -157,6 +157,56 @@ gdy będzie taka potrzeba); uruchamianie **ręczne + opcjonalny cron**.
   przed update) — budować tak, żeby dało się go wywołać programistycznie
   z innego miejsca w appce, nie tylko z przycisku w UI.
 
+## Pomysły do rozważenia później (bez ustalonych decyzji, nie specyfikacja)
+
+Luźny brainstorm, co jeszcze bywa przydatne w tego typu systemach (CMMS /
+asset management, jak Snipe-IT czy EZOfficeInventory) — nic z tego nie jest
+ustalone ani uzgodnione co do sposobu działania, w przeciwieństwie do
+instalatora/aktualizacji/backupu wyżej. Gdy któryś kierunek stanie się
+aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
+
+**Serwis i konserwacja sprzętu**
+- Harmonogram przeglądów (np. „co 6 miesięcy”) z ostrzeżeniem na dashboardzie,
+  tym samym wzorcem co dziś przeterminowane wypożyczenia.
+- Dziennik serwisowy przedmiotu — historia napraw (co, kto, jaki koszt),
+  bogatsza niż dzisiejszy sam status „w naprawie”.
+- Termin gwarancji jako pole z datą + ostrzeżenie przed wygaśnięciem.
+
+**Materiały eksploatacyjne**
+- Dziś model zakłada „1 przedmiot = 1 sztuka”. Dla śrubek/kleju/materiałów
+  przydałby się tryb ilościowy (sztuki/metry/litry) z progiem minimalnym i
+  alertem „kończy się” — większa zmiana modelu danych, nie kosmetyka.
+
+**Inwentaryzacja okresowa**
+- Tryb „policz stan”: skanowanie kolejnych QR na regale, porównanie z tym,
+  co powinno tam być, raport rozbieżności na koniec. Fundament (QR +
+  lokalizacje) już jest, więc to relatywnie tanie do zrobienia.
+
+**Rezerwacje sprzętu**
+- Dziś wypożyczenie jest „na już”. Rezerwacja na przyszły termin ma sens,
+  gdy z warsztatu korzysta więcej niż jedna osoba naraz.
+
+**Widoczność i rozliczalność**
+- Ogólny log aktywności appki (logowania, zmiany użytkowników/ustawień), nie
+  tylko historia pojedynczego przedmiotu.
+- Raport wartości majątku do PDF (lista + zdjęcia + wartości) — przydatny
+  przy ubezpieczeniu/szkodzie.
+- Powiadomienia e-mail (przeterminowane wypożyczenie, zbliżający się
+  przegląd/gwarancja), nie tylko widok na dashboardzie.
+
+**Wygoda dnia codziennego**
+- Zapisane/zaawansowane filtry, sortowanie po kliknięciu nagłówka kolumny.
+- Masowe skanowanie QR pod rząd (np. wydanie całego zestawu na wyjazd naraz).
+- Autouzupełnianie po EAN przy dodawaniu przedmiotu (nazwa/zdjęcie z
+  zewnętrznej bazy produktów po zeskanowaniu kodu kreskowego).
+- Tryb ciemny UI.
+
+**Jeśli appka miałaby trafić do innych pracowni, nie tylko własnej**
+- Multi-tenancy (wiele niezależnych organizacji w jednej instalacji) i
+  publiczne REST API do integracji z innymi narzędziami — duże decyzje
+  architektoniczne, więc przemyśleć wcześniej niż później, jeśli to realny
+  kierunek (paczki aktualizacji „dla użytkowników” już na to wskazują).
+
 ## Drobne rzeczy zauważone przy budowie
 
 - `StorageLocationController::update()` nie łapie w ładny sposób wyjątku przy
