@@ -16,6 +16,15 @@ class ItemController extends Controller
 {
     public function index(Request $request)
     {
+        // Widok kafelkowy albo lista — wybór zapamiętywany w sesji, żeby nie
+        // trzeba było przełączać za każdym wejściem na listę przedmiotów.
+        $view = $request->input('view');
+        if (in_array($view, ['grid', 'list'], true)) {
+            session(['items_view' => $view]);
+        } else {
+            $view = session('items_view', 'grid');
+        }
+
         $items = Item::query()
             ->with(['category', 'storageLocation.warehouse', 'primaryPhoto'])
             ->when($request->filled('q'), fn ($q) => $q->where(function ($q) use ($request) {
@@ -33,6 +42,7 @@ class ItemController extends Controller
 
         return view('items.index', [
             'items' => $items,
+            'view' => $view,
             'categories' => Category::orderBy('name')->get(),
             'filters' => $request->only(['q', 'category_id', 'status']),
         ]);

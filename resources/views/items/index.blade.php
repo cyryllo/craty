@@ -13,6 +13,7 @@
     <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
 
         <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap gap-3 items-end">
+            <input type="hidden" name="view" value="{{ $view }}">
             <div class="flex-1 min-w-[160px]">
                 <label class="block text-xs font-medium text-gray-500 mb-1">Szukaj</label>
                 <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="nazwa, nr ewidencyjny, seryjny albo EAN"
@@ -38,44 +39,95 @@
             </div>
             <button class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200">Filtruj</button>
             @if (array_filter($filters))
-                <a href="{{ route('items.index') }}" class="text-sm text-gray-500 hover:underline">wyczyść</a>
+                <a href="{{ route('items.index', ['view' => $view]) }}" class="text-sm text-gray-500 hover:underline">wyczyść</a>
             @endif
+
+            <div class="ms-auto flex rounded-md border border-gray-300 overflow-hidden shrink-0" role="group" aria-label="Widok listy">
+                <a href="{{ request()->fullUrlWithQuery(['view' => 'grid']) }}"
+                   title="Widok kafelkowy"
+                   @class(['px-3 py-2 text-sm', 'bg-gray-900 text-white' => $view === 'grid', 'bg-white text-gray-500 hover:bg-gray-50' => $view !== 'grid'])>
+                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M3 3h6v6H3V3zm8 0h6v6h-6V3zM3 11h6v6H3v-6zm8 0h6v6h-6v-6z"/></svg>
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['view' => 'list']) }}"
+                   title="Widok listy"
+                   @class(['px-3 py-2 text-sm border-l border-gray-300', 'bg-gray-900 text-white' => $view === 'list', 'bg-white text-gray-500 hover:bg-gray-50' => $view !== 'list'])>
+                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+                </a>
+            </div>
         </form>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            @forelse ($items as $item)
-                <a href="{{ route('items.show', $item) }}" class="bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden flex flex-col">
-                    <div class="aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
-                        @if ($item->primaryPhoto->first())
-                            <img src="{{ $item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
-                        @else
-                            <span class="text-gray-300 text-sm">brak zdjęcia</span>
-                        @endif
-                    </div>
-                    <div class="p-4 flex-1 flex flex-col gap-1">
-                        <div class="flex items-start justify-between gap-2">
-                            <h3 class="font-medium text-gray-900 leading-snug">{{ $item->name }}</h3>
-                            <span @class([
-                                'shrink-0 text-xs font-medium px-2 py-0.5 rounded-full',
-                                'bg-emerald-100 text-emerald-700' => $item->status === 'dostepny',
-                                'bg-amber-100 text-amber-700' => $item->status === 'wypozyczony',
-                                'bg-red-100 text-red-700' => $item->status === 'w_naprawie',
-                                'bg-sky-100 text-sky-700' => $item->status === 'do_sprzedazy',
-                                'bg-gray-100 text-gray-600' => in_array($item->status, ['sprzedany', 'wycofany']),
-                            ])>{{ $item->statusLabel() }}</span>
+        @if ($view === 'list')
+            <div class="bg-white rounded-lg shadow overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                        <tr>
+                            <th class="px-4 py-3"></th>
+                            <th class="text-left px-4 py-3">Nazwa</th>
+                            <th class="text-left px-4 py-3">Nr ewidencyjny</th>
+                            <th class="text-left px-4 py-3">Kategoria</th>
+                            <th class="text-left px-4 py-3">Lokalizacja</th>
+                            <th class="text-left px-4 py-3">Wartość</th>
+                            <th class="text-left px-4 py-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse ($items as $item)
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('items.show', $item) }}'">
+                                <td class="px-4 py-2 w-10">
+                                    <div class="w-8 h-8 rounded bg-gray-100 overflow-hidden flex items-center justify-center">
+                                        @if ($item->primaryPhoto->first())
+                                            <img src="{{ $item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2 text-gray-900">
+                                    <a href="{{ route('items.show', $item) }}" class="hover:underline">{{ $item->name }}</a>
+                                </td>
+                                <td class="px-4 py-2 font-mono text-xs text-gray-400">{{ $item->inventory_no }}</td>
+                                <td class="px-4 py-2 text-gray-500">{{ $item->category?->name ?? '—' }}</td>
+                                <td class="px-4 py-2 text-gray-500">{{ $item->storageLocation?->label() ?? '—' }}</td>
+                                <td class="px-4 py-2 text-gray-500">{{ $item->value ? number_format((float) $item->value, 0, ',', ' ').' zł' : '—' }}</td>
+                                <td class="px-4 py-2">@include('items._status-badge', ['item' => $item])</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                                    Nic nie znaleziono. @if (auth()->user()->isMagazynier())<a href="{{ route('items.create') }}" class="text-indigo-600 hover:underline">Dodaj pierwszy przedmiot</a>.@endif
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                @forelse ($items as $item)
+                    <a href="{{ route('items.show', $item) }}" class="bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden flex flex-col">
+                        <div class="aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
+                            @if ($item->primaryPhoto->first())
+                                <img src="{{ $item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
+                            @else
+                                <span class="text-gray-300 text-sm">brak zdjęcia</span>
+                            @endif
                         </div>
-                        <p class="text-xs font-mono text-gray-400">{{ $item->inventory_no }}</p>
-                        <p class="text-sm text-gray-500 mt-auto pt-2">
-                            {{ $item->category?->name ?? 'bez kategorii' }} · {{ $item->storageLocation?->label() ?? 'bez lokalizacji' }}
-                        </p>
+                        <div class="p-4 flex-1 flex flex-col gap-1">
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="font-medium text-gray-900 leading-snug">{{ $item->name }}</h3>
+                                @include('items._status-badge', ['item' => $item])
+                            </div>
+                            <p class="text-xs font-mono text-gray-400">{{ $item->inventory_no }}</p>
+                            <p class="text-sm text-gray-500 mt-auto pt-2">
+                                {{ $item->category?->name ?? 'bez kategorii' }} · {{ $item->storageLocation?->label() ?? 'bez lokalizacji' }}
+                            </p>
+                        </div>
+                    </a>
+                @empty
+                    <div class="col-span-full bg-white rounded-lg shadow p-8 text-center text-gray-500">
+                        Nic nie znaleziono. @if (auth()->user()->isMagazynier())<a href="{{ route('items.create') }}" class="text-indigo-600 hover:underline">Dodaj pierwszy przedmiot</a>.@endif
                     </div>
-                </a>
-            @empty
-                <div class="col-span-full bg-white rounded-lg shadow p-8 text-center text-gray-500">
-                    Nic nie znaleziono. @if (auth()->user()->isMagazynier())<a href="{{ route('items.create') }}" class="text-indigo-600 hover:underline">Dodaj pierwszy przedmiot</a>.@endif
-                </div>
-            @endforelse
-        </div>
+                @endforelse
+            </div>
+        @endif
 
         {{ $items->links() }}
     </div>
