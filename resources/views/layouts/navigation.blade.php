@@ -13,13 +13,16 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        <x-icon name="panel" class="w-4 h-4 me-1.5" />
                         {{ __('Panel') }}
                     </x-nav-link>
                     <x-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
+                        <x-icon name="items" class="w-4 h-4 me-1.5" />
                         {{ __('Przedmioty') }}
                     </x-nav-link>
                     @if (auth()->user()->isMagazynier())
                         <x-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
+                            <x-icon name="sale" class="w-4 h-4 me-1.5" />
                             {{ __('Sprzedaż') }}
                         </x-nav-link>
                     @endif
@@ -44,11 +47,17 @@
                     <x-slot name="content">
                         @if (auth()->user()->isMagazynier())
                             <x-dropdown-link :href="route('settings.index')">
-                                {{ __('Ustawienia') }}
+                                <span class="inline-flex items-center gap-2">
+                                    <x-icon name="settings" class="w-4 h-4" />
+                                    {{ __('Ustawienia') }}
+                                </span>
                             </x-dropdown-link>
                         @endif
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            <span class="inline-flex items-center gap-2">
+                                <x-icon name="profile" class="w-4 h-4" />
+                                {{ __('Profile') }}
+                            </span>
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -58,7 +67,10 @@
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                <span class="inline-flex items-center gap-2">
+                                    <x-icon name="logout" class="w-4 h-4" />
+                                    {{ __('Log Out') }}
+                                </span>
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -81,14 +93,23 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Panel') }}
+                <span class="inline-flex items-center gap-2">
+                    <x-icon name="panel" class="w-4 h-4" />
+                    {{ __('Panel') }}
+                </span>
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
-                {{ __('Przedmioty') }}
+                <span class="inline-flex items-center gap-2">
+                    <x-icon name="items" class="w-4 h-4" />
+                    {{ __('Przedmioty') }}
+                </span>
             </x-responsive-nav-link>
             @if (auth()->user()->isMagazynier())
                 <x-responsive-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
-                    {{ __('Sprzedaż') }}
+                    <span class="inline-flex items-center gap-2">
+                        <x-icon name="sale" class="w-4 h-4" />
+                        {{ __('Sprzedaż') }}
+                    </span>
                 </x-responsive-nav-link>
             @endif
         </div>
@@ -103,11 +124,17 @@
             <div class="mt-3 space-y-1">
                 @if (auth()->user()->isMagazynier())
                     <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*', 'categories.*', 'warehouses.*', 'storage-locations.*', 'users.*')">
-                        {{ __('Ustawienia') }}
+                        <span class="inline-flex items-center gap-2">
+                            <x-icon name="settings" class="w-4 h-4" />
+                            {{ __('Ustawienia') }}
+                        </span>
                     </x-responsive-nav-link>
                 @endif
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    <span class="inline-flex items-center gap-2">
+                        <x-icon name="profile" class="w-4 h-4" />
+                        {{ __('Profile') }}
+                    </span>
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
@@ -117,7 +144,10 @@
                     <x-responsive-nav-link :href="route('logout')"
                             onclick="event.preventDefault();
                                         this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        <span class="inline-flex items-center gap-2">
+                            <x-icon name="logout" class="w-4 h-4" />
+                            {{ __('Log Out') }}
+                        </span>
                     </x-responsive-nav-link>
                 </form>
             </div>
