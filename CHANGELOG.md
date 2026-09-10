@@ -52,3 +52,20 @@ Przy okazji poprawiony realny gap: eksport CSV teraz zawsze wymusza status
 Przełącznik kafelki/lista na `/items` (`?view=grid|list`), zapamiętywany w
 sesji — żeby przy większej liczbie przedmiotów dało się przeglądać zwarciej
 niż kafelkami ze zdjęciami.
+
+## 2026-09-10 — Dokumentacja projektu
+
+Dodane `CLAUDE.md` (wskazówki techniczne na przyszłość), ten plik i
+`TODO.md` — patrz [README.md](README.md#dokumentacja-projektu).
+
+## 2026-09-10 — Ustawienia aplikacji, chronione konto admina
+
+- admin może zmienić logo (upload z podglądem) i nazwę aplikacji —
+  `AppSetting`, widoczne od razu w navbarze, na ekranie logowania i w
+  tytule strony
+- nowa zakładka „Ustawienia” w menu użytkownika zbiera to, co wcześniej
+  wisiało osobno w górnym pasku: Użytkownicy i Ustawienia aplikacji (tylko
+  admin), Kategorie/Magazyny/Lokalizacje (magazynier+) — górny pasek ma
+  teraz tylko Panel/Przedmioty/Sprzedaż
+- głównego (zaseedowanego) konta administratora nie da się usunąć ani
+  zdegradować/wyłączyć (`User::protected`, celowo poza `$fillable`)
