@@ -88,3 +88,12 @@ pozycjach głównego menu i na kafelkach w Ustawieniach.
   → `APP_LOCALE` z `.env`
 - wybór własnego języka w Profilu (obok zmiany hasła) — celowo nie w
   rozwijanym menu, żeby nie rozrastało się przy kolejnych językach
+
+## 2026-09-10 — Nazwa i logo: „Graty”
+
+Robocze „Ewidencja Graty” zwężone do samej marki **Graty** — „Ewidencja” było
+opisem, nie nazwą. Domyślne logo (gdy admin nie wgrał własnego w Ustawienia →
+Ustawienia aplikacji) to teraz narysowany od zera regał z trzema półkami,
+w tej samej stylistyce co ikony menu (`x-icon`), zamiast domyślnego loga
+Laravela. Nazwa marki widoczna teraz też jako tekst obok loga w pasku
+nawigacji i na ekranie logowania, nie tylko w tytule karty.

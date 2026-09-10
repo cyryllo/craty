@@ -1,12 +1,18 @@
-# Ewidencja Graty
+# Graty
 
 Aplikacja do zarządzania magazynem i sprzętem w pracowni: kategorie, lokalizacje
 (magazyn → regał → półka → pojemnik), numery ewidencyjne z kodami QR, kartoteka
 przedmiotu (zdjęcia, specyfikacja, wartość, stan), wypożyczenia, historia zmian
-i eksport ofert sprzedażowych (OLX/CSV).
+i eksport ofert sprzedażowych (OLX/CSV). Domyślny język interfejsu to
+angielski, z pełnym tłumaczeniem na polski (patrz `CLAUDE.md` → Localization).
+
+Nazwa marki to samo „Graty” — bez opisowego „Ewidencja” z przodu, które
+zostało tylko roboczym tytułem pierwszej koncepcji. Można to zmienić w każdej
+chwili w Ustawienia → Ustawienia aplikacji (nazwa + logo), bez ruszania kodu.
 
 Pełna koncepcja i uzasadnienie decyzji: patrz opublikowany dokument
-["Ewidencja Graty"](https://claude.ai/code/artifact/1c7498de-ff94-4f0a-a338-0bee7e681bb8).
+["Ewidencja Graty"](https://claude.ai/code/artifact/1c7498de-ff94-4f0a-a338-0bee7e681bb8)
+(tytuł historyczny, treść wciąż aktualna).
 
 To jest **szkielet** (etap 0 + rdzeń etapu 1 z mapy drogowej): historia zmian,
 wypożyczenia i eksport CSV już działają; PWA, integracja z Nextcloud i appka
