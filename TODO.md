@@ -157,6 +157,34 @@ gdy będzie taka potrzeba); uruchamianie **ręczne + opcjonalny cron**.
   przed update) — budować tak, żeby dało się go wywołać programistycznie
   z innego miejsca w appce, nie tylko z przycisku w UI.
 
+## Ustawienia poczty / SMTP (specyfikacja — do budowy na sygnał „zbuduj ustawienia poczty”)
+
+Prerekwizyt pod przyszłe powiadomienia e-mail (patrz „Pomysły do rozważenia”
+niżej) — bez skonfigurowanej poczty nie ma czego wysyłać. Ten sam wzorzec co
+`AppSetting` (logo/nazwa/język): admin konfiguruje z panelu, appka trzyma to
+w bazie, nie tylko w `.env`, żeby nie wymagać dostępu do plików serwera przy
+zwykłej zmianie hasła do skrzynki.
+
+- **Nowa strona w Ustawienia** (tylko admin): host SMTP, port, szyfrowanie
+  (tls/ssl/brak), login, hasło, adres i nazwa nadawcy („od kogo”).
+- **Hasło szyfrowane w bazie** (Eloquent `encrypted` cast) — to jedyne
+  miejsce w appce, gdzie w bazie ląduje sekret tego typu, więc nie trzymać
+  go jawnym tekstem tak jak resztę `AppSetting`.
+- **Przycisk „wyślij testową wiadomość”** przed zapisaniem na stałe — wysyłka
+  próbna na adres podany w formularzu (np. e-mail zalogowanego admina),
+  z czytelnym błędem połączenia zamiast suchego wyjątku, jeśli dane są złe.
+- **Strona techniczna:** appka domyślnie czyta konfigurację poczty z `.env`
+  przy starcie (`config('mail...')`), więc żeby ustawienia z bazy faktycznie
+  zadziałały, trzeba je nadpisywać w locie — albo tym samym middleware'owym
+  wzorcem co `SetLocale` (nadpisanie `config(['mail.mailers.smtp' => ...])`
+  na starcie żądania), albo bezpieczniej: nadpisywać dopiero bezpośrednio
+  przed wysyłką maila (jedno miejsce w kodzie, nie każde żądanie HTTP).
+  Gdy w bazie nic nie ustawiono, appka ma spadać z powrotem na `.env` — nie
+  wymuszać konfiguracji przez UI, żeby dev/Docker nie przestał wysyłać maili
+  (dziś `MAIL_MAILER=log`, patrz `.env`).
+- Sam ekran ustawień nie wysyła jeszcze żadnych powiadomień — to osobna
+  funkcjonalność z listy pomysłów niżej, budowana później na tym fundamencie.
+
 ## Pomysły do rozważenia później (bez ustalonych decyzji, nie specyfikacja)
 
 Luźny brainstorm, co jeszcze bywa przydatne w tego typu systemach (CMMS /
@@ -192,7 +220,8 @@ aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
 - Raport wartości majątku do PDF (lista + zdjęcia + wartości) — przydatny
   przy ubezpieczeniu/szkodzie.
 - Powiadomienia e-mail (przeterminowane wypożyczenie, zbliżający się
-  przegląd/gwarancja), nie tylko widok na dashboardzie.
+  przegląd/gwarancja), nie tylko widok na dashboardzie — fundament pod to
+  (ustawienia SMTP) już wyżej jako osobna, gotowa specyfikacja.
 
 **Wygoda dnia codziennego**
 - Zapisane/zaawansowane filtry, sortowanie po kliknięciu nagłówka kolumny.
