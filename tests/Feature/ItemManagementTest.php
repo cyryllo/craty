@@ -54,4 +54,23 @@ class ItemManagementTest extends TestCase
         $this->actingAs($viewer)->get('/items')->assertOk();
         $this->actingAs($viewer)->get('/categories')->assertForbidden();
     }
+
+    public function test_items_can_be_found_by_serial_number_or_ean(): void
+    {
+        $viewer = User::factory()->create(['role' => 'podglad']);
+        Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wkrętarka', 'condition' => 'nowy',
+            'status' => 'dostepny', 'serial_number' => 'SN-998877', 'ean' => '5901234123457',
+        ]);
+        Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00002', 'name' => 'Inny przedmiot', 'condition' => 'nowy',
+            'status' => 'dostepny',
+        ]);
+
+        $bySerial = $this->actingAs($viewer)->get('/items?q=998877');
+        $bySerial->assertSee('Wkrętarka')->assertDontSee('Inny przedmiot');
+
+        $byEan = $this->actingAs($viewer)->get('/items?q=5901234123457');
+        $byEan->assertSee('Wkrętarka')->assertDontSee('Inny przedmiot');
+    }
 }

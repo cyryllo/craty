@@ -57,13 +57,14 @@ class SaleListingController extends Controller
         $callback = function () use ($listings) {
             $handle = fopen('php://output', 'w');
             fputcsv($handle, [
-                'nr_ewidencyjny', 'tytul', 'opis', 'cena', 'kategoria', 'stan', 'platforma', 'zdjecia',
+                'nr_ewidencyjny', 'ean', 'tytul', 'opis', 'cena', 'kategoria', 'stan', 'platforma', 'zdjecia',
             ], ';');
 
             foreach ($listings as $listing) {
                 $item = $listing->item;
                 fputcsv($handle, [
                     $item->inventory_no,
+                    $item->ean,
                     $listing->title,
                     $listing->description,
                     $listing->price,
@@ -92,6 +93,9 @@ class SaleListingController extends Controller
 
         if ($item->specification) {
             $lines[] = $item->specification;
+        }
+        if ($item->ean) {
+            $lines[] = 'EAN: '.$item->ean;
         }
         $lines[] = 'Stan: '.(Item::CONDITIONS[$item->condition] ?? $item->condition);
         if ($item->value) {

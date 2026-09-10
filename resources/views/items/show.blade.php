@@ -30,6 +30,14 @@
             <div class="bg-white rounded-lg shadow p-5 space-y-4">
                 <dl class="grid sm:grid-cols-2 gap-4 text-sm">
                     <div>
+                        <dt class="text-gray-500">Numer seryjny</dt>
+                        <dd class="text-gray-900 font-mono">{{ $item->serial_number ?? '—' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500">Kod EAN</dt>
+                        <dd class="text-gray-900 font-mono">{{ $item->ean ?? '—' }}</dd>
+                    </div>
+                    <div>
                         <dt class="text-gray-500">Kategoria</dt>
                         <dd class="text-gray-900">{{ $item->category?->name ?? '—' }}</dd>
                     </div>

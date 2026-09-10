@@ -21,7 +21,9 @@ class ItemController extends Controller
             ->when($request->filled('q'), fn ($q) => $q->where(function ($q) use ($request) {
                 $term = '%'.$request->string('q').'%';
                 $q->where('name', 'like', $term)
-                    ->orWhere('inventory_no', 'like', $term);
+                    ->orWhere('inventory_no', 'like', $term)
+                    ->orWhere('serial_number', 'like', $term)
+                    ->orWhere('ean', 'like', $term);
             }))
             ->when($request->filled('category_id'), fn ($q) => $q->where('category_id', $request->integer('category_id')))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))

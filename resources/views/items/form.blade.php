@@ -19,6 +19,18 @@
                 </div>
 
                 <div>
+                    <x-input-label for="serial_number" value="Numer seryjny (opcjonalnie)" />
+                    <x-text-input id="serial_number" name="serial_number" class="mt-1 block w-full" value="{{ old('serial_number', $item->serial_number) }}" placeholder="nadany przez producenta" />
+                    <x-input-error :messages="$errors->get('serial_number')" class="mt-1" />
+                </div>
+
+                <div>
+                    <x-input-label for="ean" value="Kod EAN / kreskowy (opcjonalnie)" />
+                    <x-text-input id="ean" name="ean" class="mt-1 block w-full" value="{{ old('ean', $item->ean) }}" placeholder="np. 5901234123457" inputmode="numeric" />
+                    <x-input-error :messages="$errors->get('ean')" class="mt-1" />
+                </div>
+
+                <div>
                     <x-input-label for="category_id" value="Kategoria" />
                     <select id="category_id" name="category_id" class="mt-1 block w-full rounded-md border-gray-300">
                         <option value="">— brak —</option>

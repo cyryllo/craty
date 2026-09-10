@@ -15,7 +15,7 @@
         <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap gap-3 items-end">
             <div class="flex-1 min-w-[160px]">
                 <label class="block text-xs font-medium text-gray-500 mb-1">Szukaj</label>
-                <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="nazwa albo nr ewidencyjny"
+                <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="nazwa, nr ewidencyjny, seryjny albo EAN"
                        class="w-full rounded-md border-gray-300 text-sm">
             </div>
             <div class="min-w-[160px]">

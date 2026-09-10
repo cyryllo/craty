@@ -17,6 +17,8 @@ class StoreItemRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'serial_number' => ['nullable', 'string', 'max:255'],
+            'ean' => ['nullable', 'string', 'max:32', 'regex:/^[0-9]{6,14}$/'],
             'description' => ['nullable', 'string'],
             'specification' => ['nullable', 'string'],
             'value' => ['nullable', 'numeric', 'min:0'],

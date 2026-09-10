@@ -12,7 +12,7 @@ class Item extends Model
     use HasFactory;
 
     protected $fillable = [
-        'inventory_no', 'name', 'description', 'specification', 'value',
+        'inventory_no', 'name', 'serial_number', 'ean', 'description', 'specification', 'value',
         'purchased_at', 'condition', 'status', 'category_id',
         'storage_location_id', 'created_by', 'qr_path',
     ];
