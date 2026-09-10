@@ -65,13 +65,13 @@ potrzeby robić tego w kontenerze.
 - `app/Observers/ItemObserver.php` — zapisuje historię zmian przedmiotu
 - `app/Http/Middleware/EnsureUserHasRole.php` — middleware `role:admin,magazynier`
 
-## Znane ograniczenia szkieletu (do etapu 2/3)
+## Dokumentacja projektu
 
-- Brak PWA / trybu offline i skanowania QR kamerą — na razie kod QR linkuje do
-  strony przedmiotu, którą otwiera zwykła przeglądarka telefonu.
-- Eksport CSV do sprzedaży jest uniwersalny (nie ma bezpośredniej integracji z
-  API OLX — patrz uzasadnienie w dokumencie koncepcyjnym, sekcja 07).
-- Brak importu masowego istniejącego spisu z arkusza.
-- Obraz Dockera (`Dockerfile`) jest tylko na potrzeby dewelopmentu (`php artisan
-  serve`) — wdrożenie produkcyjne (php-fpm + nginx, kolejka, cron, HTTPS) to
-  osobny temat.
+- [CLAUDE.md](CLAUDE.md) — wskazówki techniczne (komendy, architektura,
+  pułapki) do pracy nad kodem.
+- [CHANGELOG.md](CHANGELOG.md) — historia tego, co i dlaczego powstało.
+- [TODO.md](TODO.md) — co jeszcze zostało z mapy drogowej i drobne braki.
+
+Obraz Dockera (`Dockerfile`) jest tylko na potrzeby dewelopmentu (`php artisan
+serve`) — wdrożenie produkcyjne (php-fpm + nginx, kolejka, cron, HTTPS) to
+osobny temat.

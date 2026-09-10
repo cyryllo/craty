@@ -1,0 +1,54 @@
+# Historia zmian
+
+Zapis tego, co powstało w projekcie i dlaczego — w kolejności chronologicznej.
+Szerszy kontekst decyzji (stack, architektura, uzasadnienie eksportu OLX) jest
+w opublikowanym dokumencie koncepcyjnym ["Ewidencja Graty"](https://claude.ai/code/artifact/1c7498de-ff94-4f0a-a338-0bee7e681bb8)
+oraz w [README.md](README.md).
+
+## 2026-09-10 — Szkielet aplikacji
+
+Laravel 12 + Breeze (blade/Tailwind), całe środowisko dev w Dockerze (na tej
+maszynie nie ma lokalnego PHP/Composera) — patrz `CLAUDE.md`.
+
+- logowanie, role `admin` / `magazynier` / `podglad` (rejestracja świadomie
+  wyłączona — konta zakłada admin w `/users`)
+- kategorie → magazyny → lokalizacje (regał/półka/pojemnik) z generowanym
+  kodem lokalizacji
+- kartoteka przedmiotu: zdjęcia, załączniki, specyfikacja, wartość, stan,
+  status
+- automatyczny numer ewidencyjny (`InventoryNumberGenerator`, atomowy licznik
+  roczny) + generowanie kodu QR (`QrCodeGenerator`) i etykiety do druku
+- historia zmian przedmiotu (`ItemObserver`), wypożyczenia, pierwsza wersja
+  ofert sprzedaży + eksportu CSV
+- dane startowe (3 konta, kategorie, magazyn, przykładowe przedmioty)
+- 27 testów PHPUnit na osobnej bazie SQLite
+
+## 2026-09-10 — Zakładka „Sprzedaż”
+
+Zamiast przycisku eksportu ukrytego w nagłówku listy przedmiotów: osobna
+zakładka w menu z widokiem przygotowanych ofert i historią eksportów.
+
+## 2026-09-10 — Numer seryjny i EAN
+
+Opcjonalne pola `serial_number` i `ean` na przedmiocie (odrębne od
+wewnętrznego numeru ewidencyjnego) — bo większość towarów fabrycznie ma taki
+kod. Wyszukiwarka na liście przedmiotów szuka teraz też po nich, nie tylko po
+nazwie i numerze ewidencyjnym. EAN trafia też do CSV i podpowiadanego opisu
+oferty sprzedaży.
+
+## 2026-09-10 — Rozdzielenie sprzedaży: Przygotowane / Wystawione
+
+Zamiast jednej listy mieszającej szkice i eksporty — dwie osobne podstrony:
+
+- `/sprzedaz` — oferty-szkice jeszcze niewyeksportowane
+- `/sprzedaz/wystawione` — oferty po eksporcie CSV (status ustawia się
+  automatycznie), z akcją „oznacz jako sprzedane” kończącą cykl życia oferty
+
+Przy okazji poprawiony realny gap: eksport CSV teraz zawsze wymusza status
+`do_sprzedazy` na przedmiocie, niezależnie od tego, jak powstała jego oferta.
+
+## 2026-09-10 — Widok listy dla przedmiotów
+
+Przełącznik kafelki/lista na `/items` (`?view=grid|list`), zapamiętywany w
+sesji — żeby przy większej liczbie przedmiotów dało się przeglądać zwarciej
+niż kafelkami ze zdjęciami.
