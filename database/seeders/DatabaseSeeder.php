@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@graty.test',
             'role' => 'admin',
         ]);
+        // forceFill, bo 'protected' celowo nie jest w $fillable — to jedyne
+        // miejsce w kodzie, które powinno je ustawiać.
+        $admin->forceFill(['protected' => true])->save();
 
         User::factory()->create([
             'name' => 'Magazynier',

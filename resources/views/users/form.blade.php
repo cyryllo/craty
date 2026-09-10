@@ -18,19 +18,28 @@
                 <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" value="{{ old('email', $user->email) }}" required />
                 <x-input-error :messages="$errors->get('email')" class="mt-1" />
             </div>
-            <div>
-                <x-input-label for="role" value="Rola" />
-                <select id="role" name="role" class="mt-1 block w-full rounded-md border-gray-300" required>
-                    <option value="admin" @selected(old('role', $user->role) == 'admin')>Administrator — pełny dostęp</option>
-                    <option value="magazynier" @selected(old('role', $user->role ?: 'magazynier') == 'magazynier')>Magazynier — dodaje i edytuje przedmioty</option>
-                    <option value="podglad" @selected(old('role', $user->role) == 'podglad')>Podgląd — tylko odczyt</option>
-                </select>
-            </div>
-            @if ($user->exists)
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" id="active" name="active" value="1" @checked(old('active', $user->active)) class="rounded border-gray-300">
-                    <x-input-label for="active" value="Konto aktywne" class="!mb-0" />
+            @if ($user->isProtected())
+                <div class="rounded-md bg-indigo-50 border border-indigo-200 px-3 py-2 text-sm text-indigo-800">
+                    To główne konto administratora — rola i status zawsze pozostają
+                    „Administrator” / „aktywne”, żeby nikt nie mógł stracić dostępu do panelu.
                 </div>
+                <input type="hidden" name="role" value="admin">
+                <input type="hidden" name="active" value="1">
+            @else
+                <div>
+                    <x-input-label for="role" value="Rola" />
+                    <select id="role" name="role" class="mt-1 block w-full rounded-md border-gray-300" required>
+                        <option value="admin" @selected(old('role', $user->role) == 'admin')>Administrator — pełny dostęp</option>
+                        <option value="magazynier" @selected(old('role', $user->role ?: 'magazynier') == 'magazynier')>Magazynier — dodaje i edytuje przedmioty</option>
+                        <option value="podglad" @selected(old('role', $user->role) == 'podglad')>Podgląd — tylko odczyt</option>
+                    </select>
+                </div>
+                @if ($user->exists)
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="active" name="active" value="1" @checked(old('active', $user->active)) class="rounded border-gray-300">
+                        <x-input-label for="active" value="Konto aktywne" class="!mb-0" />
+                    </div>
+                @endif
             @endif
             <div>
                 <x-input-label for="password" :value="$user->exists ? 'Nowe hasło (opcjonalnie)' : 'Hasło'" />

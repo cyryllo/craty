@@ -23,6 +23,8 @@ class User extends Authenticatable
         'password',
         'role',
         'active',
+        // 'protected' celowo pominięte — ustawia je tylko seeder, nigdy
+        // formularz (żeby nikt nie mógł sobie tego przypadkiem włączyć/wyłączyć).
     ];
 
     /**
@@ -57,12 +59,19 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'active' => 'boolean',
+            'protected' => 'boolean',
         ];
     }
 
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /** Główne konto administratora — nie można go usunąć ani zdegradować. */
+    public function isProtected(): bool
+    {
+        return (bool) $this->protected;
     }
 
     public function isMagazynier(): bool

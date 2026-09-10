@@ -22,20 +22,6 @@
                         <x-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
                             {{ __('Sprzedaż') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
-                            {{ __('Kategorie') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('warehouses.index')" :active="request()->routeIs('warehouses.*')">
-                            {{ __('Magazyny') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('storage-locations.index')" :active="request()->routeIs('storage-locations.*')">
-                            {{ __('Lokalizacje') }}
-                        </x-nav-link>
-                    @endif
-                    @if (auth()->user()->isAdmin())
-                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                            {{ __('Użytkownicy') }}
-                        </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -56,6 +42,11 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @if (auth()->user()->isMagazynier())
+                            <x-dropdown-link :href="route('settings.index')">
+                                {{ __('Ustawienia') }}
+                            </x-dropdown-link>
+                        @endif
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
@@ -99,20 +90,6 @@
                 <x-responsive-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
                     {{ __('Sprzedaż') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
-                    {{ __('Kategorie') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('warehouses.index')" :active="request()->routeIs('warehouses.*')">
-                    {{ __('Magazyny') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('storage-locations.index')" :active="request()->routeIs('storage-locations.*')">
-                    {{ __('Lokalizacje') }}
-                </x-responsive-nav-link>
-            @endif
-            @if (auth()->user()->isAdmin())
-                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                    {{ __('Użytkownicy') }}
-                </x-responsive-nav-link>
             @endif
         </div>
 
@@ -124,6 +101,11 @@
             </div>
 
             <div class="mt-3 space-y-1">
+                @if (auth()->user()->isMagazynier())
+                    <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*', 'categories.*', 'warehouses.*', 'storage-locations.*', 'users.*')">
+                        {{ __('Ustawienia') }}
+                    </x-responsive-nav-link>
+                @endif
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>

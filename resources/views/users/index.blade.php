@@ -21,7 +21,12 @@
                 <tbody class="divide-y divide-gray-100">
                     @foreach ($users as $user)
                         <tr>
-                            <td class="px-4 py-3 text-gray-900">{{ $user->name }}</td>
+                            <td class="px-4 py-3 text-gray-900">
+                                {{ $user->name }}
+                                @if ($user->isProtected())
+                                    <span class="ms-1 text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">główne konto</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-gray-500">{{ $user->email }}</td>
                             <td class="px-4 py-3 text-gray-500">{{ ucfirst($user->role) }}</td>
                             <td class="px-4 py-3">
@@ -31,7 +36,7 @@
                             </td>
                             <td class="px-4 py-3 text-right space-x-3">
                                 <a href="{{ route('users.edit', $user) }}" class="text-indigo-600 hover:underline">edytuj</a>
-                                @if ($user->id !== auth()->id())
+                                @if ($user->id !== auth()->id() && ! $user->isProtected())
                                     <form method="POST" action="{{ route('users.destroy', $user) }}" class="inline" onsubmit="return confirm('Usunąć konto?');">
                                         @csrf @method('DELETE')
                                         <button class="text-red-600 hover:underline">usuń</button>

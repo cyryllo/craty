@@ -52,6 +52,14 @@ class UserController extends Controller
 
         $data['active'] = $request->boolean('active');
 
+        // Głównego admina nie da się zdegradować ani wyłączyć — inaczej dałoby
+        // się w ten sposób obejść ochronę przed usunięciem i zablokować
+        // wszystkim dostęp do panelu administracyjnego.
+        if ($user->isProtected()) {
+            $data['role'] = 'admin';
+            $data['active'] = true;
+        }
+
         if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
@@ -67,6 +75,10 @@ class UserController extends Controller
     {
         if ($user->id === $request->user()->id) {
             return back()->with('error', 'Nie możesz usunąć własnego konta.');
+        }
+
+        if ($user->isProtected()) {
+            return back()->with('error', 'Nie można usunąć głównego konta administratora.');
         }
 
         $user->delete();
