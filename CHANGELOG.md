@@ -69,3 +69,22 @@ Dodane `CLAUDE.md` (wskazówki techniczne na przyszłość), ten plik i
   teraz tylko Panel/Przedmioty/Sprzedaż
 - głównego (zaseedowanego) konta administratora nie da się usunąć ani
   zdegradować/wyłączyć (`User::protected`, celowo poza `$fillable`)
+
+## 2026-09-10 — Ikony w menu
+
+Proste, ręcznie rysowane ikony SVG (`x-icon`, bez zewnętrznej biblioteki) przy
+pozycjach głównego menu i na kafelkach w Ustawieniach.
+
+## 2026-09-10 — Wielojęzyczność (EN domyślnie, PL do wyboru)
+
+- angielski jako domyślny język i źródłowe teksty w kodzie (`__('...')` po
+  angielsku), polski jako pełne tłumaczenie w `lang/pl.json` — obejmuje
+  wszystkie własne widoki, komunikaty flash, etykiety statusów i ról, nie
+  tylko standardowe ekrany logowania z Breeze
+- `lang/pl/{validation,auth,passwords,pagination}.php` z pakietu
+  `laravel-lang/lang` — kompletne polskie komunikaty walidacji
+- kolejność ustalania języka: osobista preferencja użytkownika → globalny
+  domyślny język ustawiony przez admina (Ustawienia → Ustawienia aplikacji)
+  → `APP_LOCALE` z `.env`
+- wybór własnego języka w Profilu (obok zmiany hasła) — celowo nie w
+  rozwijanym menu, żeby nie rozrastało się przy kolejnych językach
