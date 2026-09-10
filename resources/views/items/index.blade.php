@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Przedmioty</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Items') }}</h2>
             @if (auth()->user()->isMagazynier())
                 <a href="{{ route('items.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">
-                    + Dodaj przedmiot
+                    + {{ __('Add item') }}
                 </a>
             @endif
         </div>
@@ -15,41 +15,41 @@
         <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap gap-3 items-end">
             <input type="hidden" name="view" value="{{ $view }}">
             <div class="flex-1 min-w-[160px]">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Szukaj</label>
-                <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="nazwa, nr ewidencyjny, seryjny albo EAN"
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Search') }}</label>
+                <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="{{ __('name, inventory no., serial no. or EAN') }}"
                        class="w-full rounded-md border-gray-300 text-sm">
             </div>
             <div class="min-w-[160px]">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Kategoria</label>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Category') }}</label>
                 <select name="category_id" class="w-full rounded-md border-gray-300 text-sm">
-                    <option value="">wszystkie</option>
+                    <option value="">{{ __('all') }}</option>
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}" @selected(($filters['category_id'] ?? null) == $category->id)>{{ $category->name }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="min-w-[160px]">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Status') }}</label>
                 <select name="status" class="w-full rounded-md border-gray-300 text-sm">
-                    <option value="">wszystkie</option>
+                    <option value="">{{ __('all') }}</option>
                     @foreach (\App\Models\Item::STATUSES as $value => $label)
-                        <option value="{{ $value }}" @selected(($filters['status'] ?? null) == $value)>{{ $label }}</option>
+                        <option value="{{ $value }}" @selected(($filters['status'] ?? null) == $value)>{{ __($label) }}</option>
                     @endforeach
                 </select>
             </div>
-            <button class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200">Filtruj</button>
+            <button class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200">{{ __('Filter') }}</button>
             @if (array_filter($filters))
-                <a href="{{ route('items.index', ['view' => $view]) }}" class="text-sm text-gray-500 hover:underline">wyczyść</a>
+                <a href="{{ route('items.index', ['view' => $view]) }}" class="text-sm text-gray-500 hover:underline">{{ __('clear') }}</a>
             @endif
 
-            <div class="ms-auto flex rounded-md border border-gray-300 overflow-hidden shrink-0" role="group" aria-label="Widok listy">
+            <div class="ms-auto flex rounded-md border border-gray-300 overflow-hidden shrink-0" role="group" aria-label="{{ __('List view') }}">
                 <a href="{{ request()->fullUrlWithQuery(['view' => 'grid']) }}"
-                   title="Widok kafelkowy"
+                   title="{{ __('Grid view') }}"
                    @class(['px-3 py-2 text-sm', 'bg-gray-900 text-white' => $view === 'grid', 'bg-white text-gray-500 hover:bg-gray-50' => $view !== 'grid'])>
                     <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M3 3h6v6H3V3zm8 0h6v6h-6V3zM3 11h6v6H3v-6zm8 0h6v6h-6v-6z"/></svg>
                 </a>
                 <a href="{{ request()->fullUrlWithQuery(['view' => 'list']) }}"
-                   title="Widok listy"
+                   title="{{ __('List view') }}"
                    @class(['px-3 py-2 text-sm border-l border-gray-300', 'bg-gray-900 text-white' => $view === 'list', 'bg-white text-gray-500 hover:bg-gray-50' => $view !== 'list'])>
                     <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
                 </a>
@@ -62,12 +62,12 @@
                     <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
                         <tr>
                             <th class="px-4 py-3"></th>
-                            <th class="text-left px-4 py-3">Nazwa</th>
-                            <th class="text-left px-4 py-3">Nr ewidencyjny</th>
-                            <th class="text-left px-4 py-3">Kategoria</th>
-                            <th class="text-left px-4 py-3">Lokalizacja</th>
-                            <th class="text-left px-4 py-3">Wartość</th>
-                            <th class="text-left px-4 py-3">Status</th>
+                            <th class="text-left px-4 py-3">{{ __('Name') }}</th>
+                            <th class="text-left px-4 py-3">{{ __('Inventory no.') }}</th>
+                            <th class="text-left px-4 py-3">{{ __('Category') }}</th>
+                            <th class="text-left px-4 py-3">{{ __('Location') }}</th>
+                            <th class="text-left px-4 py-3">{{ __('Value') }}</th>
+                            <th class="text-left px-4 py-3">{{ __('Status') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -92,7 +92,7 @@
                         @empty
                             <tr>
                                 <td colspan="7" class="px-4 py-8 text-center text-gray-500">
-                                    Nic nie znaleziono. @if (auth()->user()->isMagazynier())<a href="{{ route('items.create') }}" class="text-indigo-600 hover:underline">Dodaj pierwszy przedmiot</a>.@endif
+                                    {{ __('Nothing found.') }} @if (auth()->user()->isMagazynier())<a href="{{ route('items.create') }}" class="text-indigo-600 hover:underline">{{ __('Add the first item') }}</a>.@endif
                                 </td>
                             </tr>
                         @endforelse
@@ -107,7 +107,7 @@
                             @if ($item->primaryPhoto->first())
                                 <img src="{{ $item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
                             @else
-                                <span class="text-gray-300 text-sm">brak zdjęcia</span>
+                                <span class="text-gray-300 text-sm">{{ __('no photo') }}</span>
                             @endif
                         </div>
                         <div class="p-4 flex-1 flex flex-col gap-1">
@@ -117,13 +117,13 @@
                             </div>
                             <p class="text-xs font-mono text-gray-400">{{ $item->inventory_no }}</p>
                             <p class="text-sm text-gray-500 mt-auto pt-2">
-                                {{ $item->category?->name ?? 'bez kategorii' }} · {{ $item->storageLocation?->label() ?? 'bez lokalizacji' }}
+                                {{ $item->category?->name ?? __('no category') }} · {{ $item->storageLocation?->label() ?? __('no location') }}
                             </p>
                         </div>
                     </a>
                 @empty
                     <div class="col-span-full bg-white rounded-lg shadow p-8 text-center text-gray-500">
-                        Nic nie znaleziono. @if (auth()->user()->isMagazynier())<a href="{{ route('items.create') }}" class="text-indigo-600 hover:underline">Dodaj pierwszy przedmiot</a>.@endif
+                        {{ __('Nothing found.') }} @if (auth()->user()->isMagazynier())<a href="{{ route('items.create') }}" class="text-indigo-600 hover:underline">{{ __('Add the first item') }}</a>.@endif
                     </div>
                 @endforelse
             </div>

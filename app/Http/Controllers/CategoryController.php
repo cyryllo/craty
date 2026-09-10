@@ -26,7 +26,7 @@ class CategoryController extends Controller
     {
         Category::create($this->validated($request));
 
-        return redirect()->route('categories.index')->with('status', 'Kategoria dodana.');
+        return redirect()->route('categories.index')->with('status', __('Category added.'));
     }
 
     public function edit(Category $category)
@@ -41,18 +41,18 @@ class CategoryController extends Controller
     {
         $category->update($this->validated($request, $category));
 
-        return redirect()->route('categories.index')->with('status', 'Kategoria zaktualizowana.');
+        return redirect()->route('categories.index')->with('status', __('Category updated.'));
     }
 
     public function destroy(Category $category)
     {
         if ($category->items()->exists() || $category->children()->exists()) {
-            return back()->with('error', 'Nie można usunąć kategorii, która ma przypisane przedmioty lub podkategorie.');
+            return back()->with('error', __('This category cannot be deleted because it has items or subcategories assigned.'));
         }
 
         $category->delete();
 
-        return redirect()->route('categories.index')->with('status', 'Kategoria usunięta.');
+        return redirect()->route('categories.index')->with('status', __('Category deleted.'));
     }
 
     private function validated(Request $request, ?Category $category = null): array

@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Sprzedaż</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Sale') }}</h2>
             @if ($draft->isNotEmpty())
                 <a href="{{ route('sale-listings.export') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">
-                    Eksportuj CSV ({{ $draft->count() }})
+                    {{ __('Export CSV') }} ({{ $draft->count() }})
                 </a>
             @endif
         </div>
@@ -15,21 +15,17 @@
         @include('sale-listings._tabs', ['active' => 'draft'])
 
         <div class="bg-sky-50 border border-sky-200 text-sky-800 text-sm rounded-md p-4 mb-6">
-            OLX nie udostępnia publicznego eksportu masowego dla zwykłych kont — plik CSV poniżej zawiera
-            gotowe tytuły/opisy do ręcznego wystawienia albo do wgrania w narzędziu pośredniczącym
-            (np. BaseLinker). Po eksporcie oferta automatycznie przechodzi do zakładki „Wystawione”.
-            Ofertę dla kolejnego przedmiotu przygotowujesz na jego karcie, przyciskiem
-            „Przygotuj ofertę sprzedaży”.
+            {{ __('OLX does not offer a public bulk-listing export for regular accounts — the CSV file below contains ready-made titles/descriptions for manual posting or for uploading to an intermediary tool (e.g. BaseLinker). Once exported, a listing automatically moves to the "Listed" tab. You prepare the listing for the next item on its own item page, with the "Prepare sale listing" button.') }}
         </div>
 
         <div class="bg-white rounded-lg shadow overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
                     <tr>
-                        <th class="text-left px-4 py-3">Przedmiot</th>
-                        <th class="text-left px-4 py-3">Tytuł oferty</th>
-                        <th class="text-left px-4 py-3">Cena</th>
-                        <th class="text-left px-4 py-3">Platforma</th>
+                        <th class="text-left px-4 py-3">{{ __('Item') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Listing title') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Price') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Platform') }}</th>
                         <th class="px-4 py-3"></th>
                     </tr>
                 </thead>
@@ -44,13 +40,13 @@
                             <td class="px-4 py-3 text-gray-700">{{ $listing->price ? number_format((float) $listing->price, 2, ',', ' ').' zł' : '—' }}</td>
                             <td class="px-4 py-3 text-gray-500 uppercase text-xs">{{ $listing->platform }}</td>
                             <td class="px-4 py-3 text-right">
-                                <a href="{{ route('items.sale-listing.create', $listing->item) }}" class="text-indigo-600 hover:underline">edytuj treść</a>
+                                <a href="{{ route('items.sale-listing.create', $listing->item) }}" class="text-indigo-600 hover:underline">{{ __('edit content') }}</a>
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="5" class="px-4 py-6 text-center text-gray-500">
-                                Brak przygotowanych ofert. Wejdź na kartę przedmiotu i kliknij „Przygotuj ofertę sprzedaży”.
+                                {{ __('No prepared listings yet. Go to an item page and click "Prepare sale listing".') }}
                             </td>
                         </tr>
                     @endforelse

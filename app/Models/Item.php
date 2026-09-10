@@ -22,19 +22,20 @@ class Item extends Model
         'value' => 'decimal:2',
     ];
 
+    // Wartości to teksty źródłowe do __() (klucze angielskie) — patrz statusLabel()/conditionLabel().
     public const STATUSES = [
-        'dostepny' => 'Dostępny',
-        'wypozyczony' => 'Wypożyczony',
-        'w_naprawie' => 'W naprawie',
-        'do_sprzedazy' => 'Do sprzedaży',
-        'sprzedany' => 'Sprzedany',
-        'wycofany' => 'Wycofany',
+        'dostepny' => 'Available',
+        'wypozyczony' => 'On loan',
+        'w_naprawie' => 'Under repair',
+        'do_sprzedazy' => 'For sale',
+        'sprzedany' => 'Sold',
+        'wycofany' => 'Retired',
     ];
 
     public const CONDITIONS = [
-        'nowy' => 'Nowy',
-        'uzywany' => 'Używany',
-        'uszkodzony' => 'Uszkodzony',
+        'nowy' => 'New',
+        'uzywany' => 'Used',
+        'uszkodzony' => 'Damaged',
     ];
 
     public function category(): BelongsTo
@@ -89,6 +90,11 @@ class Item extends Model
 
     public function statusLabel(): string
     {
-        return self::STATUSES[$this->status] ?? $this->status;
+        return __(self::STATUSES[$this->status] ?? $this->status);
+    }
+
+    public function conditionLabel(): string
+    {
+        return __(self::CONDITIONS[$this->condition] ?? $this->condition);
     }
 }

@@ -73,7 +73,7 @@ class ItemController extends Controller
         $this->syncPhotos($item, $request);
         $this->syncAttachments($item, $request);
 
-        return redirect()->route('items.show', $item)->with('status', 'Przedmiot dodany do ewidencji.');
+        return redirect()->route('items.show', $item)->with('status', __('Item added to inventory.'));
     }
 
     public function show(Item $item)
@@ -99,7 +99,7 @@ class ItemController extends Controller
         $this->syncPhotos($item, $request);
         $this->syncAttachments($item, $request);
 
-        return redirect()->route('items.show', $item)->with('status', 'Zmiany zapisane.');
+        return redirect()->route('items.show', $item)->with('status', __('Changes saved.'));
     }
 
     public function destroy(Item $item)
@@ -116,7 +116,7 @@ class ItemController extends Controller
 
         $item->delete();
 
-        return redirect()->route('items.index')->with('status', 'Przedmiot usunięty z ewidencji.');
+        return redirect()->route('items.index')->with('status', __('Item removed from inventory.'));
     }
 
     /** Widok etykiety do wydruku (naklejka z numerem i kodem QR). */

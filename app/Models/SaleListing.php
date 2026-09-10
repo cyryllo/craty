@@ -14,10 +14,14 @@ class SaleListing extends Model
         'exported_at' => 'datetime',
     ];
 
+    // Wartości to teksty źródłowe do __() (klucze angielskie) — "Completed"
+    // zamiast "Sold", żeby nie kolidować w tłumaczeniach z Item::STATUSES
+    // (po polsku różny rodzaj gramatyczny: "sprzedany" przedmiot vs
+    // "sprzedana" oferta).
     public const STATUSES = [
-        'szkic' => 'Przygotowana',
-        'wyeksportowana' => 'Wystawiona',
-        'sprzedana' => 'Sprzedana',
+        'szkic' => 'Drafted',
+        'wyeksportowana' => 'Listed',
+        'sprzedana' => 'Completed',
     ];
 
     public function item(): BelongsTo
@@ -27,6 +31,6 @@ class SaleListing extends Model
 
     public function statusLabel(): string
     {
-        return self::STATUSES[$this->status] ?? $this->status;
+        return __(self::STATUSES[$this->status] ?? $this->status);
     }
 }

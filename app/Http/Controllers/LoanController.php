@@ -24,7 +24,7 @@ class LoanController extends Controller
 
         $item->update(['status' => 'wypozyczony']);
 
-        return back()->with('status', 'Przedmiot oznaczony jako wypożyczony.');
+        return back()->with('status', __('Item marked as on loan.'));
     }
 
     /** Zwrot przedmiotu — przywraca status "dostępny". */
@@ -33,6 +33,6 @@ class LoanController extends Controller
         $loan->update(['returned_at' => now()]);
         $loan->item->update(['status' => 'dostepny']);
 
-        return back()->with('status', 'Zwrot zarejestrowany.');
+        return back()->with('status', __('Return registered.'));
     }
 }

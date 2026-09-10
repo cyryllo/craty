@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Magazyny</h2>
-            <a href="{{ route('warehouses.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">+ Nowy magazyn</a>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Warehouses') }}</h2>
+            <a href="{{ route('warehouses.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">+ {{ __('New warehouse') }}</a>
         </div>
     </x-slot>
 
@@ -11,10 +11,10 @@
             <table class="min-w-full text-sm">
                 <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
                     <tr>
-                        <th class="text-left px-4 py-3">Nazwa</th>
-                        <th class="text-left px-4 py-3">Kod</th>
-                        <th class="text-left px-4 py-3">Adres</th>
-                        <th class="text-left px-4 py-3">Lokalizacji</th>
+                        <th class="text-left px-4 py-3">{{ __('Name') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Code') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Address') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Locations') }}</th>
                         <th class="px-4 py-3"></th>
                     </tr>
                 </thead>
@@ -26,10 +26,10 @@
                             <td class="px-4 py-3 text-gray-500">{{ $warehouse->address ?? '—' }}</td>
                             <td class="px-4 py-3 text-gray-500">{{ $warehouse->storage_locations_count }}</td>
                             <td class="px-4 py-3 text-right space-x-3">
-                                <a href="{{ route('warehouses.edit', $warehouse) }}" class="text-indigo-600 hover:underline">edytuj</a>
-                                <form method="POST" action="{{ route('warehouses.destroy', $warehouse) }}" class="inline" onsubmit="return confirm('Usunąć magazyn?');">
+                                <a href="{{ route('warehouses.edit', $warehouse) }}" class="text-indigo-600 hover:underline">{{ __('edit') }}</a>
+                                <form method="POST" action="{{ route('warehouses.destroy', $warehouse) }}" class="inline" onsubmit="return confirm('{{ __('Delete this warehouse?') }}');">
                                     @csrf @method('DELETE')
-                                    <button class="text-red-600 hover:underline">usuń</button>
+                                    <button class="text-red-600 hover:underline">{{ __('delete') }}</button>
                                 </form>
                             </td>
                         </tr>

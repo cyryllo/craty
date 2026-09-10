@@ -18,12 +18,12 @@
                     </x-nav-link>
                     <x-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
                         <x-icon name="items" class="w-4 h-4 me-1.5" />
-                        {{ __('Przedmioty') }}
+                        {{ __('Items') }}
                     </x-nav-link>
                     @if (auth()->user()->isMagazynier())
                         <x-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
                             <x-icon name="sale" class="w-4 h-4 me-1.5" />
-                            {{ __('Sprzedaż') }}
+                            {{ __('Sale') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -49,7 +49,7 @@
                             <x-dropdown-link :href="route('settings.index')">
                                 <span class="inline-flex items-center gap-2">
                                     <x-icon name="settings" class="w-4 h-4" />
-                                    {{ __('Ustawienia') }}
+                                    {{ __('Settings') }}
                                 </span>
                             </x-dropdown-link>
                         @endif
@@ -101,14 +101,14 @@
             <x-responsive-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
                 <span class="inline-flex items-center gap-2">
                     <x-icon name="items" class="w-4 h-4" />
-                    {{ __('Przedmioty') }}
+                    {{ __('Items') }}
                 </span>
             </x-responsive-nav-link>
             @if (auth()->user()->isMagazynier())
                 <x-responsive-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
                     <span class="inline-flex items-center gap-2">
                         <x-icon name="sale" class="w-4 h-4" />
-                        {{ __('Sprzedaż') }}
+                        {{ __('Sale') }}
                     </span>
                 </x-responsive-nav-link>
             @endif
@@ -126,7 +126,7 @@
                     <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*', 'categories.*', 'warehouses.*', 'storage-locations.*', 'users.*')">
                         <span class="inline-flex items-center gap-2">
                             <x-icon name="settings" class="w-4 h-4" />
-                            {{ __('Ustawienia') }}
+                            {{ __('Settings') }}
                         </span>
                     </x-responsive-nav-link>
                 @endif

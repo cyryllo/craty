@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'role',
         'active',
+        'locale',
         // 'protected' celowo pominięte — ustawia je tylko seeder, nigdy
         // formularz (żeby nikt nie mógł sobie tego przypadkiem włączyć/wyłączyć).
     ];
@@ -77,5 +78,16 @@ class User extends Authenticatable
     public function isMagazynier(): bool
     {
         return in_array($this->role, ['admin', 'magazynier'], true);
+    }
+
+    public const ROLES = [
+        'admin' => 'Administrator',
+        'magazynier' => 'Warehouse worker',
+        'podglad' => 'Viewer',
+    ];
+
+    public function roleLabel(): string
+    {
+        return __(self::ROLES[$this->role] ?? $this->role);
     }
 }

@@ -7,11 +7,16 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * Ustawienia wyglądu appki trzymane jako pojedynczy wiersz (id=1) zamiast
- * osobnej tabeli klucz-wartość — mamy tylko dwa pola, więc to prostsze.
+ * osobnej tabeli klucz-wartość — mamy tylko kilka pól, więc to prostsze.
  */
 class AppSetting extends Model
 {
-    protected $fillable = ['name', 'logo_path'];
+    protected $fillable = ['name', 'logo_path', 'locale'];
+
+    public const LOCALES = [
+        'en' => 'English',
+        'pl' => 'Polski',
+    ];
 
     public static function current(): self
     {

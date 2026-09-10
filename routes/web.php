@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SaleListingController;
 use App\Http\Controllers\SettingsController;
@@ -23,6 +24,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Osobisty wybór języka — dostępny z menu użytkownika dla każdej roli.
+    Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
     // Uwaga na kolejność: "items/create" musi być zarejestrowane przed "items/{item}",
     // inaczej Laravel potraktuje "create" jako id przedmiotu i zwróci 404.

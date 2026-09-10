@@ -27,7 +27,7 @@ class StorageLocationController extends Controller
     {
         StorageLocation::create($this->validated($request));
 
-        return redirect()->route('storage-locations.index')->with('status', 'Lokalizacja dodana.');
+        return redirect()->route('storage-locations.index')->with('status', __('Location added.'));
     }
 
     public function edit(StorageLocation $storageLocation)
@@ -42,18 +42,18 @@ class StorageLocationController extends Controller
     {
         $storageLocation->update($this->validated($request));
 
-        return redirect()->route('storage-locations.index')->with('status', 'Lokalizacja zaktualizowana.');
+        return redirect()->route('storage-locations.index')->with('status', __('Location updated.'));
     }
 
     public function destroy(StorageLocation $storageLocation)
     {
         if ($storageLocation->items()->exists()) {
-            return back()->with('error', 'Nie można usunąć lokalizacji, w której są przedmioty.');
+            return back()->with('error', __('This location cannot be deleted because it has items in it.'));
         }
 
         $storageLocation->delete();
 
-        return redirect()->route('storage-locations.index')->with('status', 'Lokalizacja usunięta.');
+        return redirect()->route('storage-locations.index')->with('status', __('Location deleted.'));
     }
 
     private function validated(Request $request): array

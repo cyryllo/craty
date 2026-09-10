@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Sprzedaż</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Sale') }}</h2>
     </x-slot>
 
     <div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -11,10 +11,10 @@
             <table class="min-w-full text-sm">
                 <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
                     <tr>
-                        <th class="text-left px-4 py-3">Przedmiot</th>
-                        <th class="text-left px-4 py-3">Tytuł oferty</th>
-                        <th class="text-left px-4 py-3">Cena</th>
-                        <th class="text-left px-4 py-3">Wyeksportowano</th>
+                        <th class="text-left px-4 py-3">{{ __('Item') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Listing title') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Price') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Exported') }}</th>
                         <th class="px-4 py-3"></th>
                     </tr>
                 </thead>
@@ -29,16 +29,16 @@
                             <td class="px-4 py-3 text-gray-700">{{ $listing->price ? number_format((float) $listing->price, 2, ',', ' ').' zł' : '—' }}</td>
                             <td class="px-4 py-3 text-gray-500">{{ $listing->exported_at?->format('d.m.Y H:i') }}</td>
                             <td class="px-4 py-3 text-right">
-                                <form method="POST" action="{{ route('sale-listings.mark-sold', $listing) }}" onsubmit="return confirm('Oznaczyć jako sprzedane?');">
+                                <form method="POST" action="{{ route('sale-listings.mark-sold', $listing) }}" onsubmit="return confirm('{{ __('Mark as sold?') }}');">
                                     @csrf
-                                    <button class="text-emerald-700 hover:underline">oznacz jako sprzedane</button>
+                                    <button class="text-emerald-700 hover:underline">{{ __('mark as sold') }}</button>
                                 </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="5" class="px-4 py-6 text-center text-gray-500">
-                                Nic jeszcze nie wystawiono — wyeksportuj przygotowane oferty w zakładce „Przygotowane”.
+                                {{ __('Nothing listed yet — export prepared listings from the "Prepared" tab.') }}
                             </td>
                         </tr>
                     @endforelse

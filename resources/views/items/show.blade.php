@@ -7,8 +7,8 @@
             </div>
             @if (auth()->user()->isMagazynier())
                 <div class="flex gap-2">
-                    <a href="{{ route('items.label', $item) }}" target="_blank" class="px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50">Drukuj etykietę</a>
-                    <a href="{{ route('items.edit', $item) }}" class="px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50">Edytuj</a>
+                    <a href="{{ route('items.label', $item) }}" target="_blank" class="px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50">{{ __('Print label') }}</a>
+                    <a href="{{ route('items.edit', $item) }}" class="px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50">{{ __('Edit') }}</a>
                 </div>
             @endif
         </div>
@@ -30,56 +30,56 @@
             <div class="bg-white rounded-lg shadow p-5 space-y-4">
                 <dl class="grid sm:grid-cols-2 gap-4 text-sm">
                     <div>
-                        <dt class="text-gray-500">Numer seryjny</dt>
+                        <dt class="text-gray-500">{{ __('Serial number') }}</dt>
                         <dd class="text-gray-900 font-mono">{{ $item->serial_number ?? '—' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-gray-500">Kod EAN</dt>
+                        <dt class="text-gray-500">{{ __('EAN code') }}</dt>
                         <dd class="text-gray-900 font-mono">{{ $item->ean ?? '—' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-gray-500">Kategoria</dt>
+                        <dt class="text-gray-500">{{ __('Category') }}</dt>
                         <dd class="text-gray-900">{{ $item->category?->name ?? '—' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-gray-500">Lokalizacja</dt>
+                        <dt class="text-gray-500">{{ __('Location') }}</dt>
                         <dd class="text-gray-900">{{ $item->storageLocation?->label() ?? '—' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-gray-500">Wartość</dt>
+                        <dt class="text-gray-500">{{ __('Value') }}</dt>
                         <dd class="text-gray-900">{{ $item->value ? number_format((float) $item->value, 2, ',', ' ').' zł' : '—' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-gray-500">Stan techniczny</dt>
-                        <dd class="text-gray-900">{{ \App\Models\Item::CONDITIONS[$item->condition] ?? $item->condition }}</dd>
+                        <dt class="text-gray-500">{{ __('Condition') }}</dt>
+                        <dd class="text-gray-900">{{ $item->conditionLabel() }}</dd>
                     </div>
                     <div>
-                        <dt class="text-gray-500">Data zakupu</dt>
+                        <dt class="text-gray-500">{{ __('Purchase date') }}</dt>
                         <dd class="text-gray-900">{{ optional($item->purchased_at)->format('d.m.Y') ?? '—' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-gray-500">Status</dt>
+                        <dt class="text-gray-500">{{ __('Status') }}</dt>
                         <dd class="text-gray-900">{{ $item->statusLabel() }}</dd>
                     </div>
                 </dl>
 
                 @if ($item->description)
                     <div>
-                        <h3 class="text-sm font-medium text-gray-500 mb-1">Opis</h3>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('Description') }}</h3>
                         <p class="text-sm text-gray-800 whitespace-pre-line">{{ $item->description }}</p>
                     </div>
                 @endif
 
                 @if ($item->specification)
                     <div>
-                        <h3 class="text-sm font-medium text-gray-500 mb-1">Specyfikacja</h3>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('Specification') }}</h3>
                         <p class="text-sm text-gray-800 whitespace-pre-line">{{ $item->specification }}</p>
                     </div>
                 @endif
 
                 @if ($item->attachments->isNotEmpty())
                     <div>
-                        <h3 class="text-sm font-medium text-gray-500 mb-1">Załączniki</h3>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('Attachments') }}</h3>
                         <ul class="text-sm text-indigo-600 list-disc list-inside">
                             @foreach ($item->attachments as $attachment)
                                 <li><a href="{{ $attachment->url() }}" class="hover:underline" target="_blank">{{ $attachment->label }}</a></li>
@@ -90,21 +90,21 @@
             </div>
 
             <div class="bg-white rounded-lg shadow p-5">
-                <h3 class="text-sm font-medium text-gray-500 mb-3">Historia zmian</h3>
+                <h3 class="text-sm font-medium text-gray-500 mb-3">{{ __('Change history') }}</h3>
                 <ul class="space-y-2 text-sm">
                     @forelse ($item->histories as $history)
                         <li class="flex justify-between text-gray-600">
                             <span>
-                                {{ $history->user?->name ?? 'system' }} —
-                                @if ($history->action === 'created') utworzono przedmiot
-                                @elseif ($history->field) zmieniono <b>{{ $history->field }}</b>: {{ $history->old_value ?: '—' }} → {{ $history->new_value ?: '—' }}
+                                {{ $history->user?->name ?? __('system') }} —
+                                @if ($history->action === 'created') {{ __('item created') }}
+                                @elseif ($history->field) {{ __('changed') }} <b>{{ $history->field }}</b>: {{ $history->old_value ?: '—' }} → {{ $history->new_value ?: '—' }}
                                 @else {{ $history->action }}
                                 @endif
                             </span>
                             <span class="text-gray-400 shrink-0 ms-3">{{ $history->created_at->format('d.m.Y H:i') }}</span>
                         </li>
                     @empty
-                        <li class="text-gray-400">Brak wpisów.</li>
+                        <li class="text-gray-400">{{ __('No entries yet.') }}</li>
                     @endforelse
                 </ul>
             </div>
@@ -120,44 +120,44 @@
 
             @if (auth()->user()->isMagazynier())
                 <div class="bg-white rounded-lg shadow p-5 space-y-3">
-                    <h3 class="text-sm font-medium text-gray-500">Wypożyczenie</h3>
+                    <h3 class="text-sm font-medium text-gray-500">{{ __('Loan') }}</h3>
                     @if ($item->currentLoan)
-                        <p class="text-sm text-gray-800">Wypożyczono: <b>{{ $item->currentLoan->borrowerLabel() }}</b></p>
+                        <p class="text-sm text-gray-800">{{ __('Loaned to') }}: <b>{{ $item->currentLoan->borrowerLabel() }}</b></p>
                         @if ($item->currentLoan->due_at)
-                            <p class="text-sm {{ $item->currentLoan->isOverdue() ? 'text-red-600' : 'text-gray-500' }}">Termin zwrotu: {{ $item->currentLoan->due_at->format('d.m.Y') }}</p>
+                            <p class="text-sm {{ $item->currentLoan->isOverdue() ? 'text-red-600' : 'text-gray-500' }}">{{ __('Due date') }}: {{ $item->currentLoan->due_at->format('d.m.Y') }}</p>
                         @endif
                         <form method="POST" action="{{ route('loans.return', $item->currentLoan) }}">
                             @csrf
-                            <button class="w-full mt-1 px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">Zarejestruj zwrot</button>
+                            <button class="w-full mt-1 px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('Register return') }}</button>
                         </form>
                     @else
                         <form method="POST" action="{{ route('items.loans.store', $item) }}" class="space-y-2">
                             @csrf
-                            <input type="text" name="borrower_name" placeholder="Komu wypożyczono" required class="w-full rounded-md border-gray-300 text-sm">
+                            <input type="text" name="borrower_name" placeholder="{{ __('Loaned to whom') }}" required class="w-full rounded-md border-gray-300 text-sm">
                             <input type="date" name="due_at" class="w-full rounded-md border-gray-300 text-sm">
-                            <button class="w-full px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50">Wypożycz</button>
+                            <button class="w-full px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50">{{ __('Loan out') }}</button>
                         </form>
                     @endif
                 </div>
 
                 <div class="bg-white rounded-lg shadow p-5 space-y-3">
-                    <h3 class="text-sm font-medium text-gray-500">Sprzedaż</h3>
+                    <h3 class="text-sm font-medium text-gray-500">{{ __('Sale') }}</h3>
                     @forelse ($item->saleListings as $listing)
                         <div class="text-sm">
-                            <p class="text-gray-800">{{ $listing->title }} — {{ $listing->price ? number_format((float) $listing->price, 2, ',', ' ').' zł' : 'bez ceny' }}</p>
+                            <p class="text-gray-800">{{ $listing->title }} — {{ $listing->price ? number_format((float) $listing->price, 2, ',', ' ').' zł' : __('no price') }}</p>
                             <p class="text-gray-400 text-xs uppercase">{{ $listing->platform }} · {{ $listing->statusLabel() }}</p>
                         </div>
                     @empty
-                        <p class="text-sm text-gray-400">Przedmiot nie jest jeszcze wystawiony na sprzedaż.</p>
+                        <p class="text-sm text-gray-400">{{ __('This item is not listed for sale yet.') }}</p>
                     @endforelse
                     <a href="{{ route('items.sale-listing.create', $item) }}" class="block w-full text-center px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50">
-                        Przygotuj ofertę sprzedaży
+                        {{ __('Prepare sale listing') }}
                     </a>
                 </div>
 
-                <form method="POST" action="{{ route('items.destroy', $item) }}" onsubmit="return confirm('Usunąć przedmiot z ewidencji?');">
+                <form method="POST" action="{{ route('items.destroy', $item) }}" onsubmit="return confirm('{{ __('Remove this item from inventory?') }}');">
                     @csrf @method('DELETE')
-                    <button class="w-full px-3 py-2 text-sm font-medium text-red-600 hover:underline">Usuń przedmiot</button>
+                    <button class="w-full px-3 py-2 text-sm font-medium text-red-600 hover:underline">{{ __('Delete item') }}</button>
                 </form>
             @endif
         </div>

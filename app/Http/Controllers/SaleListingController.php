@@ -43,7 +43,7 @@ class SaleListingController extends Controller
         $listing->update(['status' => 'sprzedana']);
         $listing->item->update(['status' => 'sprzedany']);
 
-        return back()->with('status', 'Przedmiot oznaczony jako sprzedany.');
+        return back()->with('status', __('Item marked as sold.'));
     }
 
     /** Formularz z podpowiedzianą treścią ogłoszenia (krok B z koncepcji: asystent treści). */
@@ -70,7 +70,7 @@ class SaleListingController extends Controller
         $item->saleListings()->create($data);
         $item->update(['status' => 'do_sprzedazy']);
 
-        return redirect()->route('sale-listings.index')->with('status', 'Oferta sprzedaży przygotowana.');
+        return redirect()->route('sale-listings.index')->with('status', __('Sale listing prepared.'));
     }
 
     /** Krok A z koncepcji: uniwersalny eksport CSV wszystkich przygotowanych ofert (zakładka Sprzedaż). */
@@ -95,7 +95,7 @@ class SaleListingController extends Controller
                     $listing->description,
                     $listing->price,
                     $item->category?->name,
-                    Item::CONDITIONS[$item->condition] ?? $item->condition,
+                    $item->conditionLabel(),
                     $listing->platform,
                     $item->photos->map(fn ($p) => $p->url())->implode(', '),
                 ], ';');
@@ -129,9 +129,9 @@ class SaleListingController extends Controller
         if ($item->ean) {
             $lines[] = 'EAN: '.$item->ean;
         }
-        $lines[] = 'Stan: '.(Item::CONDITIONS[$item->condition] ?? $item->condition);
+        $lines[] = __('Condition').': '.$item->conditionLabel();
         if ($item->value) {
-            $lines[] = 'Wartość szacunkowa: '.number_format((float) $item->value, 2).' zł';
+            $lines[] = __('Estimated value').': '.number_format((float) $item->value, 2).' zł';
         }
 
         return implode("\n", $lines);

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $user->exists ? 'Edytuj konto' : 'Nowe konto' }}</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $user->exists ? __('Edit account') : __('New account') }}</h2>
     </x-slot>
 
     <div class="max-w-lg mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -9,47 +9,46 @@
             @if ($user->exists) @method('PUT') @endif
 
             <div>
-                <x-input-label for="name" value="Imię i nazwisko" />
+                <x-input-label for="name" :value="__('Name')" />
                 <x-text-input id="name" name="name" class="mt-1 block w-full" value="{{ old('name', $user->name) }}" required autofocus />
                 <x-input-error :messages="$errors->get('name')" class="mt-1" />
             </div>
             <div>
-                <x-input-label for="email" value="E-mail" />
+                <x-input-label for="email" :value="__('Email')" />
                 <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" value="{{ old('email', $user->email) }}" required />
                 <x-input-error :messages="$errors->get('email')" class="mt-1" />
             </div>
             @if ($user->isProtected())
                 <div class="rounded-md bg-indigo-50 border border-indigo-200 px-3 py-2 text-sm text-indigo-800">
-                    To główne konto administratora — rola i status zawsze pozostają
-                    „Administrator” / „aktywne”, żeby nikt nie mógł stracić dostępu do panelu.
+                    {{ __('This is the main administrator account — its role and status always stay "Administrator" / "active", so nobody can lose access to the admin panel.') }}
                 </div>
                 <input type="hidden" name="role" value="admin">
                 <input type="hidden" name="active" value="1">
             @else
                 <div>
-                    <x-input-label for="role" value="Rola" />
+                    <x-input-label for="role" :value="__('Role')" />
                     <select id="role" name="role" class="mt-1 block w-full rounded-md border-gray-300" required>
-                        <option value="admin" @selected(old('role', $user->role) == 'admin')>Administrator — pełny dostęp</option>
-                        <option value="magazynier" @selected(old('role', $user->role ?: 'magazynier') == 'magazynier')>Magazynier — dodaje i edytuje przedmioty</option>
-                        <option value="podglad" @selected(old('role', $user->role) == 'podglad')>Podgląd — tylko odczyt</option>
+                        <option value="admin" @selected(old('role', $user->role) == 'admin')>{{ __('Administrator — full access') }}</option>
+                        <option value="magazynier" @selected(old('role', $user->role ?: 'magazynier') == 'magazynier')>{{ __('Warehouse worker — adds and edits items') }}</option>
+                        <option value="podglad" @selected(old('role', $user->role) == 'podglad')>{{ __('Viewer — read-only') }}</option>
                     </select>
                 </div>
                 @if ($user->exists)
                     <div class="flex items-center gap-2">
                         <input type="checkbox" id="active" name="active" value="1" @checked(old('active', $user->active)) class="rounded border-gray-300">
-                        <x-input-label for="active" value="Konto aktywne" class="!mb-0" />
+                        <x-input-label for="active" :value="__('Account active')" class="!mb-0" />
                     </div>
                 @endif
             @endif
             <div>
-                <x-input-label for="password" :value="$user->exists ? 'Nowe hasło (opcjonalnie)' : 'Hasło'" />
+                <x-input-label for="password" :value="$user->exists ? __('New password (optional)') : __('Password')" />
                 <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" @if (! $user->exists) required @endif />
                 <x-input-error :messages="$errors->get('password')" class="mt-1" />
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
-                <a href="{{ route('users.index') }}" class="text-sm text-gray-500 hover:underline">Anuluj</a>
-                <x-primary-button>Zapisz</x-primary-button>
+                <a href="{{ route('users.index') }}" class="text-sm text-gray-500 hover:underline">{{ __('Cancel') }}</a>
+                <x-primary-button>{{ __('Save') }}</x-primary-button>
             </div>
         </form>
     </div>

@@ -45,14 +45,14 @@ class AppSettingsTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
 
         $this->actingAs($magazynier)->get(route('settings.index'))
-            ->assertSee('Kategorie')
-            ->assertDontSee('Użytkownicy')
-            ->assertDontSee('Ustawienia aplikacji');
+            ->assertSee('Categories')
+            ->assertDontSee('Users')
+            ->assertDontSee('App settings');
 
         $this->actingAs($admin)->get(route('settings.index'))
-            ->assertSee('Kategorie')
-            ->assertSee('Użytkownicy')
-            ->assertSee('Ustawienia aplikacji');
+            ->assertSee('Categories')
+            ->assertSee('Users')
+            ->assertSee('App settings');
     }
 
     public function test_viewer_cannot_reach_settings_hub(): void

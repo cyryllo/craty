@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="pl">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <title>Etykieta — {{ $item->inventory_no }}</title>
+    <title>{{ __('Label') }} — {{ $item->inventory_no }}</title>
     <style>
         body { font-family: ui-monospace, monospace; margin: 0; padding: 24px; background: #f4f4f4; }
         .label {
@@ -21,7 +21,7 @@
 </head>
 <body>
     <div class="toolbar">
-        <button onclick="window.print()">Drukuj etykietę</button>
+        <button onclick="window.print()">{{ __('Print label') }}</button>
     </div>
     <div class="label">
         @if ($item->qr_path)

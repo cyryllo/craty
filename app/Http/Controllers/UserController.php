@@ -32,7 +32,7 @@ class UserController extends Controller
         $data['password'] = Hash::make($data['password']);
         User::create($data);
 
-        return redirect()->route('users.index')->with('status', 'Konto utworzone.');
+        return redirect()->route('users.index')->with('status', __('Account created.'));
     }
 
     public function edit(User $user)
@@ -68,21 +68,21 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('users.index')->with('status', 'Konto zaktualizowane.');
+        return redirect()->route('users.index')->with('status', __('Account updated.'));
     }
 
     public function destroy(Request $request, User $user)
     {
         if ($user->id === $request->user()->id) {
-            return back()->with('error', 'Nie możesz usunąć własnego konta.');
+            return back()->with('error', __('You cannot delete your own account.'));
         }
 
         if ($user->isProtected()) {
-            return back()->with('error', 'Nie można usunąć głównego konta administratora.');
+            return back()->with('error', __('The main administrator account cannot be deleted.'));
         }
 
         $user->delete();
 
-        return redirect()->route('users.index')->with('status', 'Konto usunięte.');
+        return redirect()->route('users.index')->with('status', __('Account deleted.'));
     }
 }

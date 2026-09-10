@@ -18,7 +18,7 @@ class EnsureUserHasRole
         $user = $request->user();
 
         if (! $user || ! $user->active) {
-            abort(403, 'Konto nieaktywne.');
+            abort(403, __('Account disabled.'));
         }
 
         if (in_array('magazynier', $roles, true) && $user->isMagazynier()) {
@@ -26,7 +26,7 @@ class EnsureUserHasRole
         }
 
         if (! in_array($user->role, $roles, true)) {
-            abort(403, 'Brak uprawnień do tej sekcji.');
+            abort(403, __('You do not have access to this section.'));
         }
 
         return $next($request);

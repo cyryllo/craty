@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $category->exists ? 'Edytuj kategorię' : 'Nowa kategoria' }}</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $category->exists ? __('Edit category') : __('New category') }}</h2>
     </x-slot>
 
     <div class="max-w-lg mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -9,19 +9,19 @@
             @if ($category->exists) @method('PUT') @endif
 
             <div>
-                <x-input-label for="name" value="Nazwa" />
+                <x-input-label for="name" :value="__('Name')" />
                 <x-text-input id="name" name="name" class="mt-1 block w-full" value="{{ old('name', $category->name) }}" required autofocus />
                 <x-input-error :messages="$errors->get('name')" class="mt-1" />
             </div>
             <div>
-                <x-input-label for="code" value="Kod (używany w numerze ewidencyjnym, np. NAR)" />
+                <x-input-label for="code" :value="__('Code (used in the inventory number, e.g. NAR)')" />
                 <x-text-input id="code" name="code" class="mt-1 block w-full uppercase" maxlength="8" value="{{ old('code', $category->code) }}" required />
                 <x-input-error :messages="$errors->get('code')" class="mt-1" />
             </div>
             <div>
-                <x-input-label for="parent_id" value="Kategoria nadrzędna" />
+                <x-input-label for="parent_id" :value="__('Parent category')" />
                 <select id="parent_id" name="parent_id" class="mt-1 block w-full rounded-md border-gray-300">
-                    <option value="">— brak —</option>
+                    <option value="">— {{ __('none') }} —</option>
                     @foreach ($categories as $option)
                         <option value="{{ $option->id }}" @selected(old('parent_id', $category->parent_id) == $option->id)>{{ $option->name }}</option>
                     @endforeach
@@ -29,8 +29,8 @@
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
-                <a href="{{ route('categories.index') }}" class="text-sm text-gray-500 hover:underline">Anuluj</a>
-                <x-primary-button>Zapisz</x-primary-button>
+                <a href="{{ route('categories.index') }}" class="text-sm text-gray-500 hover:underline">{{ __('Cancel') }}</a>
+                <x-primary-button>{{ __('Save') }}</x-primary-button>
             </div>
         </form>
     </div>

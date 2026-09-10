@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AppSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class AppSettingController extends Controller
 {
@@ -19,6 +20,7 @@ class AppSettingController extends Controller
             'name' => ['nullable', 'string', 'max:255'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'remove_logo' => ['nullable', 'boolean'],
+            'locale' => ['nullable', 'string', Rule::in(array_keys(AppSetting::LOCALES))],
         ]);
 
         $setting = AppSetting::current();
@@ -33,9 +35,10 @@ class AppSettingController extends Controller
             $setting->logo_path = null;
         }
 
-        $setting->name = $data['name'] ?: null;
+        $setting->name = ($data['name'] ?? null) ?: null;
+        $setting->locale = ($data['locale'] ?? null) ?: null;
         $setting->save();
 
-        return back()->with('status', 'Ustawienia aplikacji zapisane.');
+        return back()->with('status', __('App settings saved.'));
     }
 }

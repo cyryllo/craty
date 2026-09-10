@@ -23,7 +23,7 @@ class WarehouseController extends Controller
     {
         Warehouse::create($this->validated($request));
 
-        return redirect()->route('warehouses.index')->with('status', 'Magazyn dodany.');
+        return redirect()->route('warehouses.index')->with('status', __('Warehouse added.'));
     }
 
     public function edit(Warehouse $warehouse)
@@ -35,18 +35,18 @@ class WarehouseController extends Controller
     {
         $warehouse->update($this->validated($request, $warehouse));
 
-        return redirect()->route('warehouses.index')->with('status', 'Magazyn zaktualizowany.');
+        return redirect()->route('warehouses.index')->with('status', __('Warehouse updated.'));
     }
 
     public function destroy(Warehouse $warehouse)
     {
         if ($warehouse->storageLocations()->exists()) {
-            return back()->with('error', 'Nie można usunąć magazynu, który ma zdefiniowane lokalizacje.');
+            return back()->with('error', __('This warehouse cannot be deleted because it has locations defined.'));
         }
 
         $warehouse->delete();
 
-        return redirect()->route('warehouses.index')->with('status', 'Magazyn usunięty.');
+        return redirect()->route('warehouses.index')->with('status', __('Warehouse deleted.'));
     }
 
     private function validated(Request $request, ?Warehouse $warehouse = null): array

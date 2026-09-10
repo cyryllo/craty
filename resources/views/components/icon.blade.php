@@ -1,5 +1,14 @@
 @props(['name'])
 @switch($name)
+    @case('language')
+        {{-- globus: wybór języka --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" {{ $attributes }}>
+            <circle cx="10" cy="10" r="7"/>
+            <ellipse cx="10" cy="10" rx="3" ry="7"/>
+            <line x1="3" y1="10" x2="17" y2="10"/>
+        </svg>
+        @break
+
     @case('panel')
         {{-- domek: Panel/pulpit --}}
         <svg viewBox="0 0 20 20" fill="currentColor" {{ $attributes }}>
