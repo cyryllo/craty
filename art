@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Uruchamia `php artisan` wewnątrz kontenera deweloperskiego (PHP nie jest wymagany na hoście).
+# Użycie: ./art migrate
+#         ./art make:model Item -m
+set -e
+docker compose run --rm --no-deps -u "$(id -u):$(id -g)" app php artisan "$@"

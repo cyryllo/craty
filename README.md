@@ -1,66 +1,77 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Ewidencja Graty
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikacja do zarządzania magazynem i sprzętem w pracowni: kategorie, lokalizacje
+(magazyn → regał → półka → pojemnik), numery ewidencyjne z kodami QR, kartoteka
+przedmiotu (zdjęcia, specyfikacja, wartość, stan), wypożyczenia, historia zmian
+i eksport ofert sprzedażowych (OLX/CSV).
 
-## About Laravel
+Pełna koncepcja i uzasadnienie decyzji: patrz opublikowany dokument
+["Ewidencja Graty"](https://claude.ai/code/artifact/1c7498de-ff94-4f0a-a338-0bee7e681bb8).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+To jest **szkielet** (etap 0 + rdzeń etapu 1 z mapy drogowej): historia zmian,
+wypożyczenia i eksport CSV już działają; PWA, integracja z Nextcloud i appka
+natywna to kolejne etapy.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+PHP 8.4 (Laravel 12) + MariaDB, Blade + Tailwind, kody QR przez `endroid/qr-code`,
+PDF-y przez `barryvdh/laravel-dompdf`. Całość developersko chodzi w Dockerze —
+**nie trzeba mieć PHP/Composera zainstalowanych lokalnie**, tylko Docker i Node
+(Node jest potrzebny tylko do zbudowania assetów Tailwind/Vite).
 
-## Learning Laravel
+## Uruchomienie (dev)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+docker compose up -d          # baza (MariaDB), aplikacja (php artisan serve), Adminer
+npm install && npm run build  # raz, żeby zbudować CSS/JS (Vite)
+./art migrate:fresh --seed    # baza + dane startowe
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Aplikacja: http://localhost:8000
+Adminer (podgląd bazy): http://localhost:8080 (system: MySQL, serwer: `db`, użytkownik/hasło: `graty`/`graty`, baza: `graty`)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Konta startowe (hasło dla wszystkich: `password`):
 
-## Laravel Sponsors
+| E-mail                  | Rola        | Dostęp                                  |
+|--------------------------|-------------|------------------------------------------|
+| admin@graty.test         | admin       | pełny — w tym zarządzanie użytkownikami   |
+| magazynier@graty.test    | magazynier  | dodaje/edytuje przedmioty, lokalizacje... |
+| podglad@graty.test       | podglad     | tylko odczyt                              |
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Samodzielna rejestracja jest celowo wyłączona — konta zakłada admin w
+`/users`.
 
-### Premium Partners
+## Codzienna praca
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Zamiast instalować PHP lokalnie, użyj wrapperów w katalogu projektu (uruchamiają
+polecenie w kontenerze, jako Twój użytkownik systemowy — nie jako root):
 
-## Contributing
+```bash
+./art migrate              # każde polecenie artisan
+./art make:model Foo -m
+./composer require paczka/nazwa
+./test                     # testy PHPUnit (osobna baza SQLite w pamięci)
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Assety frontendowe (Tailwind/Vite) budujemy przez zwykłe `npm run dev` /
+`npm run build` na hoście — Node jest zwykle już zainstalowany, więc nie ma
+potrzeby robić tego w kontenerze.
 
-## Code of Conduct
+## Struktura domenowa
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- `app/Models` — Category, Warehouse, StorageLocation, Item (+ Photo/Attachment/History), Loan, SaleListing, User (role: admin/magazynier/podglad)
+- `app/Services/InventoryNumberGenerator.php` — buduje numer ewidencyjny (`NAR-M1R3-2026-00042`), z atomowym licznikiem rocznym w `inventory_number_sequences`
+- `app/Services/QrCodeGenerator.php` — generuje SVG z kodem QR wskazującym na kartę przedmiotu
+- `app/Observers/ItemObserver.php` — zapisuje historię zmian przedmiotu
+- `app/Http/Middleware/EnsureUserHasRole.php` — middleware `role:admin,magazynier`
 
-## Security Vulnerabilities
+## Znane ograniczenia szkieletu (do etapu 2/3)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Brak PWA / trybu offline i skanowania QR kamerą — na razie kod QR linkuje do
+  strony przedmiotu, którą otwiera zwykła przeglądarka telefonu.
+- Eksport CSV do sprzedaży jest uniwersalny (nie ma bezpośredniej integracji z
+  API OLX — patrz uzasadnienie w dokumencie koncepcyjnym, sekcja 07).
+- Brak importu masowego istniejącego spisu z arkusza.
+- Obraz Dockera (`Dockerfile`) jest tylko na potrzeby dewelopmentu (`php artisan
+  serve`) — wdrożenie produkcyjne (php-fpm + nginx, kolejka, cron, HTTPS) to
+  osobny temat.

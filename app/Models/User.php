@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'active',
     ];
 
     /**
@@ -34,6 +36,17 @@ class User extends Authenticatable
     ];
 
     /**
+     * Wartości domyślne dublujące defaulty z migracji — dzięki temu świeżo
+     * utworzony (jeszcze nie odświeżony z bazy) obiekt User też ma poprawne
+     * 'active' i 'role', co ma znaczenie np. w testach robiących
+     * User::factory()->create() i od razu sprawdzających dostęp.
+     */
+    protected $attributes = [
+        'role' => 'magazynier',
+        'active' => true,
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -43,6 +56,17 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'active' => 'boolean',
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isMagazynier(): bool
+    {
+        return in_array($this->role, ['admin', 'magazynier'], true);
     }
 }

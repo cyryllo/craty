@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Uruchamia testy PHPUnit w kontenerze, wymuszając APP_ENV=testing (żeby
+# Laravel na pewno wczytał .env.testing — patrz komentarz w tym pliku).
+set -e
+docker compose run --rm --no-deps -u "$(id -u):$(id -g)" -e APP_ENV=testing app php artisan test "$@"

@@ -1,0 +1,46 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /var/www/html
+    # Ten sam UID/GID co użytkownik na hoście, żeby pliki tworzone przez appkę
+    # (zdjęcia, QR) w zamontowanym storage/ nie stawały się własnością roota.
+    # Jeśli Twój użytkownik ma inne UID/GID niż 1000:1000, wyeksportuj
+    # zmienne UID i GID przed `docker compose up`.
+    user: "${UID:-1000}:${GID:-1000}"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_DATABASE: graty
+      MARIADB_USER: graty
+      MARIADB_PASSWORD: graty
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+
+volumes:
+  db-data:
