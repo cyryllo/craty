@@ -61,8 +61,9 @@ niezależne od decyzji biznesowych)**
 12. **Import masowy** istniejącego spisu z arkusza — najbardziej przydatne
     właśnie przy pierwszym realnym wdrożeniu u kogoś z istniejącym majątkiem
     (czyli naturalnie pasuje zaraz po fazie 2).
-13. **PWA** (skan QR kamerą, offline) — spory skok wygody na telefonie,
-    niezależny od reszty.
+13. **PWA** (pełna specyfikacja niżej — instalowalność + prawdziwy skan QR
+    kamerą; **bez trybu offline**, świadomie odłożonego) — spory skok
+    wygody na telefonie, niezależny od reszty.
 14. **Wygoda dnia codziennego** (filtry, masowe skanowanie, autouzupełnianie
     po EAN, dark mode) — drobne, można wpleść w dowolnym momencie później,
     niezależnie od kolejności innych faz.
@@ -365,6 +366,86 @@ ogłoszenia u pośrednika. Zero zmian w modelu `SaleListing` — `title`,
 
 </details>
 
+## PWA (specyfikacja — do budowy na sygnał „zbuduj PWA”)
+
+Zakres świadomie zawężony po rozmowie z użytkownikiem — **bez trybu
+offline w ogóle na razie** (ani samego cache'owania stron, ani tym bardziej
+zapisu offline z synchronizacją) i **bez akcji po skanie** (skan tylko
+przenosi do karty przedmiotu, tak jak dziś klik w link z zeskanowanego
+kodu — żadnego menu "wypożycz/zwróć" na tym etapie). Dwie osobne, niezależne
+części:
+
+**1. Instalowalność (appka jako ikonka na ekranie głównym)**
+- `public/manifest.json` (nazwa, `short_name`, `start_url` → `/dashboard`,
+  `display: standalone`, `theme_color`/`background_color`, ikony 192×192 i
+  512×512 + wariant "maskable"), podpięty w `<head>` layoutu przez
+  `<link rel="manifest">`.
+- Ikony na start: **stały, wbudowany zestaw** wygenerowany raz z domyślnego
+  loga Craty (regał z półkami, ten sam SVG co `x-application-logo`) —
+  **nie** dynamicznie z własnego loga admina wgranego w Ustawienia →
+  Ustawienia aplikacji. Zrobienie tego per-instalacja (rasteryzacja
+  wgranego obrazka do wymaganych rozmiarów/wariantu maskable, cache,
+  invalidacja przy zmianie loga) to więcej roboty niż to na dziś warte —
+  dopisane do "Pomysłów do rozważenia później" jako możliwe rozszerzenie.
+- **Minimalny service worker** — sam plik `sw.js` z pustym/pass-through
+  handlerem `fetch` (bez żadnego cache'owania) jest tu tylko po to, żeby
+  Chrome/Android w ogóle zaproponowały "Zainstaluj aplikację" — część
+  przeglądarek wymaga zarejestrowanego service workera jako kryterium
+  instalowalności, nawet gdy nic nie robi. To nie jest offline-first, to
+  techniczny wymóg checklisty PWA.
+- **Wymaga HTTPS** (albo `localhost`) — `getUserMedia`/kamera i rejestracja
+  service workera nie działają na zwykłym HTTP w produkcji; dopisać to
+  wyraźnie do instrukcji wdrożenia (patrz też Instalator, jeśli już będzie
+  gotowy), żeby ktoś się nie zdziwił, że "PWA nie działa" na hostingu bez
+  certyfikatu.
+
+**2. Prawdziwy skan QR/kodu kreskowego kamerą**
+- Nowy przycisk/strona "Skanuj" w nawigacji (widoczny tam, gdzie dziś widać
+  `/items` — czyli każda zalogowana rola) — otwiera kamerę wprost w
+  przeglądarce (biblioteka JS do dekodowania obrazu wideo, dociągnięta przez
+  npm/Vite, **nie** z CDN — appka nie ma dziś żadnych zależności z CDN w
+  produkcyjnym buildzie i nie ma po co taki precedens zaczynać). Jedna
+  biblioteka obsługuje od razu i QR, i typowe kody kreskowe 1D (EAN-13/
+  UPC-A) — to ważne pod punkt 3 niżej.
+- **Dwa różne rodzaje zeskanowanego kodu, dwie różne ścieżki:**
+  - **Własny QR z etykiety Craty** — koduje pełny URL strony przedmiotu
+    (`QrCodeGenerator`, patrz CLAUDE.md) już dziś, więc po zdekodowaniu
+    skaner robi zwyczajne `window.location.href = zdekodowanyTekst`. Zero
+    nowych endpointów backendowych, cała obsługa po stronie klienta.
+  - **Kod kreskowy producenta (EAN/UPC) na samym przedmiocie** — to nie
+    jest URL, tylko goły numer. Trafia do punktu 3.
+- Czytelny błąd, gdy przeglądarka odmówi dostępu do kamery (brak
+  uprawnień, brak HTTPS, brak kamery w ogóle na desktopie) — nie biała
+  strona/wyjątek JS.
+
+**3. Szybkie dodawanie, gdy zeskanowany kod nie pasuje do niczego w bazie**
+- Zeskanowany numeryczny kod kreskowy (nie URL) jest sprawdzany przez nowy,
+  lekki endpoint (`GET`, zwraca JSON) po `Item::ean`/`Item::serial_number`.
+  Trafia → tak samo jak przy własnym QR, przekierowanie do karty przedmiotu.
+  Nie trafia → appka pokazuje przycisk **„+ Dodaj jako nowy przedmiot”**
+  zamiast błędu "nie znaleziono".
+- Formularz pod tym przyciskiem jest **celowo uproszczony** względem
+  pełnego `/items/create`: tylko zdjęcie (natywny aparat telefonu przez
+  `<input type="file" capture="environment">`, jedno zdjęcie, nie cała
+  galeria), nazwa i sam zeskanowany kod (ląduje w `ean`). Bez kategorii,
+  lokalizacji, stanu, wartości — to ma zająć kilka sekund w warsztacie, nie
+  zastępować pełnego wprowadzania danych. `InventoryNumberGenerator` już
+  dziś radzi sobie z brakiem kategorii/lokalizacji (`GEN`/`BRAK` w numerze),
+  więc backend tego nie wymaga.
+- Tak dodany przedmiot dostaje nową flagę `Item::needs_completion` (bool,
+  domyślnie `false`) — **wyróżnia się na `/items`** small ikonką (📱, przez
+  `x-icon`) przy nazwie, żeby magazynier widział "to jest dodane naprędce ze
+  skanera, brakuje mu kategorii/lokalizacji/reszty danych". Flaga czyści się
+  automatycznie przy najbliższym zapisaniu przedmiotu przez zwykły formularz
+  edycji (`ItemController::update()`) — uznajemy, że skoro ktoś przeszedł
+  przez pełną edycję, to już to przejrzał; **nie** próbujemy zgadywać
+  "kompletności" po tym, czy akurat kategoria/lokalizacja są wypełnione (za
+  dużo przypadków brzegowych, prościej i uczciwiej trzymać to jako prosty
+  fakt "ktoś to dotknął po dodaniu ze skanera").
+- Uprawnienia jak przy zwykłym dodawaniu przedmiotu — `role:admin,
+  magazynier`, nie `podglad` (sam skan-do-podglądu istniejącego przedmiotu
+  zostaje dostępny dla każdej roli, tak jak dziś `/items/{item}`).
+
 ## Pomysły do rozważenia później (bez ustalonych decyzji, nie specyfikacja)
 
 Luźny brainstorm, co jeszcze bywa przydatne w tego typu systemach (CMMS /
@@ -407,8 +488,16 @@ aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
 - Zapisane/zaawansowane filtry, sortowanie po kliknięciu nagłówka kolumny.
 - Masowe skanowanie QR pod rząd (np. wydanie całego zestawu na wyjazd naraz).
 - Autouzupełnianie po EAN przy dodawaniu przedmiotu (nazwa/zdjęcie z
-  zewnętrznej bazy produktów po zeskanowaniu kodu kreskowego).
+  zewnętrznej bazy produktów po zeskanowaniu kodu kreskowego) — częściowo
+  pokrywa się z "szybkim dodawaniem" ze specyfikacji PWA (punkt 3), które
+  bierze tylko zdjęcie+nazwę+kod bez zewnętrznego źródła danych; to jest
+  wersja "plus" tamtego pomysłu, gdyby się okazało, że ręczne wpisywanie
+  nazwy przy skanowaniu jednak przeszkadza.
 - Tryb ciemny UI.
+- **Ikona PWA z własnego loga admina**, zamiast stałego domyślnego zestawu
+  ustalonego w specyfikacji PWA — wymaga rasteryzacji wgranego obrazka do
+  wymaganych rozmiarów/wariantu maskable przy każdej zmianie loga w
+  Ustawienia → Ustawienia aplikacji, więc świadomie odłożone na potem.
 
 **Jeśli appka miałaby trafić do innych pracowni, nie tylko własnej**
 - Multi-tenancy (wiele niezależnych organizacji w jednej instalacji) i
