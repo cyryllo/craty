@@ -136,6 +136,7 @@
     "Listed": "Wystawiona",
     "Listed offers": "Wystawione",
     "Listing title": "Tytuł ogłoszenia",
+    "Listing withdrawn from sale.": "Oferta wycofana ze sprzedaży.",
     "Loan": "Wypożyczenie",
     "Loan out": "Wypożycz",
     "Loaned to": "Wypożyczono",
@@ -288,6 +289,8 @@
     "Warehouse worker — adds and edits items": "Magazynier — dodaje i edytuje przedmioty",
     "Warehouses": "Magazyny",
     "Whoops!": "Ups!",
+    "Withdraw this listing from sale?": "Wycofać tę ofertę ze sprzedaży?",
+    "Withdrawn": "Wycofana",
     "You are receiving this email because we received a password reset request for your account.": "Otrzymujesz ten e-mail, ponieważ otrzymaliśmy prośbę o zresetowanie hasła dla Twojego konta.",
     "You cannot delete your own account.": "Nie możesz usunąć własnego konta.",
     "You do not have access to this section.": "Brak uprawnień do tej sekcji.",
@@ -327,5 +330,6 @@
     "results": "wyników",
     "system": "system",
     "to": "do",
-    "view all": "zobacz wszystkie"
+    "view all": "zobacz wszystkie",
+    "withdraw": "wycofaj"
 }

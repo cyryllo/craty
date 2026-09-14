@@ -28,10 +28,14 @@
                             <td class="px-4 py-3 text-gray-700">{{ $listing->title }}</td>
                             <td class="px-4 py-3 text-gray-700">{{ $listing->price ? number_format((float) $listing->price, 2, ',', ' ').' zł' : '—' }}</td>
                             <td class="px-4 py-3 text-gray-500">{{ $listing->exported_at?->format('d.m.Y H:i') }}</td>
-                            <td class="px-4 py-3 text-right">
-                                <form method="POST" action="{{ route('sale-listings.mark-sold', $listing) }}" onsubmit="return confirm('{{ __('Mark as sold?') }}');">
+                            <td class="px-4 py-3 text-right whitespace-nowrap">
+                                <form method="POST" action="{{ route('sale-listings.mark-sold', $listing) }}" onsubmit="return confirm('{{ __('Mark as sold?') }}');" class="inline">
                                     @csrf
                                     <button class="text-emerald-700 hover:underline">{{ __('mark as sold') }}</button>
+                                </form>
+                                <form method="POST" action="{{ route('sale-listings.withdraw', $listing) }}" onsubmit="return confirm('{{ __('Withdraw this listing from sale?') }}');" class="inline ms-3">
+                                    @csrf
+                                    <button class="text-red-600 hover:underline">{{ __('withdraw') }}</button>
                                 </form>
                             </td>
                         </tr>

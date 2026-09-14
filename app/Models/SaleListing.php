@@ -22,6 +22,7 @@ class SaleListing extends Model
         'szkic' => 'Drafted',
         'wyeksportowana' => 'Listed',
         'sprzedana' => 'Completed',
+        'wycofana' => 'Withdrawn',
     ];
 
     public function item(): BelongsTo

@@ -46,6 +46,20 @@ class SaleListingController extends Controller
         return back()->with('status', __('Item marked as sold.'));
     }
 
+    /**
+     * Wycofuje wystawioną ofertę ze sprzedaży — znika z zakładki "Wystawione"
+     * i z pchlego targu, a przedmiot wraca do statusu "dostępny" (to nie to
+     * samo co Item::STATUSES['wycofany'] — tamto oznacza wycofanie całego
+     * przedmiotu z użytku, nie tylko z tej jednej oferty sprzedaży).
+     */
+    public function withdraw(SaleListing $listing)
+    {
+        $listing->update(['status' => 'wycofana']);
+        $listing->item->update(['status' => 'dostepny']);
+
+        return back()->with('status', __('Listing withdrawn from sale.'));
+    }
+
     /** Formularz z podpowiedzianą treścią ogłoszenia (krok B z koncepcji: asystent treści). */
     public function create(Item $item)
     {

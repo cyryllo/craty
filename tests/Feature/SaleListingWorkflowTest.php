@@ -60,5 +60,25 @@ class SaleListingWorkflowTest extends TestCase
         $this->actingAs($viewer)->get('/sprzedaz')->assertForbidden();
         $this->actingAs($viewer)->get('/sprzedaz/eksport.csv')->assertForbidden();
         $this->actingAs($viewer)->post(route('sale-listings.mark-sold', $listing))->assertForbidden();
+        $this->actingAs($viewer)->post(route('sale-listings.withdraw', $listing))->assertForbidden();
+    }
+
+    public function test_withdrawing_a_listing_removes_it_from_wystawione_and_frees_the_item(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'do_sprzedazy',
+        ]);
+        $listing = $item->saleListings()->create([
+            'platform' => 'olx', 'title' => 'Wiertarka - okazja', 'status' => 'wyeksportowana', 'exported_at' => now(),
+        ]);
+
+        $this->actingAs($magazynier)
+            ->post(route('sale-listings.withdraw', $listing))
+            ->assertRedirect();
+
+        $this->assertSame('wycofana', $listing->refresh()->status);
+        $this->assertSame('dostepny', $item->refresh()->status);
+        $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertDontSee('Wiertarka - okazja');
     }
 }

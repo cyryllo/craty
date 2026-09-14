@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
         Route::get('sprzedaz', [SaleListingController::class, 'index'])->name('sale-listings.index');
         Route::get('sprzedaz/wystawione', [SaleListingController::class, 'exported'])->name('sale-listings.exported');
         Route::post('sprzedaz/wystawione/{listing}/sprzedano', [SaleListingController::class, 'markSold'])->name('sale-listings.mark-sold');
+        Route::post('sprzedaz/wystawione/{listing}/wycofaj', [SaleListingController::class, 'withdraw'])->name('sale-listings.withdraw');
         Route::get('items/{item}/sale-listing/create', [SaleListingController::class, 'create'])->name('items.sale-listing.create');
         Route::post('items/{item}/sale-listing', [SaleListingController::class, 'store'])->name('items.sale-listing.store');
         Route::get('sprzedaz/eksport.csv', [SaleListingController::class, 'exportCsv'])->name('sale-listings.export');
