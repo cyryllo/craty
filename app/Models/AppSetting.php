@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -49,9 +50,20 @@ class AppSetting extends Model
         'ssl' => 'SSL',
     ];
 
+    /**
+     * Wołane z x-application-logo, więc pojawia się na КAŻDEJ stronie —
+     * łącznie z Instalatorem, uruchamianym zanim `app_settings` (albo
+     * cokolwiek innego) w ogóle istnieje w bazie. Bez tej osłony każde
+     * wejście na świeżą instalację wywalałoby się na SQLSTATE 42S02,
+     * jeszcze zanim ktokolwiek zdążył wypełnić krok 2 kreatora.
+     */
     public static function current(): self
     {
-        return static::firstOrNew(['id' => 1]);
+        try {
+            return Schema::hasTable('app_settings') ? static::firstOrNew(['id' => 1]) : new static;
+        } catch (\Throwable) {
+            return new static;
+        }
     }
 
     public function effectiveName(): string

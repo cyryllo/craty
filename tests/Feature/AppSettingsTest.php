@@ -61,4 +61,20 @@ class AppSettingsTest extends TestCase
 
         $this->actingAs($viewer)->get(route('settings.index'))->assertForbidden();
     }
+
+    /**
+     * Regresja: przed pierwszą migracją (świeża instalacja, patrz Instalator)
+     * `app_settings` w ogóle nie istnieje. `current()` woła się z
+     * x-application-logo na KAŻDEJ stronie, w tym /install, więc nie może
+     * wywalać się na brakującej tabeli.
+     */
+    public function test_current_does_not_throw_when_the_table_does_not_exist_yet(): void
+    {
+        \Illuminate\Support\Facades\Schema::drop('app_settings');
+
+        $setting = AppSetting::current();
+
+        $this->assertNull($setting->name);
+        $this->assertSame(config('app.name'), $setting->effectiveName());
+    }
 }
