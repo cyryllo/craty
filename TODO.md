@@ -424,3 +424,9 @@ aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
 - `.env.testing` ma zaszyty na sztywno `APP_KEY` — jeśli kiedyś repo trafi do
   współdzielonego CI, rozważ wygenerowanie go w pipeline zamiast trzymania w
   repo (ryzyko niskie, to tylko klucz do efemerycznej bazy testowej).
+- **Pchli targ pokazuje tylko główne zdjęcie przedmiotu**, nawet gdy jest ich
+  kilka — świadomie odłożone (pytanie użytkownika, decyzja: zostawić jak
+  jest na razie), bo strona celowo nie ma podstron per-oferta, gdzie dałoby
+  się pokazać galerię. Gdy to wróci jako temat, rozważyć pasek miniaturek pod
+  głównym zdjęciem (podmiana przez Alpine, bez nowego URL-a) zamiast pełnej
+  podstrony/lightboxa.
