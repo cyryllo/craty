@@ -2,7 +2,76 @@
 
 Co jeszcze zostało z pierwotnej [koncepcji](https://claude.ai/code/artifact/1c7498de-ff94-4f0a-a338-0bee7e681bb8),
 plus drobne rzeczy zauważone po drodze. Nic z tego nie jest w toku — to lista
-do wybierania, nie backlog sprintu.
+do wybierania, nie backlog sprintu. Pełne treści/specyfikacje są w sekcjach
+niżej — ta lista tylko ustala kolejność i tłumaczy dlaczego.
+
+## Kolejność prac (od czego zacząć, żeby nie robić niczego dwa razy)
+
+Ułożone wg zależności między zadaniami (co blokuje co) i tego, co już dziś
+daje wartość vs. co ma sens dopiero po czymś innym. Każda faza zakłada, że
+poprzednia jest zrobiona — w obrębie jednej fazy kolejność jest dowolna.
+
+**Faza 0 — tanie poprawki przy okazji (nie blokują niczego, zrobić najpierw
+bo są małe)**
+1. `StorageLocationController::update()` — złapać wyjątek unikalności
+   regał/półka/pojemnik zamiast brzydkiego 500.
+2. Usuwanie pojedynczego zdjęcia/załącznika z karty przedmiotu.
+3. `.env.testing` z zaszytym `APP_KEY` — wygenerować w pipeline, jeśli/gdy
+   pojawi się wspólne CI.
+4. Testy Blade (`assertSee`) dla `items/index`/`sale-listings/*` — dorzucać
+   przy okazji, gdy i tak dotyka się tych widoków, nie jako osobne zadanie.
+
+**Faza 1 — fundamenty pod kolejne funkcje (małe/średnie, żadne nie wymaga
+jeszcze decyzji biznesowej)**
+5. **Ustawienia poczty / SMTP** (pełna specyfikacja niżej) — samodzielne,
+   wzorowane na już istniejącym `AppSetting`, i odblokowuje punkt 10
+   (powiadomienia e-mail) oraz każdą przyszłą wiadomość wysyłaną z appki.
+6. **Moduł Backup** (pełna specyfikacja niżej) — ma wartość sam w sobie
+   (bezpieczeństwo danych) już dziś, a przy okazji jest twardym wymogiem
+   kroku 3 modułu Aktualizacje w fazie 2, więc musi powstać wcześniej.
+
+**Faza 2 — wyjście poza obecny dev-loop (dopiero gdy appka ma trafić na
+realny hosting, nie tylko zostać w Dockerze na tej maszynie)**
+7. **Instalator aplikacji** (pełna specyfikacja niżej) — pierwszy krok do
+   prawdziwego wdrożenia; bez tego nie ma na czym testować punktu 8.
+8. **Moduł Aktualizacje** (pełna specyfikacja niżej) — zależny wprost od
+   Backupu (krok 3) i sensowny dopiero, gdy istnieje już jakaś instalacja do
+   aktualizowania (czyli po punkcie 7).
+
+**Faza 3 — wartość dla codziennego użytku (z mapy drogowej + pomysły
+niezależne od decyzji biznesowych)**
+9. **Raporty** — korzysta z tego, co już jest w bazie, zero zmian modelu.
+10. **Powiadomienia e-mail** — teraz odblokowane przez SMTP z fazy 1.
+11. **Import masowy** istniejącego spisu z arkusza — najbardziej przydatne
+    właśnie przy pierwszym realnym wdrożeniu u kogoś z istniejącym majątkiem
+    (czyli naturalnie pasuje zaraz po fazie 2).
+12. **PWA** (skan QR kamerą, offline) — spory skok wygody na telefonie,
+    niezależny od reszty.
+13. **Wygoda dnia codziennego** (filtry, masowe skanowanie, autouzupełnianie
+    po EAN, dark mode) — drobne, można wpleść w dowolnym momencie później,
+    niezależnie od kolejności innych faz.
+
+**Faza 4 — rozszerzenia sensowne dopiero po realnym użytkowaniu albo
+większe zmiany modelu danych**
+14. **Inwentaryzacja okresowa** — technicznie tanie (fundament QR+lokalizacje
+    już jest), ale sensowne dopiero jak jest co inwentaryzować, czyli po
+    jakimś czasie realnego użycia.
+15. **Serwis i konserwacja sprzętu** (przeglądy, dziennik serwisowy,
+    gwarancje) — naturalnie korzysta z powiadomień e-mail z punktu 10.
+16. **Rezerwacje sprzętu** — ma sens dopiero przy wielu osobach
+    współdzielących warsztat naraz.
+17. **Log aktywności + raport PDF wartości majątku**.
+18. **Materiały eksploatacyjne** (tryb ilościowy) — duża zmiana modelu
+    danych, robić świadomie i osobno, nie przy okazji czegoś innego.
+19. **Eksport OLX krok C** — dopiero jeśli sprzedaż stanie się regularna;
+    to zależy od realnego użycia, nie od nas, więc nie przyspieszać na siłę.
+20. **Integracja z Nextcloud** — opcjonalna, niezależna od reszty listy.
+
+**Faza 5 — duże decyzje, warunkowe**
+21. **Multi-tenancy + publiczne API** — tylko jeśli appka ma faktycznie
+    trafić do innych pracowni, nie tylko własnej (decyzja produktowa, nie
+    techniczna — ustalić to *przed* tą fazą, nie w jej trakcie).
+22. **Appka natywna Android** — dopiero jeśli PWA z punktu 12 się nie sprawdzi.
 
 ## Z mapy drogowej (kolejne etapy)
 
