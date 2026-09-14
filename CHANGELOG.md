@@ -119,3 +119,38 @@ appki szczegół techniczny, a zmiana wymagałaby przebudowy kontenera/wolumenu
 bazy; oraz nazwy wyświetlane appki już skonfigurowane ręcznie przez adminów
 istniejących instalacji w Ustawienia aplikacji (np. „Moje Graty”) — to ich
 własna, edytowalna nazwa instancji, nie nazwa projektu.
+
+## 2026-09-14 — Ustawienia poczty/SMTP i moduł Backup (Faza 1)
+
+Dwa fundamenty z `TODO.md`, budowane razem bo drugi zależy pośrednio od
+pierwszego (powiadomienia w przyszłości) i oba odblokowują dalsze fazy.
+
+**Ustawienia poczty** (Ustawienia → Poczta, tylko admin): host/port/
+szyfrowanie/login/hasło/nadawca SMTP, trzymane w `AppSetting` zamiast tylko
+w `.env` (hasło szyfrowane `encrypted` cast — jedyny taki sekret w appce).
+Puste ustawienia = appka dalej korzysta z configu z `.env` (np. `MAIL_MAILER=
+log` na dev/Dockerze). `MailSettingsApplier` nadpisuje `config('mail...')`
+tuż przed wysyłką, nie middleware'em na każde żądanie. Formularz ma przycisk
+„wyślij testową wiadomość” — testuje dokładnie to, co wpisane, niekoniecznie
+to, co już zapisane, z czytelnym komunikatem błędu połączenia zamiast
+suchego wyjątku.
+
+**Moduł Backup** (Ustawienia → Kopie zapasowe, tylko admin): kopia bazy +
+`storage/app/public` (zdjęcia, załączniki, logo) do zip-a na osobnym dysku
+`backups` (nigdy publicznie eksponowanym), z listą istniejących kopii do
+pobrania/usunięcia, przyciskiem „Utwórz kopię teraz” i ustawieniami retencji
+(w dniach) oraz opcjonalnego dołączania `.env` (domyślnie wyłączone — zawiera
+sekrety). Oparte na `spatie/laravel-backup` zamiast pisania dumpu/zipowania
+od zera. `BackupService` to osobna klasa (nie tylko logika w kontrolerze),
+żeby dało się ją wywołać programistycznie z przyszłego modułu Aktualizacje
+(backup jako krok przed każdą aktualizacją) i z harmonogramu
+(`routes/console.php`, `Schedule::call()` zamiast gołych komend `backup:run`/
+`backup:clean`, żeby zaplanowane uruchomienia też respektowały ustawienia
+admina).
+
+Po drodze: obraz Dockera (`Dockerfile`) potrzebował doinstalowania
+`mariadb-client` — `spatie/laravel-backup` woła binarkę `mysqldump` do
+zrzutu bazy, a obraz miał tylko rozszerzenie `pdo_mysql` PHP, nie klienta
+wiersza poleceń.
+
+13 nowych testów (`MailSettingsTest`, `BackupManagementTest`), 60/60 zielone.

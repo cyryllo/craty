@@ -27,12 +27,16 @@ bo są małe)**
 
 **Faza 1 — fundamenty pod kolejne funkcje (małe/średnie, żadne nie wymaga
 jeszcze decyzji biznesowej)**
-5. **Ustawienia poczty / SMTP** (pełna specyfikacja niżej) — samodzielne,
+5. ~~**Ustawienia poczty / SMTP** (pełna specyfikacja niżej) — samodzielne,
    wzorowane na już istniejącym `AppSetting`, i odblokowuje punkt 10
-   (powiadomienia e-mail) oraz każdą przyszłą wiadomość wysyłaną z appki.
-6. **Moduł Backup** (pełna specyfikacja niżej) — ma wartość sam w sobie
+   (powiadomienia e-mail) oraz każdą przyszłą wiadomość wysyłaną z appki.~~
+   **Zrobione** (`MailSettingController`, `MailSettingsApplier`, wysyłka
+   testowej wiadomości, 5 testów).
+6. ~~**Moduł Backup** (pełna specyfikacja niżej) — ma wartość sam w sobie
    (bezpieczeństwo danych) już dziś, a przy okazji jest twardym wymogiem
-   kroku 3 modułu Aktualizacje w fazie 2, więc musi powstać wcześniej.
+   kroku 3 modułu Aktualizacje w fazie 2, więc musi powstać wcześniej.~~
+   **Zrobione** (`spatie/laravel-backup`, `BackupService`, harmonogram w
+   `routes/console.php`, 8 testów).
 
 **Faza 2 — wyjście poza obecny dev-loop (dopiero gdy appka ma trafić na
 realny hosting, nie tylko zostać w Dockerze na tej maszynie)**
@@ -199,7 +203,26 @@ samowystarczalna (patrz niżej).
   dostępne tylko dla `role:admin`, i warto rozważyć dodatkowe potwierdzenie
   (np. ponowne podanie hasła) przed zastosowaniem.
 
-## Moduł „Backup” (specyfikacja — do budowy na sygnał „zbuduj backup”)
+## Moduł „Backup” — **Zrobione** (Faza 1)
+
+Zbudowane wg specyfikacji niżej, z dwoma odstępstwami odnotowanymi na
+przyszłość:
+- **Retencja jest dniowa, nie ilościowa** — `spatie/laravel-backup`'owa
+  `DefaultStrategy` domyślnie liczy w dniach ("trzymaj pełne kopie z
+  ostatnich N dni"), nie w sztukach ("trzymaj ostatnie N kopii"), więc UI
+  (`Ustawienia → Kopie zapasowe`) opisuje to uczciwie jako dni, żeby nie
+  wprowadzać w błąd.
+- **Obraz Dockera wymagał doinstalowania `mariadb-client`** (dostarcza
+  `mysqldump`), bo `spatie/laravel-backup` woła tę binarkę do zrzutu bazy —
+  bez tego backup 500-ował z `DumpFailed`. Patrz `Dockerfile`.
+
+Harmonogram (`routes/console.php`) woła `BackupService::run()`/`cleanup()`
+przez `Schedule::call()`, a nie `backup:run`/`backup:clean` bezpośrednio —
+dzięki temu zaplanowane uruchomienia respektują ustawienia admina (retencja,
+dołączanie `.env`), tak samo jak ręczne uruchomienie z panelu.
+
+<details>
+<summary>Oryginalna specyfikacja (dla kontekstu)</summary>
 
 Ustalone z użytkownikiem: kopie **lokalnie na dysk, do pobrania z panelu**
 (nie na Nextclouda/S3 na razie — można dodać później jako kolejne miejsce
@@ -230,7 +253,21 @@ gdy będzie taka potrzeba); uruchamianie **ręczne + opcjonalny cron**.
   przed update) — budować tak, żeby dało się go wywołać programistycznie
   z innego miejsca w appce, nie tylko z przycisku w UI.
 
-## Ustawienia poczty / SMTP (specyfikacja — do budowy na sygnał „zbuduj ustawienia poczty”)
+</details>
+
+## Ustawienia poczty / SMTP — **Zrobione** (Faza 1)
+
+Zbudowane wg specyfikacji niżej. Nadpisywanie configu robi
+`App\Services\MailSettingsApplier`, wołane bezpośrednio przed wysyłką (nie
+middleware'em na każde żądanie) — dokładnie tak, jak specyfikacja to
+przewidywała jako bezpieczniejszą opcję. Jedna techniczna rozbieżność ze
+specyfikacją: nowoczesny Laravel/Symfony Mailer nie ma już klucza
+`mail.mailers.smtp.encryption` — szyfrowanie ustala się przez `scheme`
+(`smtps` dla SSL/portu 465, `smtp` dla TLS/STARTTLS negocjowanego
+automatycznie), patrz komentarz w `MailSettingsApplier::applyFromArray()`.
+
+<details>
+<summary>Oryginalna specyfikacja (dla kontekstu)</summary>
 
 Prerekwizyt pod przyszłe powiadomienia e-mail (patrz „Pomysły do rozważenia”
 niżej) — bez skonfigurowanej poczty nie ma czego wysyłać. Ten sam wzorzec co
@@ -257,6 +294,8 @@ zwykłej zmianie hasła do skrzynki.
   (dziś `MAIL_MAILER=log`, patrz `.env`).
 - Sam ekran ustawień nie wysyła jeszcze żadnych powiadomień — to osobna
   funkcjonalność z listy pomysłów niżej, budowana później na tym fundamencie.
+
+</details>
 
 ## Pomysły do rozważenia później (bez ustalonych decyzji, nie specyfikacja)
 
