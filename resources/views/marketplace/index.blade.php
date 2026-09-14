@@ -24,6 +24,20 @@
 
         <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
+            @if ($contactEmail || $contactPhone)
+                <div class="bg-indigo-50 border border-indigo-100 text-indigo-900 rounded-lg p-4 flex flex-wrap items-center justify-between gap-3">
+                    <p class="text-sm">{{ __('Interested in one of the items below? Get in touch.') }}</p>
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium">
+                        @if ($contactEmail)
+                            <a href="mailto:{{ $contactEmail }}" class="text-indigo-700 hover:underline">✉️ {{ $contactEmail }}</a>
+                        @endif
+                        @if ($contactPhone)
+                            <a href="tel:{{ $contactPhone }}" class="text-indigo-700 hover:underline">📞 {{ $contactPhone }}</a>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
             <div class="flex items-center justify-between gap-4 flex-wrap">
                 <h1 class="text-xl font-semibold text-gray-900">{{ __('Items for sale') }}</h1>
 
@@ -60,18 +74,6 @@
                                     <span class="font-semibold text-gray-900 whitespace-nowrap">{{ number_format((float) $listing->price, 2, ',', ' ') }} zł</span>
                                 </div>
                                 <p class="text-sm text-gray-600 mt-1 whitespace-pre-line">{{ $listing->description }}</p>
-                                <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                                    @if ($contactEmail)
-                                        <a href="mailto:{{ $contactEmail }}?subject={{ rawurlencode($listing->title) }}" class="text-indigo-600 hover:underline">
-                                            {{ __('Contact us about this item') }}
-                                        </a>
-                                    @endif
-                                    @if ($contactPhone)
-                                        <a href="tel:{{ $contactPhone }}" class="text-gray-600 hover:underline">
-                                            📞 {{ $contactPhone }}
-                                        </a>
-                                    @endif
-                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -91,18 +93,6 @@
                                 </div>
                                 <span class="font-semibold text-gray-900 mt-1">{{ number_format((float) $listing->price, 2, ',', ' ') }} zł</span>
                                 <p class="text-sm text-gray-600 mt-2 flex-1 whitespace-pre-line">{{ $listing->description }}</p>
-                                <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                                    @if ($contactEmail)
-                                        <a href="mailto:{{ $contactEmail }}?subject={{ rawurlencode($listing->title) }}" class="text-indigo-600 hover:underline">
-                                            {{ __('Contact us about this item') }}
-                                        </a>
-                                    @endif
-                                    @if ($contactPhone)
-                                        <a href="tel:{{ $contactPhone }}" class="text-gray-600 hover:underline">
-                                            📞 {{ $contactPhone }}
-                                        </a>
-                                    @endif
-                                </div>
                             </div>
                         </div>
                     @endforeach
