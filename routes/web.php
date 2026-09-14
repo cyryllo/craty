@@ -8,6 +8,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MailSettingController;
+use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SaleListingController;
 use App\Http\Controllers\SettingsController;
@@ -19,6 +20,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
+
+// Jedyna dziś publiczna (bez logowania) trasa w appce — patrz TODO.md.
+// Świadomie poza grupą "auth" niżej; kontroler sam odpowiada 404, gdy admin
+// nie włączył tej strony w Ustawienia → Ustawienia aplikacji.
+Route::get('flea-market', [MarketplaceController::class, 'index'])->name('marketplace.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

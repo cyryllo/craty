@@ -21,6 +21,9 @@ class AppSettingController extends Controller
             'logo' => ['nullable', 'image', 'max:2048'],
             'remove_logo' => ['nullable', 'boolean'],
             'locale' => ['nullable', 'string', Rule::in(array_keys(AppSetting::LOCALES))],
+            'public_marketplace_enabled' => ['nullable', 'boolean'],
+            'public_contact_email' => ['required_if:public_marketplace_enabled,1', 'nullable', 'email', 'max:255'],
+            'public_contact_phone' => ['nullable', 'string', 'max:30'],
         ]);
 
         $setting = AppSetting::current();
@@ -37,6 +40,9 @@ class AppSettingController extends Controller
 
         $setting->name = ($data['name'] ?? null) ?: null;
         $setting->locale = ($data['locale'] ?? null) ?: null;
+        $setting->public_marketplace_enabled = $request->boolean('public_marketplace_enabled');
+        $setting->public_contact_email = ($data['public_contact_email'] ?? null) ?: null;
+        $setting->public_contact_phone = ($data['public_contact_phone'] ?? null) ?: null;
         $setting->save();
 
         return back()->with('status', __('App settings saved.'));

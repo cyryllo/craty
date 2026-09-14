@@ -17,6 +17,7 @@ class AppSetting extends Model
         'mail_host', 'mail_port', 'mail_encryption', 'mail_username', 'mail_password',
         'mail_from_address', 'mail_from_name',
         'backup_retention_days', 'backup_include_env',
+        'public_marketplace_enabled', 'public_contact_email', 'public_contact_phone',
     ];
 
     protected $casts = [
@@ -24,6 +25,16 @@ class AppSetting extends Model
         // reszta AppSetting to jawne, nieszyfrowane dane (nazwa, logo...).
         'mail_password' => 'encrypted',
         'backup_include_env' => 'boolean',
+        'public_marketplace_enabled' => 'boolean',
+    ];
+
+    // Tak jak w User (rola/active) — bez tego świeży, jeszcze niezapisany
+    // firstOrNew() (patrz current()) miałby te pola jako null zamiast
+    // wartości domyślnej z migracji, dopóki ktoś raz nie zapisałby ustawień.
+    protected $attributes = [
+        'backup_retention_days' => 14,
+        'backup_include_env' => false,
+        'public_marketplace_enabled' => false,
     ];
 
     public const LOCALES = [

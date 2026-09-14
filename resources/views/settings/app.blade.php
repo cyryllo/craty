@@ -44,6 +44,39 @@
                 <p class="mt-1 text-xs text-gray-500">{{ __('Used for anyone who has not picked a personal language from the user menu.') }}</p>
             </div>
 
+            <div class="pt-4 border-t border-gray-100 space-y-4" x-data="{ enabled: {{ old('public_marketplace_enabled', $setting->public_marketplace_enabled) ? 'true' : 'false' }} }">
+                <div class="flex items-start gap-2">
+                    <input type="hidden" name="public_marketplace_enabled" value="0">
+                    <input type="checkbox" id="public_marketplace_enabled" name="public_marketplace_enabled" value="1"
+                           x-model="enabled"
+                           @checked(old('public_marketplace_enabled', $setting->public_marketplace_enabled)) class="mt-1 rounded border-gray-300">
+                    <label for="public_marketplace_enabled" class="text-sm text-gray-700">
+                        {{ __('Publish a public "flea market" page') }}
+                        <span class="block text-xs text-gray-500">
+                            {{ __('Shows a public, login-free page listing items marked for sale, with no purchasing — visitors are asked to email you.') }}
+                            @if ($setting->public_marketplace_enabled)
+                                <a href="{{ route('marketplace.index') }}" target="_blank" class="text-indigo-600 hover:underline">{{ __('View the public page') }}</a>
+                            @endif
+                        </span>
+                    </label>
+                </div>
+
+                <div x-show="enabled" x-cloak class="space-y-4">
+                    <div>
+                        <x-input-label for="public_contact_email" :value="__('Contact email shown on the public page')" />
+                        <x-text-input id="public_contact_email" name="public_contact_email" type="email" class="mt-1 block w-full" value="{{ old('public_contact_email', $setting->public_contact_email) }}" />
+                        <p class="mt-1 text-xs text-gray-500">{{ __('Independent from the SMTP "from" address in Settings → Mail.') }}</p>
+                        <x-input-error :messages="$errors->get('public_contact_email')" class="mt-1" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="public_contact_phone" :value="__('Contact phone shown on the public page (optional)')" />
+                        <x-text-input id="public_contact_phone" name="public_contact_phone" type="tel" class="mt-1 block w-full" value="{{ old('public_contact_phone', $setting->public_contact_phone) }}" />
+                        <x-input-error :messages="$errors->get('public_contact_phone')" class="mt-1" />
+                    </div>
+                </div>
+            </div>
+
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
                 <a href="{{ route('settings.index') }}" class="text-sm text-gray-500 hover:underline">{{ __('Cancel') }}</a>
                 <x-primary-button>{{ __('Save') }}</x-primary-button>

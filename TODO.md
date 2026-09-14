@@ -40,10 +40,11 @@ jeszcze decyzji biznesowej)**
 
 **Faza 1.5 — punkt pośredni, samodzielny (nie blokuje ani nie jest
 blokowany przez Instalator/Aktualizacje z fazy 2)**
-7. **Publiczna witryna „pchli targ”** (pełna specyfikacja niżej) — korzysta
+7. ~~**Publiczna witryna „Market”** (pełna specyfikacja niżej) — korzysta
    wyłącznie z tego, co już jest (`SaleListing`), zero nowych zależności;
    jedyna dziś publiczna (bez logowania) część appki, więc domyślnie
-   wyłączona i włączana świadomie przez admina.
+   wyłączona i włączana świadomie przez admina.~~ **Zrobione**
+   (`MarketplaceController`, `/flea-market`, 5 testów).
 
 **Faza 2 — wyjście poza obecny dev-loop (dopiero gdy appka ma trafić na
 realny hosting, nie tylko zostać w Dockerze na tej maszynie)**
@@ -304,7 +305,24 @@ zwykłej zmianie hasła do skrzynki.
 
 </details>
 
-## Publiczna witryna „pchli targ” (specyfikacja — do budowy na sygnał „zbuduj pchli targ”)
+## Publiczna witryna „Flea market” (pchli targ) — **Zrobione** (Faza 1.5)
+
+Zbudowane wg specyfikacji niżej, z jedną zmianą już po specyfikowaniu: adres
+i angielska nazwa źródłowa to **„Flea market”** (`/flea-market`), nie
+dosłowne tłumaczenie polskiego „pchli targ” na jedno słowo — trafniej oddaje
+sens (używane przedmioty, okazjonalna sprzedaż, żadnego sklepu) niż ogólne
+„Market”, które było rozważane pośrodku i odrzucone. Polskie tłumaczenie w
+`lang/pl.json` to „Pchli targ”.
+
+Dodatkowo, obok e-maila kontaktowego: opcjonalne pole **„Telefon kontaktowy”**
+(`AppSetting::public_contact_phone`), pokazywane na stronie jako link `tel:`
+tuż obok linku `mailto:` na każdej ofercie.
+
+5 nowych testów (`MarketplaceTest`), włącznie z tym że wyłączona strona
+zwraca 404 i że sprzedane oferty nie są widoczne.
+
+<details>
+<summary>Oryginalna specyfikacja (dla kontekstu)</summary>
 
 Jedyna dziś planowana **publiczna** (bez logowania) część appki — wszystko
 inne wymaga konta. Pokazuje na zewnątrz to, co i tak już trafia na OLX przez
@@ -344,6 +362,8 @@ ogłoszenia u pośrednika. Zero zmian w modelu `SaleListing` — `title`,
 - **SEO/roboty:** poza zakresem na start — appka to narzędzie do jednego
   warsztatu, nie sklep do pozycjonowania; nie dodawać `sitemap.xml`/meta
   Open Graph, dopóki ktoś tego realnie nie potrzebuje.
+
+</details>
 
 ## Pomysły do rozważenia później (bez ustalonych decyzji, nie specyfikacja)
 
