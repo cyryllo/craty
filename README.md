@@ -1,4 +1,4 @@
-# Graty
+# Craty
 
 Aplikacja do zarządzania magazynem i sprzętem w pracowni: kategorie, lokalizacje
 (magazyn → regał → półka → pojemnik), numery ewidencyjne z kodami QR, kartoteka
@@ -6,9 +6,11 @@ przedmiotu (zdjęcia, specyfikacja, wartość, stan), wypożyczenia, historia zm
 i eksport ofert sprzedażowych (OLX/CSV). Domyślny język interfejsu to
 angielski, z pełnym tłumaczeniem na polski (patrz `CLAUDE.md` → Localization).
 
-Nazwa marki to samo „Graty” — bez opisowego „Ewidencja” z przodu, które
-zostało tylko roboczym tytułem pierwszej koncepcji. Można to zmienić w każdej
-chwili w Ustawienia → Ustawienia aplikacji (nazwa + logo), bez ruszania kodu.
+Nazwa marki to „Craty” (wcześniej robocze „Graty”/„Ewidencja Graty” — zmienione
+z myślą o wydaniu jako open source, żeby nazwa dobrze brzmiała i była łatwo
+wyszukiwalna też dla anglojęzycznych). Instancja może mieć własną nazwę
+wyświetlaną — Ustawienia → Ustawienia aplikacji (nazwa + logo), bez ruszania
+kodu; np. u siebie masz ustawione „Moje Graty” i to zostaje bez zmian.
 
 Pełna koncepcja i uzasadnienie decyzji: patrz opublikowany dokument
 ["Ewidencja Graty"](https://claude.ai/code/artifact/1c7498de-ff94-4f0a-a338-0bee7e681bb8)
@@ -34,15 +36,18 @@ npm install && npm run build  # raz, żeby zbudować CSS/JS (Vite)
 ```
 
 Aplikacja: http://localhost:8000
-Adminer (podgląd bazy): http://localhost:8080 (system: MySQL, serwer: `db`, użytkownik/hasło: `graty`/`graty`, baza: `graty`)
+Adminer (podgląd bazy): http://localhost:8080 (system: MySQL, serwer: `db`, użytkownik/hasło: `graty`/`graty`, baza: `graty` —
+nazwa/dane bazy dev celowo zostały bez zmian przy zmianie marki na Craty; to
+wewnętrzny szczegół techniczny niewidoczny dla użytkownika appki, a zmiana
+wymagałaby przebudowy kontenera bazy)
 
 Konta startowe (hasło dla wszystkich: `password`):
 
 | E-mail                  | Rola        | Dostęp                                  |
 |--------------------------|-------------|------------------------------------------|
-| admin@graty.test         | admin       | pełny — w tym zarządzanie użytkownikami   |
-| magazynier@graty.test    | magazynier  | dodaje/edytuje przedmioty, lokalizacje... |
-| podglad@graty.test       | podglad     | tylko odczyt                              |
+| admin@craty.test         | admin       | pełny — w tym zarządzanie użytkownikami   |
+| magazynier@craty.test    | magazynier  | dodaje/edytuje przedmioty, lokalizacje... |
+| podglad@craty.test       | podglad     | tylko odczyt                              |
 
 Samodzielna rejestracja jest celowo wyłączona — konta zakłada admin w
 `/users`.

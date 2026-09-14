@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "craty/craty",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "Warehouse and equipment inventory management for a workshop — categories, locations, QR-coded inventory numbers, loans, and a sale-listing pipeline with CSV export.",
+    "keywords": ["laravel", "inventory", "warehouse", "asset-management", "qr-code"],
     "license": "MIT",
     "require": {
         "php": "^8.2",

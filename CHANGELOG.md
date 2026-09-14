@@ -97,3 +97,25 @@ Ustawienia aplikacji) to teraz narysowany od zera regał z trzema półkami,
 w tej samej stylistyce co ikony menu (`x-icon`), zamiast domyślnego loga
 Laravela. Nazwa marki widoczna teraz też jako tekst obok loga w pasku
 nawigacji i na ekranie logowania, nie tylko w tytule karty.
+
+## 2026-09-14 — Rebranding na „Craty” pod wydanie open source
+
+„Graty” zmienione na **Craty** przed planowanym udostępnieniem projektu jako
+open source — nazwa brzmiąca po polsku nie sprawdziłaby się dobrze
+międzynarodowo. „Craty” brzmi niemal identycznie (minimalny koszt
+przestawienia się), a dodatkowo nawiązuje do angielskiego „crate” (skrzynka/
+pojemnik), pasując tematycznie do magazynu. Sprawdzone przed zmianą: nazwa
+wolna na GitHubie, brak kolidujących projektów.
+
+Zmienione: `composer.json` (`name`: `laravel/laravel` → `craty/craty`, plus
+realny `description`/`keywords` zamiast domyślnych ze szkieletu Laravela),
+`package.json` (dodane brakujące pole `name`), `APP_NAME` w `.env`, domeny
+e-mail kont startowych w `DatabaseSeeder` (`@graty.test` → `@craty.test`),
+README/CLAUDE.md.
+
+Świadomie **bez zmian**: nazwa/dane bazy dev w `docker-compose.yml`
+(`graty`/`graty`/`graty`) — to wewnętrzny, niewidoczny dla użytkownika
+appki szczegół techniczny, a zmiana wymagałaby przebudowy kontenera/wolumenu
+bazy; oraz nazwy wyświetlane appki już skonfigurowane ręcznie przez adminów
+istniejących instalacji w Ustawienia aplikacji (np. „Moje Graty”) — to ich
+własna, edytowalna nazwa instancji, nie nazwa projektu.

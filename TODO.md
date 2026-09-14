@@ -131,7 +131,7 @@ Kroki kreatora (roboczo):
    trzeba tego dublować w kreatorze).
 4. **Konto głównego administratora** — imię, e-mail, hasło (+ potwierdzenie).
    To konto musi dostać `protected = true` (ten sam mechanizm co dzisiejszy
-   zaseedowany `admin@graty.test` — patrz `UserController`/`User::isProtected()`),
+   zaseedowany `admin@craty.test` — patrz `UserController`/`User::isProtected()`),
    żeby od razu było chronione przed usunięciem/degradacją.
 5. **Dane przykładowe** — checkbox opisany wyżej.
 6. **Podsumowanie i uruchomienie** — w tym miejscu dopiero: zapis `.env`,

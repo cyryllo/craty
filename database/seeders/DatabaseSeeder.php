@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
     {
         $admin = User::factory()->create([
             'name' => 'Administrator',
-            'email' => 'admin@graty.test',
+            'email' => 'admin@craty.test',
             'role' => 'admin',
         ]);
         // forceFill, bo 'protected' celowo nie jest w $fillable — to jedyne
@@ -31,13 +31,13 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Magazynier',
-            'email' => 'magazynier@graty.test',
+            'email' => 'magazynier@craty.test',
             'role' => 'magazynier',
         ]);
 
         User::factory()->create([
             'name' => 'Podgląd',
-            'email' => 'podglad@graty.test',
+            'email' => 'podglad@craty.test',
             'role' => 'podglad',
         ]);
 

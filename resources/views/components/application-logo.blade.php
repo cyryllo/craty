@@ -2,7 +2,7 @@
 @if ($setting->logoUrl())
     <img src="{{ $setting->logoUrl() }}" alt="{{ $setting->effectiveName() }}" {{ $attributes->merge(['class' => 'object-contain']) }}>
 @else
-    {{-- Domyślne logo "Graty": regał z trzema półkami i przedmiotami na nich —
+    {{-- Domyślne logo "Craty": regał z trzema półkami i przedmiotami na nich —
          ten sam rysunkowy styl co ikony w menu (x-icon), żeby appka miała
          spójną tożsamość zamiast domyślnego loga Laravela. --}}
     <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {{ $attributes }}>

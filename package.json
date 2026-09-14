@@ -1,4 +1,5 @@
 {
+    "name": "craty",
     "private": true,
     "type": "module",
     "scripts": {
