@@ -18,19 +18,25 @@
                 </select>
                 <x-input-error :messages="$errors->get('warehouse_id')" class="mt-1" />
             </div>
-            <div class="grid grid-cols-3 gap-3">
-                <div>
-                    <x-input-label for="rack" :value="__('Rack')" />
-                    <x-text-input id="rack" name="rack" class="mt-1 block w-full" value="{{ old('rack', $location->rack) }}" />
+            <div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <x-input-label for="rack" :value="__('Rack')" />
+                        <x-text-input id="rack" name="rack" class="mt-1 block w-full" value="{{ old('rack', $location->rack) }}" />
+                        <x-input-error :messages="$errors->get('rack')" class="mt-1" />
+                    </div>
+                    <div>
+                        <x-input-label for="shelf" :value="__('Shelf')" />
+                        <x-text-input id="shelf" name="shelf" class="mt-1 block w-full" value="{{ old('shelf', $location->shelf) }}" />
+                        <x-input-error :messages="$errors->get('shelf')" class="mt-1" />
+                    </div>
+                    <div>
+                        <x-input-label for="bin" :value="__('Bin')" />
+                        <x-text-input id="bin" name="bin" class="mt-1 block w-full" value="{{ old('bin', $location->bin) }}" />
+                        <x-input-error :messages="$errors->get('bin')" class="mt-1" />
+                    </div>
                 </div>
-                <div>
-                    <x-input-label for="shelf" :value="__('Shelf')" />
-                    <x-text-input id="shelf" name="shelf" class="mt-1 block w-full" value="{{ old('shelf', $location->shelf) }}" />
-                </div>
-                <div>
-                    <x-input-label for="bin" :value="__('Bin')" />
-                    <x-text-input id="bin" name="bin" class="mt-1 block w-full" value="{{ old('bin', $location->bin) }}" />
-                </div>
+                <x-input-error :messages="$errors->get('combination')" class="mt-2" />
             </div>
             <div>
                 <x-input-label for="note" :value="__('Note')" />

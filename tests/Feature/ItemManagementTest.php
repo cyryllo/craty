@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Item;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ItemManagementTest extends TestCase
@@ -72,5 +73,64 @@ class ItemManagementTest extends TestCase
 
         $byEan = $this->actingAs($viewer)->get('/items?q=5901234123457');
         $byEan->assertSee('Wkrętarka')->assertDontSee('Inny przedmiot');
+    }
+
+    public function test_magazynier_can_remove_a_single_photo_and_another_one_becomes_primary(): void
+    {
+        Storage::fake('public');
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'nowy', 'status' => 'dostepny',
+        ]);
+        $first = $item->photos()->create(['path' => 'items/1/a.jpg', 'is_primary' => true, 'sort_order' => 0]);
+        $second = $item->photos()->create(['path' => 'items/1/b.jpg', 'is_primary' => false, 'sort_order' => 1]);
+        Storage::disk('public')->put($first->path, 'fake');
+        Storage::disk('public')->put($second->path, 'fake');
+
+        $response = $this->actingAs($magazynier)->delete(route('items.photos.destroy', [$item, $first]));
+
+        $response->assertRedirect();
+        $this->assertModelMissing($first);
+        Storage::disk('public')->assertMissing($first->path);
+        $this->assertTrue($second->fresh()->is_primary);
+    }
+
+    public function test_magazynier_can_remove_a_single_attachment(): void
+    {
+        Storage::fake('public');
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'nowy', 'status' => 'dostepny',
+        ]);
+        $attachment = $item->attachments()->create(['path' => 'items/1/attachments/faktura.pdf', 'label' => 'Faktura']);
+        Storage::disk('public')->put($attachment->path, 'fake');
+
+        $response = $this->actingAs($magazynier)->delete(route('items.attachments.destroy', [$item, $attachment]));
+
+        $response->assertRedirect();
+        $this->assertModelMissing($attachment);
+        Storage::disk('public')->assertMissing($attachment->path);
+    }
+
+    public function test_cannot_delete_a_photo_belonging_to_a_different_item(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $itemOne = Item::create(['inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'A', 'condition' => 'nowy', 'status' => 'dostepny']);
+        $itemTwo = Item::create(['inventory_no' => 'NAR-BRAK-2026-00002', 'name' => 'B', 'condition' => 'nowy', 'status' => 'dostepny']);
+        $photo = $itemOne->photos()->create(['path' => 'items/1/a.jpg', 'is_primary' => true, 'sort_order' => 0]);
+
+        $this->actingAs($magazynier)->delete(route('items.photos.destroy', [$itemTwo, $photo]))->assertNotFound();
+        $this->assertModelExists($photo);
+    }
+
+    public function test_viewer_cannot_delete_photos_or_attachments(): void
+    {
+        $viewer = User::factory()->create(['role' => 'podglad']);
+        $item = Item::create(['inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'A', 'condition' => 'nowy', 'status' => 'dostepny']);
+        $photo = $item->photos()->create(['path' => 'items/1/a.jpg', 'is_primary' => true, 'sort_order' => 0]);
+        $attachment = $item->attachments()->create(['path' => 'items/1/f.pdf', 'label' => 'F']);
+
+        $this->actingAs($viewer)->delete(route('items.photos.destroy', [$item, $photo]))->assertForbidden();
+        $this->actingAs($viewer)->delete(route('items.attachments.destroy', [$item, $attachment]))->assertForbidden();
     }
 }

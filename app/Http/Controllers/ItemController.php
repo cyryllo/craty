@@ -6,6 +6,8 @@ use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Models\Category;
 use App\Models\Item;
+use App\Models\ItemAttachment;
+use App\Models\ItemPhoto;
 use App\Models\StorageLocation;
 use App\Services\InventoryNumberGenerator;
 use App\Services\QrCodeGenerator;
@@ -123,6 +125,32 @@ class ItemController extends Controller
     public function label(Item $item)
     {
         return view('items.label', ['item' => $item]);
+    }
+
+    public function destroyPhoto(Item $item, ItemPhoto $photo)
+    {
+        abort_unless($photo->item_id === $item->id, 404);
+
+        Storage::disk('public')->delete($photo->path);
+        $wasPrimary = $photo->is_primary;
+        $photo->delete();
+
+        // Jeśli usunięto zdjęcie główne, a zostały inne — któreś musi przejąć rolę okładki.
+        if ($wasPrimary) {
+            $item->photos()->first()?->update(['is_primary' => true]);
+        }
+
+        return back()->with('status', __('Photo removed.'));
+    }
+
+    public function destroyAttachment(Item $item, ItemAttachment $attachment)
+    {
+        abort_unless($attachment->item_id === $item->id, 404);
+
+        Storage::disk('public')->delete($attachment->path);
+        $attachment->delete();
+
+        return back()->with('status', __('Attachment removed.'));
     }
 
     private function syncPhotos(Item $item, Request $request): void

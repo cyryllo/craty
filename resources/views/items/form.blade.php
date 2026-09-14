@@ -95,25 +95,11 @@
                 <div class="sm:col-span-2">
                     <x-input-label for="photos" :value="__('Photos')" />
                     <input id="photos" name="photos[]" type="file" accept="image/*" multiple class="mt-1 block w-full text-sm">
-                    @if ($item->exists && $item->photos->isNotEmpty())
-                        <div class="mt-3 flex flex-wrap gap-2">
-                            @foreach ($item->photos as $photo)
-                                <img src="{{ $photo->url() }}" class="w-20 h-20 object-cover rounded-md border {{ $photo->is_primary ? 'ring-2 ring-indigo-500' : '' }}">
-                            @endforeach
-                        </div>
-                    @endif
                 </div>
 
                 <div class="sm:col-span-2">
                     <x-input-label for="attachments" :value="__('Attachments (invoice, manual...)')" />
                     <input id="attachments" name="attachments[]" type="file" multiple class="mt-1 block w-full text-sm">
-                    @if ($item->exists && $item->attachments->isNotEmpty())
-                        <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
-                            @foreach ($item->attachments as $attachment)
-                                <li><a href="{{ $attachment->url() }}" class="text-indigo-600 hover:underline" target="_blank">{{ $attachment->label }}</a></li>
-                            @endforeach
-                        </ul>
-                    @endif
                 </div>
             </div>
 
@@ -122,5 +108,39 @@
                 <x-primary-button>{{ $item->exists ? __('Save changes') : __('Add to inventory') }}</x-primary-button>
             </div>
         </form>
+
+        @if ($item->exists && $item->photos->isNotEmpty())
+            <div class="bg-white rounded-lg shadow p-6 mt-6">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">{{ __('Photos') }}</h3>
+                <div class="flex flex-wrap gap-3">
+                    @foreach ($item->photos as $photo)
+                        <div class="relative group">
+                            <img src="{{ $photo->url() }}" class="w-20 h-20 object-cover rounded-md border {{ $photo->is_primary ? 'ring-2 ring-indigo-500' : '' }}">
+                            <form method="POST" action="{{ route('items.photos.destroy', [$item, $photo]) }}" onsubmit="return confirm('{{ __('Remove this photo?') }}');" class="absolute -top-2 -end-2">
+                                @csrf @method('DELETE')
+                                <button type="submit" title="{{ __('Remove photo') }}" class="w-5 h-5 flex items-center justify-center rounded-full bg-red-600 text-white text-xs leading-none shadow hover:bg-red-700">×</button>
+                            </form>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        @if ($item->exists && $item->attachments->isNotEmpty())
+            <div class="bg-white rounded-lg shadow p-6 mt-6">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">{{ __('Attachments (invoice, manual...)') }}</h3>
+                <ul class="space-y-2 text-sm">
+                    @foreach ($item->attachments as $attachment)
+                        <li class="flex items-center justify-between gap-3">
+                            <a href="{{ $attachment->url() }}" class="text-indigo-600 hover:underline" target="_blank">{{ $attachment->label }}</a>
+                            <form method="POST" action="{{ route('items.attachments.destroy', [$item, $attachment]) }}" onsubmit="return confirm('{{ __('Remove this attachment?') }}');">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:underline">{{ __('remove') }}</button>
+                            </form>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </div>
 </x-app-layout>

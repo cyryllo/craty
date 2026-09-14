@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\StorageLocation;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class StorageLocationController extends Controller
 {
@@ -40,7 +41,7 @@ class StorageLocationController extends Controller
 
     public function update(Request $request, StorageLocation $storageLocation)
     {
-        $storageLocation->update($this->validated($request));
+        $storageLocation->update($this->validated($request, $storageLocation));
 
         return redirect()->route('storage-locations.index')->with('status', __('Location updated.'));
     }
@@ -56,14 +57,33 @@ class StorageLocationController extends Controller
         return redirect()->route('storage-locations.index')->with('status', __('Location deleted.'));
     }
 
-    private function validated(Request $request): array
+    private function validated(Request $request, ?StorageLocation $storageLocation = null): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'rack' => ['nullable', 'string', 'max:32'],
             'shelf' => ['nullable', 'string', 'max:32'],
             'bin' => ['nullable', 'string', 'max:32'],
             'note' => ['nullable', 'string', 'max:255'],
         ]);
+
+        // storage_locations.code (regał/półka/pojemnik w obrębie magazynu) jest
+        // unikalny w bazie, ale nie jest polem formularza — sam się buduje w
+        // StorageLocation::buildCode(). Sprawdzamy duplikat z wyprzedzeniem,
+        // żeby dostać czytelny błąd walidacji zamiast wyjątku unikalności z bazy.
+        $candidate = new StorageLocation($data);
+        $code = $candidate->buildCode();
+
+        $duplicateExists = StorageLocation::where('code', $code)
+            ->when($storageLocation, fn ($query) => $query->whereKeyNot($storageLocation))
+            ->exists();
+
+        if ($duplicateExists) {
+            throw ValidationException::withMessages([
+                'combination' => [__('A location with this rack/shelf/bin combination already exists in this warehouse.')],
+            ]);
+        }
+
+        return $data;
     }
 }

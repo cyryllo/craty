@@ -40,6 +40,8 @@ Route::middleware('auth')->group(function () {
         Route::get('items/{item}/edit', [ItemController::class, 'edit'])->name('items.edit');
         Route::put('items/{item}', [ItemController::class, 'update'])->name('items.update');
         Route::delete('items/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
+        Route::delete('items/{item}/photos/{photo}', [ItemController::class, 'destroyPhoto'])->name('items.photos.destroy');
+        Route::delete('items/{item}/attachments/{attachment}', [ItemController::class, 'destroyAttachment'])->name('items.attachments.destroy');
 
         Route::post('items/{item}/loans', [LoanController::class, 'store'])->name('items.loans.store');
         Route::post('loans/{loan}/return', [LoanController::class, 'returnLoan'])->name('loans.return');
