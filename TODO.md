@@ -13,11 +13,15 @@ poprzednia jest zrobiona — w obrębie jednej fazy kolejność jest dowolna.
 
 **Faza 0 — tanie poprawki przy okazji (nie blokują niczego, zrobić najpierw
 bo są małe)**
-1. `StorageLocationController::update()` — złapać wyjątek unikalności
-   regał/półka/pojemnik zamiast brzydkiego 500.
-2. Usuwanie pojedynczego zdjęcia/załącznika z karty przedmiotu.
+1. ~~`StorageLocationController::update()` — złapać wyjątek unikalności
+   regał/półka/pojemnik zamiast brzydkiego 500.~~ **Zrobione** (walidacja
+   z wyprzedzeniem zamiast łapania wyjątku z bazy, 3 testy).
+2. ~~Usuwanie pojedynczego zdjęcia/załącznika z karty przedmiotu.~~
+   **Zrobione** (`ItemController::destroyPhoto()`/`destroyAttachment()`,
+   4 testy — w tym że nie da się usunąć cudzego zdjęcia po ID).
 3. `.env.testing` z zaszytym `APP_KEY` — wygenerować w pipeline, jeśli/gdy
-   pojawi się wspólne CI.
+   pojawi się wspólne CI. Nie zrobione świadomie — nie ma dziś żadnego CI,
+   więc nie ma czego generować; zostawione jako przypomnienie na później.
 4. Testy Blade (`assertSee`) dla `items/index`/`sale-listings/*` — dorzucać
    przy okazji, gdy i tak dotyka się tych widoków, nie jako osobne zadanie.
 
@@ -307,12 +311,6 @@ aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
 
 ## Drobne rzeczy zauważone przy budowie
 
-- `StorageLocationController::update()` nie łapie w ładny sposób wyjątku przy
-  próbie ustawienia kombinacji regał/półka/pojemnik, która już istnieje w tym
-  magazynie (unique constraint na `storage_locations.code`) — skończy się
-  brzydkim 500 zamiast komunikatu walidacji.
-- Brak usuwania pojedynczego zdjęcia/załącznika z karty przedmiotu — da się
-  tylko dodawać, albo usunąć cały przedmiot.
 - Brak `assertSee`-owych testów Blade dla widoków (`items/index`,
   `sale-listings/*`) poza tym, co pokrywają testy feature na kontrolerach —
   wystarczające jak na szkielet, ale warto rozbudować przy większych zmianach UI.
