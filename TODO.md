@@ -48,11 +48,15 @@ blokowany przez Instalator/Aktualizacje z fazy 2)**
 
 **Faza 2 — wyjście poza obecny dev-loop (dopiero gdy appka ma trafić na
 realny hosting, nie tylko zostać w Dockerze na tej maszynie)**
-8. **Instalator aplikacji** (pełna specyfikacja niżej) — pierwszy krok do
-   prawdziwego wdrożenia; bez tego nie ma na czym testować punktu 9.
-9. **Moduł Aktualizacje** (pełna specyfikacja niżej) — zależny wprost od
+8. ~~**Instalator aplikacji** (pełna specyfikacja niżej) — pierwszy krok do
+   prawdziwego wdrożenia; bez tego nie ma na czym testować punktu 9.~~
+   **Zrobione** (`InstallController`, kreator jednostronicowy pod
+   `/install`, 11 testów).
+9. ~~**Moduł Aktualizacje** (pełna specyfikacja niżej) — zależny wprost od
    Backupu (krok 3) i sensowny dopiero, gdy istnieje już jakaś instalacja do
-   aktualizowania (czyli po punkcie 8).
+   aktualizowania (czyli po punkcie 8).~~ **Zrobione** (`UpdateService`,
+   `release:build`, 18 testów) — backup bazy jako krok 3 jeszcze nie
+   podpięty automatycznie, patrz "Drobne rzeczy zauważone przy budowie".
 
 **Faza 3 — wartość dla codziennego użytku (z mapy drogowej + pomysły
 niezależne od decyzji biznesowych)**
@@ -105,7 +109,58 @@ większe zmiany modelu danych**
   bulk-API dla zwykłych kont, więc to świadomie odłożone, nie zapomniane.
 - Appka natywna (Android), jeśli PWA się nie sprawdzi.
 
-## Instalator aplikacji (specyfikacja — do budowy na sygnał „zbuduj instalator”)
+## Instalator aplikacji — **Zrobione** (Faza 2)
+
+Zbudowane wg specyfikacji niżej, z kilkoma decyzjami technicznymi podjętymi
+przy budowie (nieustalonymi wcześniej z użytkownikiem, bo to poziom
+implementacji, nie produktu):
+
+- **Kreator to jedna strona** (`GET /install`), nie osobna trasa na każdy z
+  6 kroków — kroki 1-5 to panele Alpine.js pokazywane/ukrywane w jednym
+  `<form>`, wysyłanym raz na końcu do `POST /install`. Powód: appka przed
+  instalacją nie ma jeszcze bazy, a wieloetapowy kreator z osobnymi trasami
+  wymagałby trzymania stanu (dane z poprzednich kroków) w sesji między
+  żądaniami — kruche na tym etapie. "Testuj połączenie" w kroku 2 to
+  osobne, bezstanowe żądanie AJAX (`POST /install/test-database`), nic nie
+  zapisuje.
+- **`APP_KEY` generowany automatycznie, zanim Laravel w ogóle wystartuje**
+  (`public/index.php`, przez `App\Support\EnvFileWriter`) — bez klucza
+  KAŻDE żądanie wywala się na `MissingAppKeyException` (middleware
+  `EncryptCookies` wymaga klucza już przy konstrukcji), więc kreator nie
+  zdążyłby nawet pokazać strony 1, gdyby czekać z generowaniem klucza do
+  kroku 6, jak sugerowała pierwotna specyfikacja niżej. To rozwiązuje
+  problem dla całej appki, nie tylko instalatora (dotyczy też paczek
+  Aktualizacji rozpakowanych ze świeżym `.env`).
+- **`.env.example` zmienione na `SESSION_DRIVER=file`, `CACHE_STORE=file`,
+  `QUEUE_CONNECTION=sync`** (było: `database` dla wszystkich trzech) — appka
+  nie używa dziś ani `Cache::`, ani kolejek, więc to nie miało żadnego
+  powodu poza domyślnym szkieletem Laravela, a `SESSION_DRIVER=database`
+  wywalał każde żądanie na świeżej, niezmigrowanej bazie (brak tabeli
+  `sessions`) jeszcze przed pokazaniem kroku 1. Realny dev `.env` (już
+  zmigrowany, z działającą bazą) **celowo pozostawiony bez zmian**.
+- **Rozstrzygnięcie otwartego pytania o błąd w trakcie instalacji:** kreator
+  nie robi żadnego rollbacku/`migrate:fresh` — przy błędzie (zły host bazy,
+  migracja padnie w połowie) appka wraca na tę samą stronę z czytelnym
+  komunikatem, `.env` zostaje z już zapisanymi danymi bazy. Ponowne wysłanie
+  formularza jest bezpieczne: `migrate` pomija migracje już wykonane, więc
+  to naturalnie idempotentne — nie trzeba nic ręcznie czyścić.
+- **Strona podsumowania po instalacji** (`GET /install/done`, chroniona
+  jednorazową flagą na sesji zamiast blokady "już zainstalowane" — inaczej
+  przekierowałaby sama siebie na `/login`, bo admin już istnieje) — poza
+  potwierdzeniem sukcesu przypomina, że instalator jest już automatycznie
+  zablokowany, i **podpowiada, które pliki można opcjonalnie usunąć** z
+  serwera dla dodatkowego spokoju (`routes/install.php`,
+  `InstallController.php`, `resources/views/install/`) — bez automatycznego
+  kasowania czegokolwiek (zbyt ryzykowne: appka usuwająca własny kod w
+  trakcie działania to więcej problemów niż warte).
+
+11 nowych testów (`InstallerTest`, `EnvFileWriterTest`), w tym jeden pełny
+przebieg end-to-end na osobnej, jednorazowej bazie scratch na tym samym
+kontenerze MariaDB co dev (tworzonej i kasowanej w teście) — nie na danych
+deweloperskich.
+
+<details>
+<summary>Oryginalna specyfikacja (dla kontekstu)</summary>
 
 Kreator webowy do stawiania appki na docelowym hostingu (nie zastępuje
 obecnego dev-loopu z Dockerem i `DatabaseSeeder` — to osobna ścieżka dla
@@ -161,7 +216,59 @@ Do przemyślenia przy budowie: obsługa błędu w trakcie kroku 6 (np. migracja
 padnie w połowie) — czy wracać do kroku 2 z komunikatem, czy wymagać ręcznego
 `migrate:fresh`; to nie zostało jeszcze ustalone z użytkownikiem.
 
-## Moduł „Aktualizacje” (specyfikacja — do budowy na sygnał „zbuduj aktualizacje”)
+**Rozstrzygnięte przy budowie** — patrz notatka nad `<details>` wyżej.
+
+</details>
+
+## Moduł „Aktualizacje” — **Zrobione** (Faza 2)
+
+Zbudowane wg specyfikacji niżej, z decyzjami dopytanymi przed budową i
+kilkoma technicznymi doprecyzowanymi przy niej:
+
+- **Suma kontrolna: admin wkleja SHA-256 z release notes** (opcjonalne pole
+  przy uploadzie) — realnie chroni przed uszkodzonym/podmienionym plikiem,
+  bo pochodzi spoza samej paczki. Sama paczka nie niesie sumy samej siebie
+  (byłoby to bez znaczenia — uszkodzona/podmieniona paczka miałaby po
+  prostu inną, "zgodną z sobą" sumę).
+- **Rollback przywraca tylko kod, nie bazę** — `UpdateService::apply()`
+  robi własną migawkę kodu (zip całej appki, ten sam `UpdatePackageBuilder`
+  co `release:build`, więc też zawiera `vendor/`/skompilowane assety) tuż
+  przed nadpisaniem plików. Rollback rozpakowuje tę migawkę z powrotem.
+  Automatyczne cofanie migracji świadomie pominięte (niebezpieczne dla
+  dowolnych przyszłych migracji) — panel przypomina, żeby w razie potrzeby
+  ręcznie przywrócić bazę z automatycznego backupu wziętego tuż przed
+  aktualizacją (Moduł Backup — *uwaga: `UpdateService::apply()` dziś **nie**
+  wywołuje jeszcze `BackupService::run()` automatycznie, tylko robi migawkę
+  kodu; podpięcie prawdziwego backupu bazy jako krok 3 to następny mały
+  krok, patrz "Drobne rzeczy zauważone przy budowie"*).
+- **Dodatkowe potwierdzenie hasłem** przed upload/rollback — nie własny
+  mechanizm, tylko istniejący w appce Breeze'owy `password.confirm`
+  middleware (ten sam co przy standardowej zmianie hasła), zaaplikowany na
+  tych dwóch trasach.
+- **Manifest (`update-manifest.json`)** zawiera `version`, opcjonalne
+  `min_version`, `changelog` (tablica linii) i informacyjną listę wszystkich
+  plików migracji w repo (nie diff od ostatniego wydania — `migrate --force`
+  i tak samo wykrywa, co jeszcze nie zostało uruchomione, więc lista w
+  manifeście służy tylko do pokazania adminowi, nie steruje niczym).
+- **`release:build`** (deweloperska komenda w tym repo) i migawka kodu do
+  rollbacku dzielą tę samą listę wykluczeń (`UpdatePaths::PACKAGE_EXCLUDES`)
+  i tę samą klasę pakującą (`UpdatePackageBuilder`) — obie mają reprezentować
+  "całą działającą appkę" z tym samym wyjątkiem plików deweloperskich/danych
+  użytkownika, więc nie ma sensu ich rozdzielać.
+- **Zip slip** i inne bezpieczeństwo z pierwotnej specyfikacji zaimplementowane
+  dokładnie jak opisano: ręczne rozpakowywanie z odrzucaniem wpisów z `../`,
+  jawna lista chronionych ścieżek (`UpdatePaths::PROTECTED_PATHS`) nigdy
+  nienadpisywanych przy podmianie plików.
+
+18 nowych testów (`UpdateServiceTest`, `UpdateControllerTest`,
+`UpdatePackageBuilderTest`, `BuildReleasePackageTest`, `AppVersionTest`) —
+wszystkie operujące na katalogach tymczasowych, nigdy na tym repo (poza
+jednym testem komendy `release:build`, który bezpiecznie tylko CZYTA
+prawdziwe drzewo źródłowe do zbudowania paczki testowej, zapisywanej do
+katalogu tymczasowego).
+
+<details>
+<summary>Oryginalna specyfikacja (dla kontekstu)</summary>
 
 Model ustalony z użytkownikiem: **upload paczki ZIP**, nie samo-pobieranie z
 repo ani sam podgląd `composer outdated`. My (dewelopersko, w tym repo)
@@ -211,6 +318,8 @@ samowystarczalna (patrz niżej).
   w całej appce (nadpisuje kod PHP, który się potem wykonuje) — musi być
   dostępne tylko dla `role:admin`, i warto rozważyć dodatkowe potwierdzenie
   (np. ponowne podanie hasła) przed zastosowaniem.
+
+</details>
 
 ## Moduł „Backup” — **Zrobione** (Faza 1)
 
@@ -519,3 +628,16 @@ aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
   się pokazać galerię. Gdy to wróci jako temat, rozważyć pasek miniaturek pod
   głównym zdjęciem (podmiana przez Alpine, bez nowego URL-a) zamiast pełnej
   podstrony/lightboxa.
+- **Moduł Aktualizacje jeszcze nie woła `BackupService::run()` automatycznie**
+  przed zastosowaniem paczki (krok 3 z oryginalnej specyfikacji) — dziś robi
+  tylko własną migawkę kodu. Podpięcie prawdziwego backupu bazy jako
+  kolejny krok `UpdateService::apply()` to małe, osobne zadanie (backup
+  moduł już istnieje i ma dokładnie taki interfejs, `app(BackupService::
+  class)->run()`, żeby dało się to łatwo dopisać).
+- **Wgrywanie paczki aktualizacji może uderzyć w limity PHP**
+  (`upload_max_filesize`/`post_max_size` w php.ini) — pełna paczka z
+  `vendor/`/skompilowanymi assetami waży dziś ~26 MB, a domyślne limity PHP
+  bywają dużo niższe (często 2-8 MB). Warto to dopisać do przyszłego kroku
+  1 Instalatora ("Wymagania środowiska") albo przynajmniej pokazać czytelny
+  komunikat na stronie Ustawienia → Aktualizacje, zamiast pozwolić appce
+  ucinać upload w milczeniu.

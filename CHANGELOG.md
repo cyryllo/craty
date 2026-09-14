@@ -154,3 +154,65 @@ zrzutu bazy, a obraz miał tylko rozszerzenie `pdo_mysql` PHP, nie klienta
 wiersza poleceń.
 
 13 nowych testów (`MailSettingsTest`, `BackupManagementTest`), 60/60 zielone.
+
+## 2026-09-14 — Publiczna strona "Flea market" (pchli targ)
+
+Jedyna dziś publiczna (bez logowania) część appki: `/flea-market` pokazuje
+oferty ze `SaleListing` (status "wyeksportowana") z przełącznikiem lista/
+kafle jak w `/items`, filtrem kategorii po lewej i banerem kontaktowym
+(e-mail + telefon) na górze zamiast linku przy każdej ofercie — bez
+możliwości zakupu, appka niczego nie sprzedaje sama. Sprzedane i wycofane
+oferty znikają z listy całkowicie. Włącznik i dane kontaktowe w
+Ustawienia → Ustawienia aplikacji, domyślnie wyłączone.
+
+Przy okazji: przycisk "wycofaj" na `/sprzedaz/wystawione` (nowy status
+`SaleListing::wycofana`, odróżniony od `Item::STATUSES['wycofany']` —
+wycofanie oferty sprzedaży to nie to samo co wycofanie całego przedmiotu
+z użytku).
+
+## 2026-09-14 — Instalator webowy
+
+Kreator pod `/install` do stawiania appki na docelowym hostingu bez
+SSH/artisan — jednostronicowy formularz (Alpine.js), pyta o wymagania
+środowiska, dane do bazy (z testem połączenia), nazwę appki i konto
+głównego administratora (chronione tak samo jak dev-owy
+`admin@craty.test`), z opcjonalnymi danymi przykładowymi. Blokuje się
+automatycznie po zakończeniu — każde ponowne wejście na `/install*`
+przekierowuje na `/login`, gdy w bazie istnieje już jakikolwiek użytkownik.
+
+Wymagało dwóch zmian sięgających głębiej niż sam instalator: `APP_KEY`
+generowany automatycznie w `public/index.php` zanim Laravel wystartuje (bez
+klucza wywala się każde żądanie, nie tylko instalatora), oraz
+`.env.example` przełączony z `SESSION_DRIVER=database`/`CACHE_STORE=
+database`/`QUEUE_CONNECTION=database` na `file`/`file`/`sync` — appka nie
+używa cache'a ani kolejek, a sterownik bazodanowy wymagał tabel, które nie
+istnieją przed pierwszą migracją. `DatabaseSeeder` rozdzielony na konta
+dev-owe i samodzielny `DemoDataSeeder` (to on jest wywoływany przez checkbox
+"dane przykładowe" w kreatorze).
+
+12 nowych testów (`InstallerTest`, `EnvFileWriterTest`) — w tym pełny
+przebieg end-to-end na jednorazowej bazie scratch na tym samym MariaDB co
+dev, nigdy nie dotykający realnych danych deweloperskich.
+
+## 2026-09-14 — Moduł Aktualizacje
+
+Samo-aktualizacja przez panel (Ustawienia → Aktualizacje) — bez SSH/git/
+composera/npm na docelowym hostingu. Administrator wgrywa plik `.zip`
+zbudowany w tym repo komendą `php artisan release:build` (pakuje kod razem
+z `vendor/` i skompilowanymi assetami, z manifestem `update-manifest.json`:
+wersja docelowa, opcjonalne `min_version`, changelog). Opcjonalna suma
+kontrolna SHA-256 wklejana z release notes weryfikuje wgrany plik przed
+dotknięciem czegokolwiek.
+
+Przed zastosowaniem appka sama robi migawkę obecnego kodu (ten sam
+mechanizm co `release:build`) — błędną aktualizację da się cofnąć jednym
+przyciskiem, choć to przywraca tylko kod, nie bazę danych (świadomie: ogólne
+automatyczne cofanie migracji nie jest bezpieczne). Jeśli aktualizacja
+dodała migracje, przywrócenie bazy zostaje ręczne, z automatycznego
+backupu wziętego przed aktualizacją. Rozpakowywanie odporne na "zip slip",
+`.env`/dane użytkownika nigdy nie są nadpisywane, upload i wycofanie
+wymagają ponownego podania hasła (Breeze'owy `password.confirm`).
+
+18 nowych testów, wszystkie operujące na katalogach tymczasowych zamiast na
+tym repo — `apply()`/`rollback()` nadpisują pliki appki, więc uruchomienie
+ich na prawdziwym drzewie kodu w trakcie testów by je zepsuło.

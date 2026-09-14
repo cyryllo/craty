@@ -8,6 +8,16 @@
         </svg>
         @break
 
+    @case('update')
+        {{-- strzałka odświeżenia w okręgu: Aktualizacje --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" {{ $attributes }}>
+            <path d="M4 10a6 6 0 0 1 10.2-4.2L16 7.5"/>
+            <path d="M16 4v3.5h-3.5"/>
+            <path d="M16 10a6 6 0 0 1-10.2 4.2L4 12.5"/>
+            <path d="M4 16v-3.5h3.5"/>
+        </svg>
+        @break
+
     @case('backup')
         {{-- taca z pobieraniem: Kopie zapasowe --}}
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" {{ $attributes }}>

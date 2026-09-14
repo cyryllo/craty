@@ -86,3 +86,20 @@ potrzeby robić tego w kontenerze.
 Obraz Dockera (`Dockerfile`) jest tylko na potrzeby dewelopmentu (`php artisan
 serve`) — wdrożenie produkcyjne (php-fpm + nginx, kolejka, cron, HTTPS) to
 osobny temat.
+
+## Wdrożenie na prawdziwym hostingu
+
+Poza dev-loopem z Dockera appka ma webowy instalator pod adresem `/install`
+— kreator działa od razu po wgraniu plików na serwer (kopiuje `.env` z
+`.env.example`, sam generuje `APP_KEY`), nie wymaga wcześniejszego dostępu
+SSH/artisan. Pyta o dane do bazy (z testem połączenia), nazwę appki i konto
+głównego administratora, opcjonalnie ładuje dane przykładowe. Po zakończeniu
+blokuje się automatycznie — nie da się go uruchomić drugi raz, gdy w bazie
+istnieje już jakikolwiek użytkownik.
+
+Kolejne wersje wgrywa się przez panel (Ustawienia → Aktualizacje) jako plik
+`.zip` — tak samo bez SSH/composera/npm. Paczki buduje się w tym repo
+komendą `php artisan release:build` (pakuje kod wraz z `vendor/` i
+skompilowanymi assetami). Przed zastosowaniem appka sama robi migawkę
+obecnego kodu, więc błędną aktualizację da się cofnąć jednym przyciskiem
+("Wycofaj ostatnią aktualizację") — to przywraca tylko kod, nie bazę danych.

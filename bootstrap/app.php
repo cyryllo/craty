@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
+            'install.guard' => \App\Http\Middleware\EnsureNotInstalled::class,
         ]);
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,

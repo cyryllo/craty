@@ -38,6 +38,14 @@
                         <p class="text-sm text-gray-500 mt-1">{{ __('Download or create a backup of the database and uploaded files.') }}</p>
                     </div>
                 </a>
+
+                <a href="{{ route('settings.updates.index') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition flex gap-4 items-start">
+                    <x-icon name="update" class="w-8 h-8 text-indigo-500 shrink-0" />
+                    <div>
+                        <h3 class="font-medium text-gray-900">{{ __('Updates') }}</h3>
+                        <p class="text-sm text-gray-500 mt-1">{{ __('Upload an update package for this app.') }}</p>
+                    </div>
+                </a>
             @endif
 
             <a href="{{ route('categories.index') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition flex gap-4 items-start">

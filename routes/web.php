@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SaleListingController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StorageLocationController;
+use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
@@ -90,7 +91,17 @@ Route::middleware('auth')->group(function () {
             ->where('filename', '.*')->name('settings.backup.download');
         Route::delete('ustawienia/kopie-zapasowe/{filename}', [BackupController::class, 'destroy'])
             ->where('filename', '.*')->name('settings.backup.destroy');
+
+        Route::get('ustawienia/aktualizacje', [UpdateController::class, 'index'])->name('settings.updates.index');
+        // password.confirm: ponowne podanie hasła tuż przed jedną z najbardziej
+        // uprzywilejowanych akcji w appce (nadpisanie własnego kodu PHP) —
+        // ten sam mechanizm Breeze co przy zwykłej zmianie hasła.
+        Route::post('ustawienia/aktualizacje', [UpdateController::class, 'upload'])
+            ->middleware('password.confirm')->name('settings.updates.upload');
+        Route::post('ustawienia/aktualizacje/wycofaj', [UpdateController::class, 'rollback'])
+            ->middleware('password.confirm')->name('settings.updates.rollback');
     });
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/install.php';
