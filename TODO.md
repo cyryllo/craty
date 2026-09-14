@@ -28,7 +28,7 @@ bo są małe)**
 **Faza 1 — fundamenty pod kolejne funkcje (małe/średnie, żadne nie wymaga
 jeszcze decyzji biznesowej)**
 5. ~~**Ustawienia poczty / SMTP** (pełna specyfikacja niżej) — samodzielne,
-   wzorowane na już istniejącym `AppSetting`, i odblokowuje punkt 10
+   wzorowane na już istniejącym `AppSetting`, i odblokowuje punkt 11
    (powiadomienia e-mail) oraz każdą przyszłą wiadomość wysyłaną z appki.~~
    **Zrobione** (`MailSettingController`, `MailSettingsApplier`, wysyłka
    testowej wiadomości, 5 testów).
@@ -38,48 +38,55 @@ jeszcze decyzji biznesowej)**
    **Zrobione** (`spatie/laravel-backup`, `BackupService`, harmonogram w
    `routes/console.php`, 8 testów).
 
+**Faza 1.5 — punkt pośredni, samodzielny (nie blokuje ani nie jest
+blokowany przez Instalator/Aktualizacje z fazy 2)**
+7. **Publiczna witryna „pchli targ”** (pełna specyfikacja niżej) — korzysta
+   wyłącznie z tego, co już jest (`SaleListing`), zero nowych zależności;
+   jedyna dziś publiczna (bez logowania) część appki, więc domyślnie
+   wyłączona i włączana świadomie przez admina.
+
 **Faza 2 — wyjście poza obecny dev-loop (dopiero gdy appka ma trafić na
 realny hosting, nie tylko zostać w Dockerze na tej maszynie)**
-7. **Instalator aplikacji** (pełna specyfikacja niżej) — pierwszy krok do
-   prawdziwego wdrożenia; bez tego nie ma na czym testować punktu 8.
-8. **Moduł Aktualizacje** (pełna specyfikacja niżej) — zależny wprost od
+8. **Instalator aplikacji** (pełna specyfikacja niżej) — pierwszy krok do
+   prawdziwego wdrożenia; bez tego nie ma na czym testować punktu 9.
+9. **Moduł Aktualizacje** (pełna specyfikacja niżej) — zależny wprost od
    Backupu (krok 3) i sensowny dopiero, gdy istnieje już jakaś instalacja do
-   aktualizowania (czyli po punkcie 7).
+   aktualizowania (czyli po punkcie 8).
 
 **Faza 3 — wartość dla codziennego użytku (z mapy drogowej + pomysły
 niezależne od decyzji biznesowych)**
-9. **Raporty** — korzysta z tego, co już jest w bazie, zero zmian modelu.
-10. **Powiadomienia e-mail** — teraz odblokowane przez SMTP z fazy 1.
-11. **Import masowy** istniejącego spisu z arkusza — najbardziej przydatne
+10. **Raporty** — korzysta z tego, co już jest w bazie, zero zmian modelu.
+11. **Powiadomienia e-mail** — teraz odblokowane przez SMTP z fazy 1.
+12. **Import masowy** istniejącego spisu z arkusza — najbardziej przydatne
     właśnie przy pierwszym realnym wdrożeniu u kogoś z istniejącym majątkiem
     (czyli naturalnie pasuje zaraz po fazie 2).
-12. **PWA** (skan QR kamerą, offline) — spory skok wygody na telefonie,
+13. **PWA** (skan QR kamerą, offline) — spory skok wygody na telefonie,
     niezależny od reszty.
-13. **Wygoda dnia codziennego** (filtry, masowe skanowanie, autouzupełnianie
+14. **Wygoda dnia codziennego** (filtry, masowe skanowanie, autouzupełnianie
     po EAN, dark mode) — drobne, można wpleść w dowolnym momencie później,
     niezależnie od kolejności innych faz.
 
 **Faza 4 — rozszerzenia sensowne dopiero po realnym użytkowaniu albo
 większe zmiany modelu danych**
-14. **Inwentaryzacja okresowa** — technicznie tanie (fundament QR+lokalizacje
+15. **Inwentaryzacja okresowa** — technicznie tanie (fundament QR+lokalizacje
     już jest), ale sensowne dopiero jak jest co inwentaryzować, czyli po
     jakimś czasie realnego użycia.
-15. **Serwis i konserwacja sprzętu** (przeglądy, dziennik serwisowy,
-    gwarancje) — naturalnie korzysta z powiadomień e-mail z punktu 10.
-16. **Rezerwacje sprzętu** — ma sens dopiero przy wielu osobach
+16. **Serwis i konserwacja sprzętu** (przeglądy, dziennik serwisowy,
+    gwarancje) — naturalnie korzysta z powiadomień e-mail z punktu 11.
+17. **Rezerwacje sprzętu** — ma sens dopiero przy wielu osobach
     współdzielących warsztat naraz.
-17. **Log aktywności + raport PDF wartości majątku**.
-18. **Materiały eksploatacyjne** (tryb ilościowy) — duża zmiana modelu
+18. **Log aktywności + raport PDF wartości majątku**.
+19. **Materiały eksploatacyjne** (tryb ilościowy) — duża zmiana modelu
     danych, robić świadomie i osobno, nie przy okazji czegoś innego.
-19. **Eksport OLX krok C** — dopiero jeśli sprzedaż stanie się regularna;
+20. **Eksport OLX krok C** — dopiero jeśli sprzedaż stanie się regularna;
     to zależy od realnego użycia, nie od nas, więc nie przyspieszać na siłę.
-20. **Integracja z Nextcloud** — opcjonalna, niezależna od reszty listy.
+21. **Integracja z Nextcloud** — opcjonalna, niezależna od reszty listy.
 
 **Faza 5 — duże decyzje, warunkowe**
-21. **Multi-tenancy + publiczne API** — tylko jeśli appka ma faktycznie
+22. **Multi-tenancy + publiczne API** — tylko jeśli appka ma faktycznie
     trafić do innych pracowni, nie tylko własnej (decyzja produktowa, nie
     techniczna — ustalić to *przed* tą fazą, nie w jej trakcie).
-22. **Appka natywna Android** — dopiero jeśli PWA z punktu 12 się nie sprawdzi.
+23. **Appka natywna Android** — dopiero jeśli PWA z punktu 13 się nie sprawdzi.
 
 ## Z mapy drogowej (kolejne etapy)
 
@@ -296,6 +303,47 @@ zwykłej zmianie hasła do skrzynki.
   funkcjonalność z listy pomysłów niżej, budowana później na tym fundamencie.
 
 </details>
+
+## Publiczna witryna „pchli targ” (specyfikacja — do budowy na sygnał „zbuduj pchli targ”)
+
+Jedyna dziś planowana **publiczna** (bez logowania) część appki — wszystko
+inne wymaga konta. Pokazuje na zewnątrz to, co i tak już trafia na OLX przez
+eksport CSV (`SaleListing`), tylko jako własna podstrona zamiast/obok
+ogłoszenia u pośrednika. Zero zmian w modelu `SaleListing` — `title`,
+`description`, `price` już tam są.
+
+- **Adres:** `/pchli-targ`, osobna grupa tras **poza** middleware `auth`
+  (ale nadal przez `SetLocale`, żeby strona szła w domyślnym języku appki —
+  gość nie ma konta, więc nie ma z czego czytać osobistej preferencji
+  języka; używa `AppSetting::current()->locale`).
+- **Włącznik w Ustawienia → Ustawienia aplikacji** (nowe pole na
+  `AppSetting`, np. `public_marketplace_enabled`, domyślnie `false`) — gdy
+  wyłączony, trasa zwraca 404, a nie pustą stronę, żeby nie zdradzać nawet
+  istnienia adresu. Obok włącznika: pole **„E-mail kontaktowy do ofert”**
+  (osobne od „From address” w Ustawienia → Poczta — administrator może
+  chcieć inną skrzynkę do korespondencji z kupującymi niż techniczny adres
+  nadawcy SMTP), pokazywane/wymagane tylko gdy włącznik jest zaznaczony.
+- **Dane źródłowe:** tylko `SaleListing` ze statusem `wyeksportowana`
+  („Listed”) — **oferty ze statusem `sprzedana` znikają z listy całkowicie**
+  (ustalone: prościej niż trzymać na stronie nieaktualne/niedostępne pozycje,
+  i nie trzeba pilnować, żeby ktoś nie napisał o coś, co już sprzedane).
+- **Jedna strona, bez podstron per-oferta** (ustalone: mniej do zbudowania,
+  wszystko widoczne od razu na kafelku/w wierszu — zdjęcie, tytuł, cena,
+  opis; brak osobnego URL do wysłania komuś pojedynczej oferty na razie).
+- **Przełącznik lista/kafle**, tym samym wzorcem co `/items`
+  (`ItemController::index()` + `session('items_view')`) — osobny klucz sesji
+  (np. `marketplace_view`), żeby wybór na stronie publicznej nie nadpisywał
+  preferencji zalogowanego użytkownika w panelu i odwrotnie.
+- **Pokazywane pola:** zdjęcie (`item->primaryPhoto`, placeholder gdy brak),
+  `title`, `price`, `description` z `SaleListing` — **nie** dane wewnętrzne
+  przedmiotu (`inventory_no`, lokalizacja, numer seryjny/EAN, wartość
+  księgowa) — to ogłoszenie sprzedażowe, nie kartoteka magazynowa.
+- **Kontakt:** link `mailto:` na skonfigurowany e-mail kontaktowy, z
+  tematem wstępnie wypełnionym tytułem oferty (`?subject=...`) — żadnego
+  formularza/koszyka/płatności, appka niczego nie sprzedaje sama.
+- **SEO/roboty:** poza zakresem na start — appka to narzędzie do jednego
+  warsztatu, nie sklep do pozycjonowania; nie dodawać `sitemap.xml`/meta
+  Open Graph, dopóki ktoś tego realnie nie potrzebuje.
 
 ## Pomysły do rozważenia później (bez ustalonych decyzji, nie specyfikacja)
 
