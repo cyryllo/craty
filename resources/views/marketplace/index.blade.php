@@ -22,85 +22,110 @@
             </div>
         </header>
 
-        <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="lg:flex lg:items-start lg:gap-8">
 
-            @if ($contactEmail || $contactPhone)
-                <div class="bg-indigo-50 border border-indigo-100 text-indigo-900 rounded-lg p-4 flex flex-wrap items-center justify-between gap-3">
-                    <p class="text-sm">{{ __('Interested in one of the items below? Get in touch.') }}</p>
-                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium">
-                        @if ($contactEmail)
-                            <a href="mailto:{{ $contactEmail }}" class="text-indigo-700 hover:underline">✉️ {{ $contactEmail }}</a>
-                        @endif
-                        @if ($contactPhone)
-                            <a href="tel:{{ $contactPhone }}" class="text-indigo-700 hover:underline">📞 {{ $contactPhone }}</a>
-                        @endif
+                @if ($categories->isNotEmpty())
+                    <aside class="mb-6 lg:mb-0 lg:w-52 shrink-0">
+                        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{{ __('Categories') }}</h2>
+                        <nav class="bg-white rounded-lg shadow divide-y divide-gray-100 overflow-hidden text-sm">
+                            <a href="{{ request()->fullUrlWithQuery(['category_id' => null, 'page' => null]) }}"
+                               @class(['flex justify-between px-4 py-2', 'bg-gray-900 text-white' => ! $categoryId, 'text-gray-700 hover:bg-gray-50' => $categoryId])>
+                                <span>{{ __('All') }}</span>
+                                <span @class(['text-gray-400' => $categoryId])>{{ $totalCount }}</span>
+                            </a>
+                            @foreach ($categories as $category)
+                                <a href="{{ request()->fullUrlWithQuery(['category_id' => $category->id, 'page' => null]) }}"
+                                   @class(['flex justify-between px-4 py-2', 'bg-gray-900 text-white' => $categoryId === $category->id, 'text-gray-700 hover:bg-gray-50' => $categoryId !== $category->id])>
+                                    <span>{{ $category->name }}</span>
+                                    <span @class(['text-gray-400' => $categoryId !== $category->id])>{{ $category->listings_count }}</span>
+                                </a>
+                            @endforeach
+                        </nav>
+                    </aside>
+                @endif
+
+                <div class="flex-1 min-w-0 space-y-6">
+
+                    @if ($contactEmail || $contactPhone)
+                        <div class="bg-indigo-50 border border-indigo-100 text-indigo-900 rounded-lg p-4 flex flex-wrap items-center justify-between gap-3">
+                            <p class="text-sm">{{ __('Interested in one of the items below? Get in touch.') }}</p>
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium">
+                                @if ($contactEmail)
+                                    <a href="mailto:{{ $contactEmail }}" class="text-indigo-700 hover:underline">✉️ {{ $contactEmail }}</a>
+                                @endif
+                                @if ($contactPhone)
+                                    <a href="tel:{{ $contactPhone }}" class="text-indigo-700 hover:underline">📞 {{ $contactPhone }}</a>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="flex items-center justify-between gap-4 flex-wrap">
+                        <h1 class="text-xl font-semibold text-gray-900">{{ __('Items for sale') }}</h1>
+
+                        <div class="flex rounded-md border border-gray-300 overflow-hidden shrink-0 bg-white" role="group" aria-label="{{ __('List view') }}">
+                            <a href="{{ request()->fullUrlWithQuery(['view' => 'grid']) }}"
+                               title="{{ __('Grid view') }}"
+                               @class(['px-3 py-2 text-sm', 'bg-gray-900 text-white' => $view === 'grid', 'text-gray-500 hover:bg-gray-50' => $view !== 'grid'])>
+                                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M3 3h6v6H3V3zm8 0h6v6h-6V3zM3 11h6v6H3v-6zm8 0h6v6h-6v-6z"/></svg>
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['view' => 'list']) }}"
+                               title="{{ __('List view') }}"
+                               @class(['px-3 py-2 text-sm border-l border-gray-300', 'bg-gray-900 text-white' => $view === 'list', 'text-gray-500 hover:bg-gray-50' => $view !== 'list'])>
+                                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    @if ($listings->isEmpty())
+                        <div class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+                            {{ __('Nothing for sale right now — check back later.') }}
+                        </div>
+                    @elseif ($view === 'list')
+                        <div class="bg-white rounded-lg shadow divide-y divide-gray-100">
+                            @foreach ($listings as $listing)
+                                <div class="p-4 flex gap-4 items-start">
+                                    <div class="w-20 h-20 rounded-md bg-gray-100 overflow-hidden shrink-0">
+                                        @if ($listing->item?->primaryPhoto->first())
+                                            <img src="{{ $listing->item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
+                                        @endif
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-baseline justify-between gap-3 flex-wrap">
+                                            <h2 class="font-medium text-gray-900">{{ $listing->title }}</h2>
+                                            <span class="font-semibold text-gray-900 whitespace-nowrap">{{ number_format((float) $listing->price, 2, ',', ' ') }} zł</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-1 whitespace-pre-line">{{ $listing->description }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach ($listings as $listing)
+                                <div class="bg-white rounded-lg shadow overflow-hidden flex flex-col">
+                                    <div class="aspect-video bg-gray-100">
+                                        @if ($listing->item?->primaryPhoto->first())
+                                            <img src="{{ $listing->item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
+                                        @endif
+                                    </div>
+                                    <div class="p-4 flex-1 flex flex-col">
+                                        <div class="flex items-baseline justify-between gap-3">
+                                            <h2 class="font-medium text-gray-900">{{ $listing->title }}</h2>
+                                        </div>
+                                        <span class="font-semibold text-gray-900 mt-1">{{ number_format((float) $listing->price, 2, ',', ' ') }} zł</span>
+                                        <p class="text-sm text-gray-600 mt-2 flex-1 whitespace-pre-line">{{ $listing->description }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div>
+                        {{ $listings->links() }}
                     </div>
                 </div>
-            @endif
-
-            <div class="flex items-center justify-between gap-4 flex-wrap">
-                <h1 class="text-xl font-semibold text-gray-900">{{ __('Items for sale') }}</h1>
-
-                <div class="flex rounded-md border border-gray-300 overflow-hidden shrink-0 bg-white" role="group" aria-label="{{ __('List view') }}">
-                    <a href="{{ request()->fullUrlWithQuery(['view' => 'grid']) }}"
-                       title="{{ __('Grid view') }}"
-                       @class(['px-3 py-2 text-sm', 'bg-gray-900 text-white' => $view === 'grid', 'text-gray-500 hover:bg-gray-50' => $view !== 'grid'])>
-                        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M3 3h6v6H3V3zm8 0h6v6h-6V3zM3 11h6v6H3v-6zm8 0h6v6h-6v-6z"/></svg>
-                    </a>
-                    <a href="{{ request()->fullUrlWithQuery(['view' => 'list']) }}"
-                       title="{{ __('List view') }}"
-                       @class(['px-3 py-2 text-sm border-l border-gray-300', 'bg-gray-900 text-white' => $view === 'list', 'text-gray-500 hover:bg-gray-50' => $view !== 'list'])>
-                        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
-                    </a>
-                </div>
-            </div>
-
-            @if ($listings->isEmpty())
-                <div class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-                    {{ __('Nothing for sale right now — check back later.') }}
-                </div>
-            @elseif ($view === 'list')
-                <div class="bg-white rounded-lg shadow divide-y divide-gray-100">
-                    @foreach ($listings as $listing)
-                        <div class="p-4 flex gap-4 items-start">
-                            <div class="w-20 h-20 rounded-md bg-gray-100 overflow-hidden shrink-0">
-                                @if ($listing->item?->primaryPhoto->first())
-                                    <img src="{{ $listing->item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
-                                @endif
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-baseline justify-between gap-3 flex-wrap">
-                                    <h2 class="font-medium text-gray-900">{{ $listing->title }}</h2>
-                                    <span class="font-semibold text-gray-900 whitespace-nowrap">{{ number_format((float) $listing->price, 2, ',', ' ') }} zł</span>
-                                </div>
-                                <p class="text-sm text-gray-600 mt-1 whitespace-pre-line">{{ $listing->description }}</p>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach ($listings as $listing)
-                        <div class="bg-white rounded-lg shadow overflow-hidden flex flex-col">
-                            <div class="aspect-video bg-gray-100">
-                                @if ($listing->item?->primaryPhoto->first())
-                                    <img src="{{ $listing->item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
-                                @endif
-                            </div>
-                            <div class="p-4 flex-1 flex flex-col">
-                                <div class="flex items-baseline justify-between gap-3">
-                                    <h2 class="font-medium text-gray-900">{{ $listing->title }}</h2>
-                                </div>
-                                <span class="font-semibold text-gray-900 mt-1">{{ number_format((float) $listing->price, 2, ',', ' ') }} zł</span>
-                                <p class="text-sm text-gray-600 mt-2 flex-1 whitespace-pre-line">{{ $listing->description }}</p>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-
-            <div>
-                {{ $listings->links() }}
             </div>
         </main>
     </body>

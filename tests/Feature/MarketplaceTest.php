@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\AppSetting;
+use App\Models\Category;
 use App\Models\Item;
 use App\Models\SaleListing;
 use App\Models\User;
@@ -47,10 +48,29 @@ class MarketplaceTest extends TestCase
         $this->assertSame('list', session('marketplace_view'));
     }
 
-    private function createListing(string $inventoryNo, string $title, string $status): SaleListing
+    public function test_marketplace_can_be_filtered_by_category(): void
+    {
+        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
+        $tools = Category::create(['name' => 'Narzędzia', 'code' => 'NAR']);
+        $electronics = Category::create(['name' => 'Elektronika', 'code' => 'ELE']);
+
+        $drill = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka', 'wyeksportowana', $tools->id);
+        $multimeter = $this->createListing('ELE-BRAK-2026-00001', 'Multimetr', 'wyeksportowana', $electronics->id);
+
+        $response = $this->get(route('marketplace.index', ['category_id' => $tools->id]));
+
+        $response->assertOk();
+        $response->assertSee($drill->title);
+        $response->assertDontSee($multimeter->title);
+        $response->assertSee('Narzędzia');
+        $response->assertSee('Elektronika');
+    }
+
+    private function createListing(string $inventoryNo, string $title, string $status, ?int $categoryId = null): SaleListing
     {
         $item = Item::create([
             'inventory_no' => $inventoryNo, 'name' => $title, 'condition' => 'uzywany', 'status' => 'do_sprzedazy',
+            'category_id' => $categoryId,
         ]);
 
         return SaleListing::create([

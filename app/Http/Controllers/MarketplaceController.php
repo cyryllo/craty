@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AppSetting;
+use App\Models\Category;
 use App\Models\SaleListing;
 use Illuminate\Http\Request;
 
@@ -29,11 +30,26 @@ class MarketplaceController extends Controller
             $view = session('marketplace_view', 'grid');
         }
 
-        // Tylko aktualnie dostępne oferty — sprzedane znikają całkowicie
-        // (ustalone: prościej niż trzymać nieaktualne pozycje na stronie).
-        $listings = SaleListing::query()
-            ->where('status', 'wyeksportowana')
-            ->with('item.primaryPhoto')
+        // Tylko aktualnie dostępne oferty — sprzedane/wycofane znikają
+        // całkowicie (ustalone: prościej niż trzymać nieaktualne pozycje).
+        $activeListings = SaleListing::query()->where('status', 'wyeksportowana');
+
+        // Kategorie do filtra po lewej — tylko te, w których faktycznie jest
+        // dziś coś wystawione, z liczbą ofert przy każdej.
+        $categories = Category::query()
+            ->whereHas('items.saleListings', fn ($q) => $q->where('status', 'wyeksportowana'))
+            ->withCount(['items as listings_count' => fn ($q) => $q->whereHas(
+                'saleListings',
+                fn ($q) => $q->where('status', 'wyeksportowana')
+            )])
+            ->orderBy('name')
+            ->get();
+
+        $categoryId = $request->integer('category_id') ?: null;
+
+        $listings = (clone $activeListings)
+            ->when($categoryId, fn ($q) => $q->whereHas('item', fn ($q) => $q->where('category_id', $categoryId)))
+            ->with('item.primaryPhoto', 'item.category')
             ->latest('exported_at')
             ->paginate(24)
             ->withQueryString();
@@ -41,6 +57,9 @@ class MarketplaceController extends Controller
         return view('marketplace.index', [
             'listings' => $listings,
             'view' => $view,
+            'categories' => $categories,
+            'categoryId' => $categoryId,
+            'totalCount' => $activeListings->count(),
             'contactEmail' => $setting->public_contact_email,
             'contactPhone' => $setting->public_contact_phone,
             'appName' => $setting->effectiveName(),
