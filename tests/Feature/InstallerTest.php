@@ -14,6 +14,9 @@ class InstallerTest extends TestCase
 {
     use RefreshDatabase;
 
+    // Ten test celowo sprawdza stan "przed instalacją" — patrz Tests\TestCase.
+    protected bool $withoutDefaultInstalledUser = true;
+
     private string $tempEnvPath;
 
     protected function setUp(): void

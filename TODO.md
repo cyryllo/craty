@@ -176,10 +176,34 @@ implementacji, nie produktu):
   klasę, z której akurat wykonuje się bieżące żądanie — PHP trzyma już
   wczytaną definicję w pamięci do końca tego żądania niezależnie od usunięcia
   pliku z dysku.
+- **Automatyczne przekierowanie na `/install`, gdy appka nie jest
+  zainstalowana** (na sygnał użytkownika, po realnym teście ręcznym) — nie
+  tylko `EnsureNotInstalled` blokujące ponowne wejście na kreator PO
+  instalacji, ale też odwrotność: `RedirectToInstallerIfNotInstalled`,
+  globalny middleware w grupie `web`, wysyła KAŻDE inne żądanie (login,
+  dashboard, cokolwiek) na `/install`, dopóki w bazie nie ma żadnego
+  użytkownika — zamiast pokazywać ekrany, które i tak by nie zadziałały bez
+  zainstalowanej bazy. Obie blokady dzielą jedną definicję "czy appka jest
+  zainstalowana" (`App\Support\InstallationStatus`). Wymagało jawnego
+  ustawienia priorytetu middleware (`prependToPriorityList`, zakotwiczone o
+  interfejs `AuthenticatesRequests`, nie konkretną klasę `Authenticate` —
+  to on jest w domyślnej liście priorytetów Laravela) — bez tego `auth`
+  wykonywało się pierwsze na trasach typu `/dashboard` i gość trafiał na
+  `/login` zamiast na `/install`.
 
-11 nowych testów (`InstallerTest`, `EnvFileWriterTest`), w tym jeden pełny
-przebieg end-to-end na osobnej, jednorazowej bazie scratch na tym samym
-kontenerze MariaDB co dev (tworzonej i kasowanej w teście) — nie na danych
+**Techniczna konsekwencja dla całego pakietu testów:** skoro appka
+"niezainstalowana" przekierowuje teraz wszystko, prawie każdy istniejący
+test niejawnie zakładał, że appka JEST zainstalowana (nigdy nie musiał tego
+zakładać jawnie). Zamiast dopisywać `User::factory()->create()` do
+dziesiątek testów, `Tests\TestCase::setUp()` zakłada teraz jednego
+"milczącego" admina zaraz po migracji z `RefreshDatabase`, chyba że test
+jawnie ustawi `$withoutDefaultInstalledUser = true` (robią to tylko testy,
+które celowo sprawdzają stan przed instalacją).
+
+Testy: `InstallerTest`, `EnvFileWriterTest`, `InstallerCleanupServiceTest`,
+`RedirectToInstallerIfNotInstalledTest` — w tym jeden pełny przebieg
+end-to-end na osobnej, jednorazowej bazie scratch na tym samym kontenerze
+MariaDB co dev (tworzonej i kasowanej w teście) — nie na danych
 deweloperskich.
 
 <details>
