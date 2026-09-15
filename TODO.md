@@ -144,16 +144,23 @@ implementacji, nie produktu):
   komunikatem, `.env` zostaje z już zapisanymi danymi bazy. Ponowne wysłanie
   formularza jest bezpieczne w normalnym przypadku: `migrate` pomija
   migracje już wykonane, więc to naturalnie idempotentne — nie trzeba nic
-  ręcznie czyścić. **Wyjątek zaobserwowany przy ręcznym teście:** jeśli sam
-  proces PHP zostanie przerwany W ŚRODKU pojedynczej migracji (np. kontener
-  padł dokładnie między `CREATE TABLE jobs` a wpisem do tabeli `migrations`
-  — DDL w MySQL nie jest transakcyjne, więc tego etapu nie da się cofnąć),
-  ponowne `migrate --force` próbuje stworzyć tę samą tabelę drugi raz i
-  wybucha `Table already exists`. To rzadki, zewnętrzny scenariusz (przerwanie
-  procesu, nie błąd w kodzie), ale naprawa jest wtedy ręczna — trzeba albo
-  usunąć osierocone tabele, albo (najprościej na dev/pierwszej instalacji,
-  gdzie i tak nie ma jeszcze żadnych realnych danych) wyczyścić całą bazę i
-  zacząć kreator od nowa.
+  ręcznie czyścić. Jeśli mimo to proces zostanie przerwany W ŚRODKU
+  pojedynczej migracji (DDL w MySQL nie jest transakcyjne, więc tego etapu
+  nie da się cofnąć), ponowne `migrate --force` próbuje stworzyć tę samą
+  tabelę drugi raz i wybucha `Table already exists` — naprawa jest wtedy
+  ręczna (usunięcie osieroconych tabel albo, najprościej na pierwszej
+  instalacji, gdzie i tak nie ma jeszcze żadnych realnych danych,
+  wyczyszczenie całej bazy i start kreatora od nowa).
+- **Znaleziona i naprawiona prawdziwa przyczyna "pustej strony" po
+  kliknięciu "Zainstaluj" przy ręcznym teście** — to nie był rzadki zbieg
+  okoliczności, tylko systematyczny błąd: `php artisan serve` domyślnie
+  restartuje CAŁY proces w środku żądania, gdy wykryje zmianę pliku `.env`
+  — a `store()` właśnie do niego pisze (dane bazy). Restart w połowie
+  żądania zrywa połączenie z klientem (pusta strona/HTTP 000, zero wpisu w
+  logu Laravela, bo proces ginie, nie rzuca wyjątku) zanim odpowiedź zdąży
+  dotrzeć — i to on, nie coś w logice instalatora, stał za każdym
+  wcześniejszym "przerwanym w środku" przebiegiem opisanym wyżej.
+  `docker-compose.yml` dostał `--no-reload` na stałe — patrz CLAUDE.md.
 - **Strona podsumowania po instalacji** (`GET /install/done`, chroniona
   flagą na sesji — nie flash(), bo strona obsługuje jeszcze jedno kolejne
   żądanie, patrz niżej — zamiast blokady "już zainstalowane", która

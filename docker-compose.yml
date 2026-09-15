@@ -16,7 +16,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: php artisan serve --host=0.0.0.0 --port=8000
+    # --no-reload: bez tego `php artisan serve` restartuje CAŁY proces w
+    # środku żądania, gdy wykryje zmianę pliku .env — a Instalator i Moduł
+    # Aktualizacje właśnie do niego piszą jako część własnej logiki. Restart
+    # w połowie żądania zrywa połączenie z klientem (pusta strona/HTTP 000)
+    # zanim odpowiedź zdąży dotrzeć — nie problem środowiska, tylko
+    # sprzeczność między tą appką a domyślnym trybem dev-serwera Laravela.
+    command: php artisan serve --host=0.0.0.0 --port=8000 --no-reload
 
   db:
     image: mariadb:11
