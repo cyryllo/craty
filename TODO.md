@@ -142,17 +142,40 @@ implementacji, nie produktu):
   nie robi żadnego rollbacku/`migrate:fresh` — przy błędzie (zły host bazy,
   migracja padnie w połowie) appka wraca na tę samą stronę z czytelnym
   komunikatem, `.env` zostaje z już zapisanymi danymi bazy. Ponowne wysłanie
-  formularza jest bezpieczne: `migrate` pomija migracje już wykonane, więc
-  to naturalnie idempotentne — nie trzeba nic ręcznie czyścić.
+  formularza jest bezpieczne w normalnym przypadku: `migrate` pomija
+  migracje już wykonane, więc to naturalnie idempotentne — nie trzeba nic
+  ręcznie czyścić. **Wyjątek zaobserwowany przy ręcznym teście:** jeśli sam
+  proces PHP zostanie przerwany W ŚRODKU pojedynczej migracji (np. kontener
+  padł dokładnie między `CREATE TABLE jobs` a wpisem do tabeli `migrations`
+  — DDL w MySQL nie jest transakcyjne, więc tego etapu nie da się cofnąć),
+  ponowne `migrate --force` próbuje stworzyć tę samą tabelę drugi raz i
+  wybucha `Table already exists`. To rzadki, zewnętrzny scenariusz (przerwanie
+  procesu, nie błąd w kodzie), ale naprawa jest wtedy ręczna — trzeba albo
+  usunąć osierocone tabele, albo (najprościej na dev/pierwszej instalacji,
+  gdzie i tak nie ma jeszcze żadnych realnych danych) wyczyścić całą bazę i
+  zacząć kreator od nowa.
 - **Strona podsumowania po instalacji** (`GET /install/done`, chroniona
-  jednorazową flagą na sesji zamiast blokady "już zainstalowane" — inaczej
-  przekierowałaby sama siebie na `/login`, bo admin już istnieje) — poza
-  potwierdzeniem sukcesu przypomina, że instalator jest już automatycznie
-  zablokowany, i **podpowiada, które pliki można opcjonalnie usunąć** z
-  serwera dla dodatkowego spokoju (`routes/install.php`,
-  `InstallController.php`, `resources/views/install/`) — bez automatycznego
-  kasowania czegokolwiek (zbyt ryzykowne: appka usuwająca własny kod w
-  trakcie działania to więcej problemów niż warte).
+  flagą na sesji — nie flash(), bo strona obsługuje jeszcze jedno kolejne
+  żądanie, patrz niżej — zamiast blokady "już zainstalowane", która
+  przekierowałaby stąd samą siebie na `/login`, bo admin już istnieje) —
+  potwierdza sukces i pokazuje przycisk **"Usuń teraz pliki instalatora"**.
+- **Usuwanie plików instalatora jednak zaimplementowane** (na sygnał
+  użytkownika, po realnym teście ręcznym) — wbrew pierwotnej ostrożności
+  ("appka usuwająca własny kod w trakcie działania to więcej problemów niż
+  warte"), bo domknięcie tej luki miało realną wartość: sama blokada
+  `EnsureNotInstalled` opiera się na zapytaniu do bazy, więc chwilowa awaria
+  połączenia (`catch (\Throwable)` traktuje to jako "jeszcze
+  niezainstalowane") ponownie odsłoniłaby kreator, dopóki jego pliki tam
+  leżą. `App\Services\InstallerCleanupService` (root skonfigurowany przez
+  `app.update_root_path` — ten sam klucz co `UpdateService`, więc testy
+  operują na katalogu tymczasowym, nie na tym repo) usuwa w bezpiecznej
+  kolejności: najpierw `require __DIR__.'/install.php';` z `routes/web.php`
+  (żeby kolejne żądanie nigdy nie trafiło na nieistniejący plik tras),
+  dopiero potem sam `routes/install.php`, `InstallController.php` i
+  `resources/views/install/`. Bezpieczne mimo że kasuje plik definiujący
+  klasę, z której akurat wykonuje się bieżące żądanie — PHP trzyma już
+  wczytaną definicję w pamięci do końca tego żądania niezależnie od usunięcia
+  pliku z dysku.
 
 11 nowych testów (`InstallerTest`, `EnvFileWriterTest`), w tym jeden pełny
 przebieg end-to-end na osobnej, jednorazowej bazie scratch na tym samym

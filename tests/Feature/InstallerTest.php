@@ -139,6 +139,56 @@ class InstallerTest extends TestCase
         $this->get(route('install.done'))->assertRedirect(route('login'));
     }
 
+    public function test_cleanup_redirects_to_login_without_the_one_time_flag(): void
+    {
+        $this->post(route('install.cleanup'))->assertRedirect(route('login'));
+    }
+
+    public function test_cleanup_removes_installer_files_when_flag_is_present(): void
+    {
+        // Patrz InstallerCleanupServiceTest — InstallerCleanupService dzieli
+        // "app.update_root_path" z UpdateService, więc podmieniamy je tak
+        // samo, żeby ta trasa nigdy nie dotknęła prawdziwych plików repo.
+        $root = sys_get_temp_dir().'/craty-cleanup-controller-test-'.uniqid();
+        mkdir($root.'/routes', 0755, true);
+        mkdir($root.'/app/Http/Controllers', 0755, true);
+        mkdir($root.'/resources/views/install', 0755, true);
+        file_put_contents($root.'/routes/web.php', "<?php\nrequire __DIR__.'/install.php';\n");
+        file_put_contents($root.'/routes/install.php', '<?php');
+        file_put_contents($root.'/app/Http/Controllers/InstallController.php', '<?php');
+
+        config(['app.update_root_path' => $root]);
+        session(['justInstalled' => true, 'adminEmail' => 'admin@example.com']);
+
+        $response = $this->post(route('install.cleanup'));
+
+        $response->assertRedirect(route('login'));
+        $this->assertFileDoesNotExist($root.'/routes/install.php');
+        $this->assertFileDoesNotExist($root.'/app/Http/Controllers/InstallController.php');
+        $this->assertDirectoryDoesNotExist($root.'/resources/views/install');
+        $this->assertFalse(session()->has('justInstalled'));
+
+        $this->deleteDirectory($root);
+    }
+
+    private function deleteDirectory(string $path): void
+    {
+        if (! is_dir($path)) {
+            return;
+        }
+
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $file) {
+            $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
+        }
+
+        rmdir($path);
+    }
+
     /** @return array<string, mixed> */
     private function validPayload(array $overrides = []): array
     {

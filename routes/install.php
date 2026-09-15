@@ -15,7 +15,7 @@ Route::middleware('install.guard')->group(function () {
 
 // Poza EnsureNotInstalled świadomie — w momencie, gdy tu trafiamy, admin
 // JUŻ istnieje (store() go właśnie założył), więc ta sama blokada
-// przekierowałaby stąd prosto na /login. Zamiast tego chroni ją jednorazowa
-// flaga na sesji, ustawiana wyłącznie przez store() tuż przed przekierowaniem
-// (patrz InstallController::done()).
+// przekierowałaby stąd prosto na /login. Zamiast tego chroni je flaga na
+// sesji, ustawiana wyłącznie przez store() (patrz InstallController::done()).
 Route::get('install/done', [InstallController::class, 'done'])->name('install.done');
+Route::post('install/done/cleanup', [InstallController::class, 'cleanupFiles'])->name('install.cleanup');

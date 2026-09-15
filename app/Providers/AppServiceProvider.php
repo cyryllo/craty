@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Item;
 use App\Observers\ItemObserver;
+use App\Services\InstallerCleanupService;
 use App\Support\AppVersion;
 use App\Support\EnvFileWriter;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +27,13 @@ class AppServiceProvider extends ServiceProvider
         // appki w katalogu tymczasowym, nie na tym repo.
         $this->app->bind(AppVersion::class, fn () => new AppVersion(
             config('app.version_file_path', base_path('VERSION'))
+        ));
+
+        // Ten sam klucz co UpdateService::appRoot() — oba opisują "katalog,
+        // w którym leży ta appka", i oba muszą dać się podmienić w testach
+        // na katalog tymczasowy (ta usługa kasuje pliki appki).
+        $this->app->bind(InstallerCleanupService::class, fn () => new InstallerCleanupService(
+            config('app.update_root_path', base_path())
         ));
     }
 

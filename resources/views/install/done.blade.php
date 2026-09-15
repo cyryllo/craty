@@ -31,6 +31,12 @@
                         <li>app/Http/Controllers/InstallController.php</li>
                         <li>resources/views/install/</li>
                     </ul>
+                    <form method="POST" action="{{ route('install.cleanup') }}" class="mt-3">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-amber-800 text-white text-xs font-medium rounded-md hover:bg-amber-900">
+                            {{ __('Delete installer files now') }}
+                        </button>
+                    </form>
                 </div>
 
                 <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">

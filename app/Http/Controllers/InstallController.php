@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AppSetting;
 use App\Models\User;
+use App\Services\InstallerCleanupService;
 use App\Support\EnvFileWriter;
 use Database\Seeders\DemoDataSeeder;
 use Illuminate\Http\Request;
@@ -99,11 +100,12 @@ class InstallController extends Controller
                 __('Installation failed: :message. Fix the problem and submit the form again — steps already completed will simply be skipped.', ['message' => $e->getMessage()]));
         }
 
-        // Jednorazowa flaga na stronę podsumowania — od teraz w bazie już JEST
-        // użytkownik, więc EnsureNotInstalled zablokowałby /install/done tak
-        // samo jak resztę kreatora, gdyby nie ten wyjątek na sesji.
-        session()->flash('justInstalled', true);
-        session()->flash('adminEmail', $admin->email);
+        // Flaga na sesji (nie flash() — strona podsumowania może obsłużyć
+        // jeszcze jedno żądanie, "usuń pliki instalacyjne", więc musi
+        // przeżyć więcej niż jeden kolejny request) — od teraz w bazie już
+        // JEST użytkownik, więc EnsureNotInstalled zablokowałby /install/done
+        // tak samo jak resztę kreatora, gdyby nie ten wyjątek na sesji.
+        session(['justInstalled' => true, 'adminEmail' => $admin->email]);
 
         return redirect()->route('install.done');
     }
@@ -115,6 +117,31 @@ class InstallController extends Controller
         }
 
         return view('install.done', ['adminEmail' => session('adminEmail')]);
+    }
+
+    /**
+     * Usuwa pliki kreatora z serwera — opcjonalne domknięcie luki: sama
+     * blokada EnsureNotInstalled trzyma się bazy (User::query()->exists()),
+     * więc chwilowa awaria połączenia z bazą (catch (\Throwable) traktuje
+     * to jako "jeszcze niezainstalowane") ponownie odsłoniłaby kreator,
+     * dopóki te pliki istnieją. Chroniona tą samą flagą na sesji co done() —
+     * nie EnsureNotInstalled, bo w tym momencie admin już istnieje.
+     */
+    public function cleanupFiles(InstallerCleanupService $cleanup)
+    {
+        if (! session('justInstalled')) {
+            return redirect()->route('login');
+        }
+
+        $cleanup->removeInstallerFiles();
+
+        Artisan::call('route:clear');
+        Artisan::call('view:clear');
+
+        session()->forget(['justInstalled', 'adminEmail']);
+
+        return redirect()->route('login')
+            ->with('status', __('Installer files removed. You can now log in.'));
     }
 
     /** @return array<string, mixed> */
