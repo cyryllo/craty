@@ -25,6 +25,13 @@ npm install && npm run build
 App: http://localhost:8000 — seeded accounts (password: `password`):
 `admin@craty.test`, `magazynier@craty.test`, `podglad@craty.test`.
 
+**Custom database credentials:** before the first `docker compose up`,
+change `DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD` (and optionally
+`DB_ROOT_PASSWORD`) in `.env` — Docker Compose reads the same file, so the
+MariaDB container is created with those values. Changing them *after* the
+first run has no effect (the database volume already exists) — remove it
+first with `docker compose down -v` and start over.
+
 For a real hosting deployment (no Docker or SSH needed), the app ships a
 web-based installer at `/install` that generates `.env` for you, asks for
 database credentials, and creates the administrator account. Later

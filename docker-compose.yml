@@ -29,11 +29,15 @@ services:
     restart: unless-stopped
     ports:
       - "3306:3306"
+    # Czytane z tego samego .env, którego używa Laravel (Docker Compose sam
+    # ładuje plik .env z katalogu projektu) — zmień DB_DATABASE/DB_USERNAME/
+    # DB_PASSWORD w .env PRZED pierwszym uruchomieniem, żeby ustawić własne
+    # dane logowania do bazy zamiast wartości domyślnych.
     environment:
-      MARIADB_DATABASE: graty
-      MARIADB_USER: graty
-      MARIADB_PASSWORD: graty
-      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: ${DB_DATABASE:-craty}
+      MARIADB_USER: ${DB_USERNAME:-craty}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-craty}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
     volumes:
       - db-data:/var/lib/mysql
     healthcheck:

@@ -25,6 +25,13 @@ npm install && npm run build
 Aplikacja: http://localhost:8000 — konta startowe (hasło: `password`):
 `admin@craty.test`, `magazynier@craty.test`, `podglad@craty.test`.
 
+**Własne dane logowania do bazy:** przed pierwszym `docker compose up`
+zmień `DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD` (i opcjonalnie
+`DB_ROOT_PASSWORD`) w pliku `.env` — Docker Compose czyta ten sam plik, więc
+kontener MariaDB założy bazę/użytkownika z tymi wartościami. Zmiana tego
+już PO pierwszym uruchomieniu (gdy wolumen bazy istnieje) nic nie da — trzeba
+wtedy usunąć wolumen (`docker compose down -v`) i wystartować od nowa.
+
 Na docelowym hostingu (bez Dockera i SSH) appka ma webowy kreator
 instalacji pod `/install` — sam generuje `.env`, prosi o dane do bazy i
 zakłada konto administratora. Kolejne wersje wgrywa się przez panel
