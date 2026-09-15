@@ -90,5 +90,16 @@ class BuildReleasePackageTest extends TestCase
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $this->assertStringStartsNotWith('storage/app/releases/', $zip->getNameIndex($i));
         }
+
+        // Regresja: ten Dockerfile/dev kontener stoi na PHP 8.4, więc
+        // `composer update` odpalony na tej maszynie bez pilnowania
+        // config.platform.php w composer.json cicho dociąga wersje pakietów
+        // (endroid/qr-code, symfony/*), które wymagają PHP 8.4 — appka
+        // deklaruje wsparcie od 8.3. Realnie złapane: produkcja na PHP
+        // 8.3.26 wywalała się na starcie (platform_check.php).
+        $platformCheck = $zip->getFromName('vendor/composer/platform_check.php');
+        $this->assertNotFalse($platformCheck);
+        $this->assertStringContainsString('PHP_VERSION_ID >= 80300', $platformCheck);
+        $this->assertStringNotContainsString('80400', $platformCheck);
     }
 }

@@ -108,10 +108,35 @@ class BuildHostingPackage extends Command
         File::deleteDirectory($publicDir);
     }
 
-    /** public/index.php zakłada, że appka leży katalog WYŻEJ ("__DIR__.'/../...'") — po spłaszczeniu jest obok, więc "/.." znika. */
+    /**
+     * public/index.php zakłada, że appka leży katalog WYŻEJ ("__DIR__.'/../...'")
+     * — po spłaszczeniu jest obok, więc "/.." znika. Druga zmiana jest mniej
+     * oczywista: Laravel liczy publicPath() jako base_path().'/public' na
+     * sztywno, niezależnie od tego, gdzie faktycznie leży index.php — Vite
+     * (manifest.json, zbudowane assety) i asset() budują ścieżki właśnie
+     * przez publicPath(). Bez jawnego $app->usePublicPath(__DIR__) appka
+     * szukałaby manifestu pod .../build/public/build/manifest.json
+     * (podwójne "public") i wywalała ViteManifestNotFoundException, zanim
+     * cokolwiek zdążyło się wyrenderować — złapane realnie przy pierwszym
+     * GET /install na spłaszczonej paczce na produkcji.
+     */
     private function rewriteIndexPhp(string $path): void
     {
-        file_put_contents($path, str_replace("__DIR__.'/../", "__DIR__.'/", file_get_contents($path)));
+        $contents = str_replace("__DIR__.'/../", "__DIR__.'/", file_get_contents($path));
+
+        $contents = str_replace(
+            "(require_once __DIR__.'/bootstrap/app.php')\n    ->handleRequest(Request::capture());",
+            "\$app = require_once __DIR__.'/bootstrap/app.php';\n".
+                "// Appka jest spłaszczona (patrz release:build-hosting) — public/ nie\n".
+                "// istnieje jako osobny katalog, więc publicPath() musi wskazywać tu, a nie\n".
+                "// na domyślne base_path().'/public' (inaczej Vite szuka manifestu pod\n".
+                "// podwójnym '/public/build/...' i wywala ViteManifestNotFoundException).\n".
+                "\$app->usePublicPath(__DIR__);\n".
+                "\$app->handleRequest(Request::capture());",
+            $contents
+        );
+
+        file_put_contents($path, $contents);
     }
 
     private function writeHtaccessFiles(string $workDir): void
