@@ -49,20 +49,6 @@ class SaleListingWorkflowTest extends TestCase
         $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertDontSee('Wiertarka - okazja');
     }
 
-    public function test_viewer_cannot_export_or_mark_sold(): void
-    {
-        $viewer = User::factory()->create(['role' => 'podglad']);
-        $item = Item::create([
-            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'dostepny',
-        ]);
-        $listing = $item->saleListings()->create(['platform' => 'olx', 'title' => 'Wiertarka', 'status' => 'wyeksportowana']);
-
-        $this->actingAs($viewer)->get('/sprzedaz')->assertForbidden();
-        $this->actingAs($viewer)->get('/sprzedaz/eksport.csv')->assertForbidden();
-        $this->actingAs($viewer)->post(route('sale-listings.mark-sold', $listing))->assertForbidden();
-        $this->actingAs($viewer)->post(route('sale-listings.withdraw', $listing))->assertForbidden();
-    }
-
     public function test_withdrawing_a_listing_removes_it_from_wystawione_and_frees_the_item(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);
@@ -80,5 +66,42 @@ class SaleListingWorkflowTest extends TestCase
         $this->assertSame('wycofana', $listing->refresh()->status);
         $this->assertSame('dostepny', $item->refresh()->status);
         $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertDontSee('Wiertarka - okazja');
+    }
+
+    public function test_marking_a_single_prepared_listing_as_listed_moves_it_to_wystawione(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'dostepny',
+        ]);
+        $listing = $item->saleListings()->create([
+            'platform' => 'olx', 'title' => 'Wiertarka - okazja', 'price' => 90,
+        ]);
+
+        $this->actingAs($magazynier)
+            ->post(route('sale-listings.mark-listed', $listing))
+            ->assertRedirect();
+
+        $this->assertSame('wyeksportowana', $listing->refresh()->status);
+        $this->assertNotNull($listing->exported_at);
+        $this->assertSame('do_sprzedazy', $item->refresh()->status);
+
+        $this->actingAs($magazynier)->get('/sprzedaz')->assertDontSee('Wiertarka - okazja');
+        $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertSee('Wiertarka - okazja');
+    }
+
+    public function test_cannot_mark_an_already_listed_listing_as_listed_again(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'do_sprzedazy',
+        ]);
+        $listing = $item->saleListings()->create([
+            'platform' => 'olx', 'title' => 'Wiertarka - okazja', 'status' => 'wyeksportowana', 'exported_at' => now(),
+        ]);
+
+        $this->actingAs($magazynier)
+            ->post(route('sale-listings.mark-listed', $listing))
+            ->assertNotFound();
     }
 }

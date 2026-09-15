@@ -37,6 +37,26 @@ class SaleListingController extends Controller
         ]);
     }
 
+    /**
+     * Ręczne oznaczenie pojedynczej przygotowanej oferty jako wystawionej —
+     * alternatywa dla zbiorczego CSV, gdy admin/magazynier woli po prostu
+     * skopiować treść z okienka podglądu i wkleić ją ręcznie w OLX/Allegro.
+     * Ten sam efekt końcowy co eksport CSV (status + item), tylko dla
+     * jednej oferty naraz, bez pobierania pliku.
+     */
+    public function markListed(SaleListing $listing)
+    {
+        abort_unless($listing->status === 'szkic', 404);
+
+        $listing->update(['status' => 'wyeksportowana', 'exported_at' => now()]);
+
+        if ($listing->item->status !== 'sprzedany') {
+            $listing->item->update(['status' => 'do_sprzedazy']);
+        }
+
+        return back()->with('status', __('Listing marked as listed.'));
+    }
+
     /** Oznacza wystawioną ofertę jako sprzedaną — kończy jej cykl życia. */
     public function markSold(SaleListing $listing)
     {

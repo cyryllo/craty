@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
         Route::post('loans/{loan}/return', [LoanController::class, 'returnLoan'])->name('loans.return');
 
         Route::get('sprzedaz', [SaleListingController::class, 'index'])->name('sale-listings.index');
+        Route::post('sprzedaz/{listing}/wystawiono', [SaleListingController::class, 'markListed'])->name('sale-listings.mark-listed');
         Route::get('sprzedaz/wystawione', [SaleListingController::class, 'exported'])->name('sale-listings.exported');
         Route::post('sprzedaz/wystawione/{listing}/sprzedano', [SaleListingController::class, 'markSold'])->name('sale-listings.mark-sold');
         Route::post('sprzedaz/wystawione/{listing}/wycofaj', [SaleListingController::class, 'withdraw'])->name('sale-listings.withdraw');
@@ -68,7 +69,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('storage-locations', StorageLocationController::class)->except('show');
     });
 
-    // Ewidencję przedmiotów widzi każdy zalogowany, niezależnie od roli (rola "podglad" = tylko odczyt).
+    // Ewidencję przedmiotów widzi każdy zalogowany, niezależnie od roli.
     Route::get('items', [ItemController::class, 'index'])->name('items.index');
     Route::get('items/{item}/label', [ItemController::class, 'label'])->name('items.label');
     Route::get('items/{item}', [ItemController::class, 'show'])->name('items.show');
