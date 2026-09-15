@@ -23,6 +23,8 @@ class UpdatePaths
         '.env',
         '.env.testing',
         '.gitignore',
+        '.gitattributes',
+        '.editorconfig',
         'node_modules',
         'tests',
         'docker-compose.yml',
@@ -37,6 +39,28 @@ class UpdatePaths
         'storage/framework/cache',
         'storage/framework/sessions',
         'storage/framework/views',
+        // Dokumentacja/meta tego repo — nie jest kodem appki, nie ma czego
+        // szukać na docelowym serwerze. CLAUDE.md w szczególności NIE ma
+        // prawa nigdzie wyciekać (patrz .gitignore) — bez tego wpisu i tak
+        // trafiał do paczki, bo builder zipuje realne pliki na dysku, a nie
+        // to, co jest w gicie (gitignore go nie chroni przed spakowaniem).
+        'CLAUDE.md',
+        'README.md',
+        'README.en.md',
+        'CHANGELOG.md',
+        'TODO.md',
+        'LICENSE',
+        // Konfiguracja narzędzi budujących/testujących, zbędna po tym, jak
+        // `public/build` jest już skompilowane, a `vendor/` już zvendorowany
+        // — na docelowym hostingu i tak nikt nie odpali composera ani npm.
+        'package.json',
+        'package-lock.json',
+        'composer.json',
+        'composer.lock',
+        'phpunit.xml',
+        'vite.config.js',
+        'tailwind.config.js',
+        'postcss.config.js',
     ];
 
     /**
