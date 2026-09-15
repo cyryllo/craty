@@ -23,3 +23,6 @@ yarn-error.log
 /.zed
 .DS_Store
 Thumbs.db
+
+# Notatki techniczne do pracy z Claude Code — lokalne, nie publikujemy.
+/CLAUDE.md

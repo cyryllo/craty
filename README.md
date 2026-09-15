@@ -40,7 +40,6 @@ serwerze.
 
 ## Dokumentacja
 
-- [CLAUDE.md](CLAUDE.md) — architektura i wskazówki techniczne
 - [CHANGELOG.md](CHANGELOG.md) — historia zmian
 - [TODO.md](TODO.md) — mapa drogowa
 

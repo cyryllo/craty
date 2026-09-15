@@ -40,7 +40,6 @@ versions are uploaded through the admin panel (Settings → Updates) as a
 
 ## Documentation
 
-- [CLAUDE.md](CLAUDE.md) — architecture and technical notes
 - [CHANGELOG.md](CHANGELOG.md) — change history
 - [TODO.md](TODO.md) — roadmap
 
