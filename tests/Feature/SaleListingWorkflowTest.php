@@ -90,6 +90,33 @@ class SaleListingWorkflowTest extends TestCase
         $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertSee('Wiertarka - okazja');
     }
 
+    public function test_item_page_shows_withdraw_and_mark_sold_instead_of_prepare_when_already_listed(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'do_sprzedazy',
+        ]);
+        $item->saleListings()->create([
+            'platform' => 'olx', 'title' => 'Wiertarka - okazja', 'status' => 'wyeksportowana', 'exported_at' => now(),
+        ]);
+
+        $this->actingAs($magazynier)->get(route('items.show', $item))
+            ->assertSee(__('withdraw'))
+            ->assertSee(__('mark as sold'))
+            ->assertDontSee(__('Prepare sale listing'));
+    }
+
+    public function test_item_page_shows_prepare_button_when_nothing_is_currently_listed(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'dostepny',
+        ]);
+
+        $this->actingAs($magazynier)->get(route('items.show', $item))
+            ->assertSee(__('Prepare sale listing'));
+    }
+
     public function test_cannot_mark_an_already_listed_listing_as_listed_again(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);

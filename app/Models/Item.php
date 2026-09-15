@@ -88,6 +88,12 @@ class Item extends Model
         return $this->hasMany(SaleListing::class);
     }
 
+    /** Oferta aktualnie wystawiona na sprzedaż (jeśli jest) — do przycisków "wycofaj"/"oznacz jako sprzedane" na karcie przedmiotu. */
+    public function activeSaleListing()
+    {
+        return $this->hasOne(SaleListing::class)->where('status', 'wyeksportowana')->latestOfMany();
+    }
+
     public function statusLabel(): string
     {
         return __(self::STATUSES[$this->status] ?? $this->status);
