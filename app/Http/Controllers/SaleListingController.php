@@ -158,20 +158,21 @@ class SaleListingController extends Controller
         );
     }
 
+    /**
+     * EAN/nr seryjny i szacunkowa wartość celowo NIE trafiają tu na życzenie
+     * użytkownika — pierwsze dwa są zbędne (a EAN bywa niepożądany na
+     * publicznym ogłoszeniu), a wartość i tak ląduje osobno w polu "cena"
+     * (patrz create(), $listing->price = $item->value), więc powtarzanie
+     * jej w treści opisu byłoby duplikatem.
+     */
     private function suggestDescription(Item $item): string
     {
         $lines = [$item->name];
 
-        if ($item->specification) {
-            $lines[] = $item->specification;
-        }
-        if ($item->ean) {
-            $lines[] = 'EAN: '.$item->ean;
+        if ($item->description) {
+            $lines[] = $item->description;
         }
         $lines[] = __('Condition').': '.$item->conditionLabel();
-        if ($item->value) {
-            $lines[] = __('Estimated value').': '.number_format((float) $item->value, 2).' zł';
-        }
 
         return implode("\n", $lines);
     }

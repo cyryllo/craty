@@ -84,12 +84,7 @@
 
                 <div class="sm:col-span-2">
                     <x-input-label for="description" :value="__('Description')" />
-                    <textarea id="description" name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300">{{ old('description', $item->description) }}</textarea>
-                </div>
-
-                <div class="sm:col-span-2">
-                    <x-input-label for="specification" :value="__('Technical specification')" />
-                    <textarea id="specification" name="specification" rows="3" class="mt-1 block w-full rounded-md border-gray-300" placeholder="{{ __('model, parameters, serial number...') }}">{{ old('specification', $item->specification) }}</textarea>
+                    <textarea id="description" name="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300" placeholder="{{ __('model, parameters, condition, anything worth noting...') }}">{{ old('description', $item->description) }}</textarea>
                 </div>
 
                 <div class="sm:col-span-2">

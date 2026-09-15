@@ -45,7 +45,7 @@ class DemoDataSeeder extends Seeder
         $qr = app(QrCodeGenerator::class);
 
         $items = [
-            ['name' => 'Wiertarka udarowa Bosch GSB 13 RE', 'category_id' => $elektronarzedzia->id, 'storage_location_id' => $lokR3P2->id, 'value' => 320, 'condition' => 'uzywany', 'specification' => 'Moc 600 W, uchwyt 13 mm, walizka + 2 wiertła', 'serial_number' => 'GSB13RE-00812345', 'ean' => '3165140796337'],
+            ['name' => 'Wiertarka udarowa Bosch GSB 13 RE', 'category_id' => $elektronarzedzia->id, 'storage_location_id' => $lokR3P2->id, 'value' => 320, 'condition' => 'uzywany', 'description' => 'Moc 600 W, uchwyt 13 mm, walizka + 2 wiertła', 'serial_number' => 'GSB13RE-00812345', 'ean' => '3165140796337'],
             ['name' => 'Szlifierka kątowa Makita 9557', 'category_id' => $elektronarzedzia->id, 'storage_location_id' => $lokR3P2->id, 'value' => 280, 'condition' => 'uzywany', 'ean' => '0088381136264'],
             ['name' => 'Zestaw wierteł do metalu 1-13mm', 'category_id' => $narzedzia->id, 'storage_location_id' => $lokR3P2K1->id, 'value' => 60, 'condition' => 'nowy'],
             ['name' => 'Profile aluminiowe 20x20 (6 szt.)', 'category_id' => $materialy->id, 'storage_location_id' => $lokR7->id, 'value' => 90, 'condition' => 'nowy'],

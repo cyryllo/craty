@@ -12,6 +12,29 @@ class SaleListingWorkflowTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * "Specyfikacja techniczna" jako osobne pole zniknęła na życzenie
+     * użytkownika (scalona z "Opis") — sugerowany opis oferty ma teraz
+     * wklejać description przedmiotu, a EAN/wartość celowo znikły (EAN
+     * zbędny na publicznym ogłoszeniu, wartość i tak ląduje osobno w polu
+     * "cena").
+     */
+    public function test_suggested_sale_description_includes_item_description_not_ean_or_value(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany',
+            'status' => 'dostepny', 'description' => 'Moc 600 W, uchwyt 13 mm', 'ean' => '5901234123457', 'value' => 250,
+        ]);
+
+        $response = $this->actingAs($magazynier)->get(route('items.sale-listing.create', $item));
+
+        $response->assertSee('Moc 600 W, uchwyt 13 mm', false)
+            ->assertSee($item->conditionLabel())
+            ->assertDontSee('5901234123457')
+            ->assertDontSee(__('Estimated value'));
+    }
+
     public function test_listing_moves_from_prepared_to_wystawione_after_export_then_to_sold(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);

@@ -70,13 +70,6 @@
                     </div>
                 @endif
 
-                @if ($item->specification)
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('Specification') }}</h3>
-                        <p class="text-sm text-gray-800 whitespace-pre-line">{{ $item->specification }}</p>
-                    </div>
-                @endif
-
                 @if ($item->attachments->isNotEmpty())
                     <div>
                         <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('Attachments') }}</h3>
