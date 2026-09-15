@@ -19,7 +19,7 @@ class ItemManagementTest extends TestCase
         $category = Category::create(['name' => 'Narzędzia', 'code' => 'NAR']);
 
         $response = $this->actingAs($magazynier)->post('/items', [
-            'name' => 'Wkrętarka akumulatorowa',
+            'item_name' => 'Wkrętarka akumulatorowa',
             'condition' => 'nowy',
             'status' => 'dostepny',
             'category_id' => $category->id,
@@ -31,6 +31,36 @@ class ItemManagementTest extends TestCase
         $this->assertStringStartsWith('NAR-', $item->inventory_no);
         $this->assertNotNull($item->qr_path);
         $this->assertDatabaseHas('item_histories', ['item_id' => $item->id, 'action' => 'created']);
+    }
+
+    /**
+     * Regresja: pole nazwy przedmiotu w formularzu nazywa się "item_name",
+     * nie "name" — na telefonie zwykłe <input name="name"> jest przez Chrome
+     * traktowane jak "imię i nazwisko" i podpowiada autouzupełnienie danymi
+     * z konta Google nad polem (realnie zgłoszony bug). Sprawdzamy zarówno
+     * że formularz renderuje właściwą nazwę pola, jak i że stary klucz
+     * "name" nadal działa (kompatybilność wsteczna w prepareForValidation()).
+     */
+    public function test_item_form_uses_item_name_field_not_name_to_avoid_browser_autofill(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+
+        $this->actingAs($magazynier)->get(route('items.create'))
+            ->assertSee('name="item_name"', false)
+            ->assertDontSee('name="name"', false);
+
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'nowy', 'status' => 'dostepny',
+        ]);
+
+        $this->actingAs($magazynier)->put(route('items.update', $item), [
+            'name' => 'Powinno zostać zignorowane bez item_name',
+            'item_name' => 'Wiertarka udarowa',
+            'condition' => 'nowy',
+            'status' => 'dostepny',
+        ])->assertRedirect();
+
+        $this->assertSame('Wiertarka udarowa', $item->fresh()->name);
     }
 
     public function test_items_can_be_found_by_serial_number_or_ean(): void

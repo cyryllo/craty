@@ -13,6 +13,21 @@ class StoreItemRequest extends FormRequest
         return $this->user()->isMagazynier();
     }
 
+    /**
+     * Formularz wysyła nazwę przedmiotu jako "item_name", nie "name" — zwykłe
+     * <input name="name"> jest na telefonie przez Chrome traktowane jak
+     * "imię i nazwisko" i podpowiada autouzupełnienie danymi z konta Google
+     * nad polem (realnie zgłoszony bug). Przemapowujemy tu, przed walidacją,
+     * żeby reszta appki (walidacja, mass assignment na Item::$fillable)
+     * nadal operowała na "name" tak jak dotychczas.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('item_name')) {
+            $this->merge(['name' => $this->input('item_name')]);
+        }
+    }
+
     public function rules(): array
     {
         return [

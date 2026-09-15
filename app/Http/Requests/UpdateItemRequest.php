@@ -13,6 +13,14 @@ class UpdateItemRequest extends FormRequest
         return $this->user()->isMagazynier();
     }
 
+    /** Patrz StoreItemRequest — "item_name" w formularzu przemapowane na "name" przed walidacją. */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('item_name')) {
+            $this->merge(['name' => $this->input('item_name')]);
+        }
+    }
+
     public function rules(): array
     {
         return [
