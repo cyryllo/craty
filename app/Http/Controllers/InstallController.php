@@ -76,6 +76,12 @@ class InstallController extends Controller
             Artisan::call('config:clear');
             Artisan::call('migrate', ['--force' => true]);
 
+            // Bez tego linku zdjęcia przedmiotów i kody QR (dysk "public",
+            // serwowany spod /storage/...) 404-owałyby na każdej świeżo
+            // zainstalowanej appce — nikt wcześniej nie miał okazji tego
+            // odpalić ręcznie, tak jak przy `composer create-project`.
+            Artisan::call('storage:link');
+
             AppSetting::current()->fill(['name' => $data['app_name'] ?? null])->save();
 
             $admin = User::create([
