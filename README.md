@@ -15,6 +15,23 @@ proponuje szybkie dodanie nowego przedmiotu.
 
 Zbudowana na Laravel 12 + MariaDB, w pełni dwujęzyczna (PL/EN).
 
+## Wymagania (własny hosting)
+
+Dotyczy instalacji poza Dockerem (patrz [Wdrożenie na hostingu](#wdrożenie-na-hostingu-bez-dockera-i-ssh)
+niżej) — kreator instalacji (`/install`) sam sprawdza to wszystko i pokazuje,
+czego ewentualnie brakuje, zanim pozwoli przejść dalej.
+
+- **PHP ≥ 8.3**
+- Rozszerzenia PHP: `pdo_mysql`, `mbstring`, `gd`, `zip`, `bcmath`, `exif`, `intl`
+- **MySQL 8+ lub MariaDB 10.3+**
+- Serwer WWW z obsługą przepisywania adresów (Apache z `mod_rewrite` i
+  `AllowOverride All`, albo Nginx z regułą kierującą wszystko do `index.php`)
+- Zapis (uprawnienia dla użytkownika PHP) do katalogów `storage/` i
+  `bootstrap/cache/`
+- **HTTPS** — wymagany do skanowania kamerą (PWA) i realnie zalecany zawsze;
+  zwykły HTTP na produkcji przeglądarki traktują jako niebezpieczny
+  kontekst i blokują dostęp do kamery
+
 ## Szybki start (Docker)
 
 ```bash

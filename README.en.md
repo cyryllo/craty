@@ -15,6 +15,23 @@ adding the item instead of a dead end.
 
 Built with Laravel 12 + MariaDB, fully bilingual (EN/PL).
 
+## Requirements (self-hosting)
+
+Applies to installs outside Docker (see
+[Deploying to a hosting account](#deploying-to-a-hosting-account-no-docker-or-ssh-needed)
+below) — the installer (`/install`) checks all of this itself and shows
+what's missing before letting you proceed.
+
+- **PHP ≥ 8.3**
+- PHP extensions: `pdo_mysql`, `mbstring`, `gd`, `zip`, `bcmath`, `exif`, `intl`
+- **MySQL 8+ or MariaDB 10.3+**
+- A web server with URL rewriting (Apache with `mod_rewrite` and
+  `AllowOverride All`, or Nginx with a rule routing everything to `index.php`)
+- Write access (for the PHP user) to `storage/` and `bootstrap/cache/`
+- **HTTPS** — required for camera scanning (PWA) and recommended generally;
+  browsers treat plain HTTP in production as an insecure context and block
+  camera access
+
 ## Quick start (Docker)
 
 ```bash
