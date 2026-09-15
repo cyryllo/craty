@@ -9,6 +9,10 @@ wartość, stan), wypożyczenia, historia zmian i eksport ofert sprzedażowych
 do CSV (OLX). Do tego publiczna strona „pchli targ” dla wystawionych ofert,
 webowy instalator i moduł samo-aktualizacji przez panel administratora.
 
+Do tego appka instaluje się jako PWA na telefonie/tablecie i skanuje kody QR
+oraz kreskowe (EAN/UPC) wprost kamerą przeglądarki — nietrafiony skan
+proponuje szybkie dodanie nowego przedmiotu.
+
 Zbudowana na Laravel 12 + MariaDB, w pełni dwujęzyczna (PL/EN).
 
 ## Szybki start (Docker)
@@ -47,6 +51,11 @@ Obraz Dockera z tego repo ma to już podniesione (`128M`), ale na zwykłym
 hostingu trzeba samodzielnie podbić obie wartości w `php.ini` (albo w
 `.htaccess`/panelu hostingu, jeśli nie ma dostępu do `php.ini`) i
 zrestartować PHP/serwer.
+
+**Skanowanie kamerą wymaga HTTPS** (albo `localhost`, stąd działa bez
+niczego dodatkowego na dev) — przeglądarki nie dają dostępu do kamery na
+zwykłym HTTP w produkcji. Zadbaj o certyfikat, zanim ktoś się zdziwi, że
+„skaner nie działa”.
 
 ## Dokumentacja
 

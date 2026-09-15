@@ -15,11 +15,15 @@ class Item extends Model
         'inventory_no', 'name', 'serial_number', 'ean', 'description', 'specification', 'value',
         'purchased_at', 'condition', 'status', 'category_id',
         'storage_location_id', 'created_by', 'qr_path',
+        // 'needs_completion' celowo pominięte — ustawia je tylko
+        // ScanController::quickAddStore() (przez forceFill), nigdy zwykły
+        // formularz, tak samo jak 'protected' na User.
     ];
 
     protected $casts = [
         'purchased_at' => 'date',
         'value' => 'decimal:2',
+        'needs_completion' => 'boolean',
     ];
 
     // Wartości to teksty źródłowe do __() (klucze angielskie) — patrz statusLabel()/conditionLabel().

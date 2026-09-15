@@ -11,6 +11,7 @@ use App\Http\Controllers\MailSettingController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SaleListingController;
+use App\Http\Controllers\ScanController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StorageLocationController;
 use App\Http\Controllers\UpdateController;
@@ -67,12 +68,23 @@ Route::middleware('auth')->group(function () {
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('warehouses', WarehouseController::class)->except('show');
         Route::resource('storage-locations', StorageLocationController::class)->except('show');
+
+        // "Szybkie dodawanie" po nietrafionym skanie kodu kreskowego — mutuje
+        // stan magazynu, więc te dwie trasy zostają w grupie admin/magazynier,
+        // w przeciwieństwie do samego skanowania/podglądu niżej.
+        Route::get('scan/quick-add', [ScanController::class, 'quickAddCreate'])->name('scan.quick-add.create');
+        Route::post('scan/quick-add', [ScanController::class, 'quickAddStore'])->name('scan.quick-add.store');
     });
 
     // Ewidencję przedmiotów widzi każdy zalogowany, niezależnie od roli.
     Route::get('items', [ItemController::class, 'index'])->name('items.index');
     Route::get('items/{item}/label', [ItemController::class, 'label'])->name('items.label');
     Route::get('items/{item}', [ItemController::class, 'show'])->name('items.show');
+
+    // Skanowanie kamerą (patrz TODO.md "PWA") — dostępne dla każdej roli, tak
+    // samo jak sam podgląd przedmiotu po zeskanowaniu własnego QR z etykiety.
+    Route::get('scan', [ScanController::class, 'show'])->name('scan.show');
+    Route::get('scan/lookup', [ScanController::class, 'lookup'])->name('scan.lookup');
 
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', UserController::class)->except('show');

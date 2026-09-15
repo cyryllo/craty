@@ -9,6 +9,10 @@ loans, change history, and CSV export of sale listings (OLX). Also includes
 a public "flea market" page for listed items, a web-based installer, and a
 self-update module via the admin panel.
 
+It also installs as a PWA on your phone/tablet and scans QR and barcodes
+(EAN/UPC) straight from the browser's camera — a miss suggests quickly
+adding the item instead of a dead end.
+
 Built with Laravel 12 + MariaDB, fully bilingual (EN/PL).
 
 ## Quick start (Docker)
@@ -46,6 +50,11 @@ the request ever reaches the app. This repo's Docker image already raises
 both to `128M`, but on plain hosting you'll need to bump them yourself in
 `php.ini` (or via `.htaccess`/your host's control panel if you can't touch
 `php.ini`) and restart PHP/the web server.
+
+**Camera scanning needs HTTPS** (or `localhost`, which is why it works out
+of the box in dev) — browsers won't grant camera access over plain HTTP in
+production. Sort out a certificate before someone wonders why "the scanner
+doesn't work".
 
 ## Documentation
 

@@ -21,6 +21,10 @@
                         <x-icon name="items" class="w-4 h-4 me-1.5" />
                         {{ __('Items') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('scan.show')" :active="request()->routeIs('scan.*')">
+                        <x-icon name="scan" class="w-4 h-4 me-1.5" />
+                        {{ __('Scan') }}
+                    </x-nav-link>
                     @if (auth()->user()->isMagazynier())
                         <x-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
                             <x-icon name="sale" class="w-4 h-4 me-1.5" />
@@ -103,6 +107,12 @@
                 <span class="inline-flex items-center gap-2">
                     <x-icon name="items" class="w-4 h-4" />
                     {{ __('Items') }}
+                </span>
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('scan.show')" :active="request()->routeIs('scan.*')">
+                <span class="inline-flex items-center gap-2">
+                    <x-icon name="scan" class="w-4 h-4" />
+                    {{ __('Scan') }}
                 </span>
             </x-responsive-nav-link>
             @if (auth()->user()->isMagazynier())

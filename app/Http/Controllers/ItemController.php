@@ -98,6 +98,13 @@ class ItemController extends Controller
     {
         $item->update($request->validated());
 
+        // Skoro ktoś przeszedł przez pełną edycję, uznajemy że "dodany naprędce
+        // ze skanera" przedmiot został już przejrzany — flaga znika, niezależnie
+        // od tego, czy akurat uzupełnił kategorię/lokalizację (patrz TODO.md "PWA").
+        if ($item->needs_completion) {
+            $item->forceFill(['needs_completion' => false])->saveQuietly();
+        }
+
         $this->syncPhotos($item, $request);
         $this->syncAttachments($item, $request);
 

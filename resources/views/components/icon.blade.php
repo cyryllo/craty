@@ -131,4 +131,15 @@
             <circle cx="10" cy="8" r="2" fill="#fff" fill-opacity=".7"/>
         </svg>
         @break
+
+    @case('scan')
+        {{-- celownik skanera: Skanuj --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" {{ $attributes }}>
+            <path d="M3 7V4.5A1.5 1.5 0 0 1 4.5 3H7"/>
+            <path d="M13 3H15.5A1.5 1.5 0 0 1 17 4.5V7"/>
+            <path d="M17 13V15.5A1.5 1.5 0 0 1 15.5 17H13"/>
+            <path d="M7 17H4.5A1.5 1.5 0 0 1 3 15.5V13"/>
+            <line x1="3.5" y1="10" x2="16.5" y2="10" stroke-width="1.4"/>
+        </svg>
+        @break
 @endswitch

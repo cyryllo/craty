@@ -82,6 +82,9 @@
                                 </td>
                                 <td class="px-4 py-2 text-gray-900">
                                     <a href="{{ route('items.show', $item) }}" class="hover:underline">{{ $item->name }}</a>
+                                    @if ($item->needs_completion)
+                                        <span title="{{ __('Quickly added by scan — needs category, location and the rest.') }}">📱</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-2 font-mono text-xs text-gray-400">{{ $item->inventory_no }}</td>
                                 <td class="px-4 py-2 text-gray-500">{{ $item->category?->name ?? '—' }}</td>
@@ -112,7 +115,12 @@
                         </div>
                         <div class="p-4 flex-1 flex flex-col gap-1">
                             <div class="flex items-start justify-between gap-2">
-                                <h3 class="font-medium text-gray-900 leading-snug">{{ $item->name }}</h3>
+                                <h3 class="font-medium text-gray-900 leading-snug">
+                                    {{ $item->name }}
+                                    @if ($item->needs_completion)
+                                        <span title="{{ __('Quickly added by scan — needs category, location and the rest.') }}">📱</span>
+                                    @endif
+                                </h3>
                                 @include('items._status-badge', ['item' => $item])
                             </div>
                             <p class="text-xs font-mono text-gray-400">{{ $item->inventory_no }}</p>

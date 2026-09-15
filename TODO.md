@@ -65,9 +65,11 @@ niezależne od decyzji biznesowych)**
 12. **Import masowy** istniejącego spisu z arkusza — najbardziej przydatne
     właśnie przy pierwszym realnym wdrożeniu u kogoś z istniejącym majątkiem
     (czyli naturalnie pasuje zaraz po fazie 2).
-13. **PWA** (pełna specyfikacja niżej — instalowalność + prawdziwy skan QR
+13. ~~**PWA** (pełna specyfikacja niżej — instalowalność + prawdziwy skan QR
     kamerą; **bez trybu offline**, świadomie odłożonego) — spory skok
-    wygody na telefonie, niezależny od reszty.
+    wygody na telefonie, niezależny od reszty.~~ **Zrobione** (manifest +
+    service worker minimalny, skaner `@zxing/browser` na `/scan`, szybkie
+    dodawanie po nietrafionym skanie z flagą `needs_completion`, 12 testów).
 14. **Wygoda dnia codziennego** (filtry, masowe skanowanie, autouzupełnianie
     po EAN, dark mode) — drobne, można wpleść w dowolnym momencie później,
     niezależnie od kolejności innych faz.
@@ -98,9 +100,6 @@ większe zmiany modelu danych**
 
 - **Raporty** — wartość magazynu w czasie, zestawienia wg kategorii/lokalizacji.
 - **Import masowy** istniejącego spisu z arkusza CSV/Excel.
-- **PWA** — instalacja na telefonie/tablecie, prawdziwe skanowanie QR kamerą
-  (dziś kod QR tylko linkuje do strony przedmiotu, otwieranej ręcznie w
-  przeglądarce po zeskanowaniu aparatem).
 - **Integracja z Nextcloud** (opcjonalna) — SSO logowania (OIDC), zdjęcia/
   załączniki na WebDAV zamiast lokalnego dysku.
 - **Eksport OLX krok C** — jeśli sprzedaż stanie się regularna: integracja z
@@ -529,7 +528,7 @@ ogłoszenia u pośrednika. Zero zmian w modelu `SaleListing` — `title`,
 
 </details>
 
-## PWA (specyfikacja — do budowy na sygnał „zbuduj PWA”)
+## PWA (zrobione — zapisane jako referencja decyzji podjętych przy budowie)
 
 Zakres świadomie zawężony po rozmowie z użytkownikiem — **bez trybu
 offline w ogóle na razie** (ani samego cache'owania stron, ani tym bardziej
