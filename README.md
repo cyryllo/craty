@@ -36,21 +36,39 @@ kontener MariaDB założy bazę/użytkownika z tymi wartościami. Zmiana tego
 już PO pierwszym uruchomieniu (gdy wolumen bazy istnieje) nic nie da — trzeba
 wtedy usunąć wolumen (`docker compose down -v`) i wystartować od nowa.
 
-Na docelowym hostingu (bez Dockera i SSH) appka ma webowy kreator
-instalacji pod `/install` — sam generuje `.env`, prosi o dane do bazy i
-zakłada konto administratora. Kolejne wersje wgrywa się przez panel
-(Ustawienia → Aktualizacje) jako paczkę `.zip`, bez composera/npm na
-serwerze.
+## Wdrożenie na hostingu (bez Dockera i SSH)
 
-**Limit rozmiaru wgrywanego pliku:** paczka aktualizacyjna to zwykle
-kilkanaście–kilkadziesiąt MB (zawiera cały `vendor/` i skompilowany
-frontend), a domyślne limity PHP (`post_max_size`, zwykle 8M;
-`upload_max_filesize`, zwykle 2M) tego nie przepuszczą — upload padnie z
-błędem `413 Content Too Large`, zanim żądanie w ogóle dotrze do aplikacji.
-Obraz Dockera z tego repo ma to już podniesione (`128M`), ale na zwykłym
-hostingu trzeba samodzielnie podbić obie wartości w `php.ini` (albo w
-`.htaccess`/panelu hostingu, jeśli nie ma dostępu do `php.ini`) i
-zrestartować PHP/serwer.
+Appka ma webowy kreator instalacji pod `/install` — sam generuje `.env`,
+prosi o dane do bazy i zakłada konto administratora. Nie trzeba composera
+ani npm na serwerze — `vendor/` i zbudowany frontend (`public/build`) są
+już w środku paczki.
+
+`php artisan release:build*` (uruchamiane w tym repo, nie na hostingu)
+produkuje trzy rodzaje paczek do `storage/app/releases/`, każdą pod inny
+scenariusz:
+
+| Paczka | Kiedy używać | Jak zainstalować |
+|---|---|---|
+| **`craty-{wersja}-full.zip`** | Świeża instalacja na hostingu z klasyczną strukturą — da się trzymać kod appki **poza** document rootem (np. VPS, hosting z możliwością ustawienia document rootu na dowolny podkatalog). | Rozpakuj **całość** poza document rootem serwera (np. obok `public_html`), a **zawartość** folderu `public/` z paczki skopiuj **do** document rootu. Wejdź na `/install`. |
+| **`craty-{wersja}-hosting.zip`** | Hosting z `open_basedir` ograniczonym do samego document rootu (typowe na cPanel/DirectAdmin) — PHP fizycznie nie ma prawa czytać niczego poza `public_html`, więc rozdzielenie kodu i document rootu jest niemożliwe. | Rozpakuj **całą zawartość wprost do document rootu** (`public_html`) — bez żadnej ręcznej edycji. Paczka ma już poprawione ścieżki w `index.php` i gotowe pliki `.htaccess` blokujące dostęp z przeglądarki do `.env`, kodu źródłowego i `vendor/`. Wejdź na `/install`. |
+| **`craty-{wersja}-update.zip`** | Aktualizacja już zainstalowanej appki (dowolny z powyższych wariantów). | Zaloguj się jako admin → Ustawienia → Aktualizacje → wgraj plik. `.env` i dane użytkowników (`storage/app/public`, `storage/logs`) nigdy nie są nadpisywane. |
+
+Wszystkie trzy mają identyczną zawartość kodu — różnią się tylko układem
+plików i (w wariancie `hosting`) dodanymi `.htaccess`.
+
+**Skąd wiadomo, który wybrać?** Jeśli nie masz pewności, zacznij od
+`-full`. Jeśli po rozpakowaniu i ustawieniu document rootu appka nie
+startuje z błędem `open_basedir restriction in effect` — to znak, że
+hosting wymaga wariantu `-hosting`.
+
+**Limit rozmiaru wgrywanego pliku:** paczka to zwykle kilkanaście–
+kilkadziesiąt MB (zawiera cały `vendor/` i skompilowany frontend), a
+domyślne limity PHP (`post_max_size`, zwykle 8M; `upload_max_filesize`,
+zwykle 2M) tego nie przepuszczą — upload padnie z błędem `413 Content Too
+Large`, zanim żądanie w ogóle dotrze do aplikacji. Obraz Dockera z tego
+repo ma to już podniesione (`128M`), ale na zwykłym hostingu trzeba
+samodzielnie podbić obie wartości w `php.ini` (albo w `.htaccess`/panelu
+hostingu, jeśli nie ma dostępu do `php.ini`) i zrestartować PHP/serwer.
 
 **Skanowanie kamerą wymaga HTTPS** (albo `localhost`, stąd działa bez
 niczego dodatkowego na dev) — przeglądarki nie dają dostępu do kamery na

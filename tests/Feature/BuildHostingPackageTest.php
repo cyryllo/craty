@@ -27,6 +27,7 @@ class BuildHostingPackageTest extends TestCase
     protected function tearDown(): void
     {
         @unlink($this->outputZip);
+        @unlink($this->outputZip.'.sha256');
         parent::tearDown();
     }
 
@@ -38,6 +39,13 @@ class BuildHostingPackageTest extends TestCase
         ])->assertSuccessful();
 
         $this->assertFileExists($this->outputZip);
+
+        // Sidecar do weryfikacji pobranej paczki bez przepisywania hasha z konsoli.
+        $this->assertFileExists($this->outputZip.'.sha256');
+        $this->assertSame(
+            hash_file('sha256', $this->outputZip).'  '.basename($this->outputZip)."\n",
+            file_get_contents($this->outputZip.'.sha256')
+        );
 
         $zip = new ZipArchive();
         $zip->open($this->outputZip);

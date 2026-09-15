@@ -35,6 +35,7 @@ class BuildReleasePackageTest extends TestCase
     {
         @unlink($this->versionFile);
         @unlink($this->outputZip);
+        @unlink($this->outputZip.'.sha256');
         parent::tearDown();
     }
 
@@ -49,6 +50,13 @@ class BuildReleasePackageTest extends TestCase
 
         $this->assertFileExists($this->outputZip);
         $this->assertSame("2.5.0\n", file_get_contents($this->versionFile));
+
+        // Sidecar do weryfikacji pobranej paczki bez przepisywania hasha z konsoli.
+        $this->assertFileExists($this->outputZip.'.sha256');
+        $this->assertSame(
+            hash_file('sha256', $this->outputZip).'  '.basename($this->outputZip)."\n",
+            file_get_contents($this->outputZip.'.sha256')
+        );
 
         $zip = new ZipArchive();
         $zip->open($this->outputZip);

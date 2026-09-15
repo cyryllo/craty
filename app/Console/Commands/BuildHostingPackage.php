@@ -70,8 +70,10 @@ class BuildHostingPackage extends Command
             // dodatkowych wykluczeń przy pakowaniu z powrotem.
             $builder->build($workDir, $output, []);
 
+            $hash = $builder->writeChecksumFile($output);
+
             $this->info('Gotowe: '.$output);
-            $this->line('SHA-256: '.hash_file('sha256', $output));
+            $this->line('SHA-256: '.$hash.' (zapisany też obok jako '.basename($output).'.sha256)');
 
             return self::SUCCESS;
         } finally {

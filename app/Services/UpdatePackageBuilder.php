@@ -50,6 +50,22 @@ class UpdatePackageBuilder
         $zip->close();
     }
 
+    /**
+     * Dopisuje obok paczki plik `<nazwa>.sha256` w formacie zgodnym z
+     * `sha256sum -c` (hash + dwie spacje + nazwa pliku), żeby admin mógł
+     * zweryfikować pobraną paczkę bez przepisywania hasha z konsoli. Tylko
+     * dla paczek do dystrybucji (release:build/-hosting) — nie wołane z
+     * wewnętrznej migawki kodu robionej przez UpdateService przed apply(),
+     * której nikt nie pobiera/weryfikuje ręcznie.
+     */
+    public function writeChecksumFile(string $zipPath): string
+    {
+        $hash = hash_file('sha256', $zipPath);
+        file_put_contents($zipPath.'.sha256', "{$hash}  ".basename($zipPath)."\n");
+
+        return $hash;
+    }
+
     private function relativePath(string $sourceDir, SplFileInfo $file): string
     {
         return ltrim(substr($file->getPathname(), strlen($sourceDir)), '/');

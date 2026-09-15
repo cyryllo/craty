@@ -34,7 +34,12 @@ class UpdatePackageBuilderTest extends TestCase
     protected function tearDown(): void
     {
         $this->deleteDirectory($this->sourceDir);
-        @unlink($this->outputZip);
+        if (file_exists($this->outputZip)) {
+            unlink($this->outputZip);
+        }
+        if (file_exists($this->outputZip.'.sha256')) {
+            unlink($this->outputZip.'.sha256');
+        }
         parent::tearDown();
     }
 
@@ -63,6 +68,17 @@ class UpdatePackageBuilderTest extends TestCase
 
         $this->assertNotFalse($zip->locateName('.env'));
         $this->assertNotFalse($zip->locateName('node_modules/some-lib/index.js'));
+    }
+
+    public function test_write_checksum_file_creates_a_sha256sum_compatible_sidecar(): void
+    {
+        (new UpdatePackageBuilder())->build($this->sourceDir, $this->outputZip);
+
+        $hash = (new UpdatePackageBuilder())->writeChecksumFile($this->outputZip);
+
+        $this->assertSame(hash_file('sha256', $this->outputZip), $hash);
+        $this->assertFileExists($this->outputZip.'.sha256');
+        $this->assertSame($hash.'  '.basename($this->outputZip)."\n", file_get_contents($this->outputZip.'.sha256'));
     }
 
     private function deleteDirectory(string $path): void

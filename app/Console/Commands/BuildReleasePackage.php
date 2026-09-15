@@ -64,8 +64,10 @@ class BuildReleasePackage extends Command
         $zip->addFromString('update-manifest.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         $zip->close();
 
+        $hash = $builder->writeChecksumFile($output);
+
         $this->info('Gotowe: '.$output);
-        $this->line('SHA-256: '.hash_file('sha256', $output));
+        $this->line('SHA-256: '.$hash.' (zapisany też obok jako '.basename($output).'.sha256)');
 
         return self::SUCCESS;
     }

@@ -36,15 +36,38 @@ MariaDB container is created with those values. Changing them *after* the
 first run has no effect (the database volume already exists) — remove it
 first with `docker compose down -v` and start over.
 
-For a real hosting deployment (no Docker or SSH needed), the app ships a
-web-based installer at `/install` that generates `.env` for you, asks for
-database credentials, and creates the administrator account. Later
-versions are uploaded through the admin panel (Settings → Updates) as a
-`.zip` package — no Composer or npm required on the server.
+## Deploying to a hosting account (no Docker or SSH needed)
 
-**Upload size limit:** an update package is typically several to a few
-dozen MB (it bundles the full `vendor/` directory and the built frontend),
-and PHP's default limits (`post_max_size`, usually 8M; `upload_max_filesize`,
+The app ships a web-based installer at `/install` that generates `.env`
+for you, asks for database credentials, and creates the administrator
+account. No Composer or npm needed on the server — `vendor/` and the built
+frontend (`public/build`) already ship inside the package.
+
+`php artisan release:build*` (run in this repo, not on the target host)
+produces three kinds of packages under `storage/app/releases/`, one per
+scenario:
+
+| Package | When to use | How to install |
+|---|---|---|
+| **`craty-{version}-full.zip`** | Fresh install on hosting with a classic layout — you can keep the app code **outside** the document root (VPS, or a host that lets you point the document root at an arbitrary subfolder). | Extract **everything** outside the document root (e.g. next to `public_html`), then copy the **contents** of the package's `public/` folder **into** the document root. Visit `/install`. |
+| **`craty-{version}-hosting.zip`** | Hosting with `open_basedir` restricted to the document root itself (typical on cPanel/DirectAdmin) — PHP has no permission to read anything outside `public_html`, so separating code from the document root is impossible. | Extract the **entire contents straight into the document root** (`public_html`) — no manual editing needed. The package already has `index.php`'s paths fixed and ready-made `.htaccess` files blocking browser access to `.env`, the source code, and `vendor/`. Visit `/install`. |
+| **`craty-{version}-update.zip`** | Updating an already-installed app (either variant above). | Log in as admin → Settings → Updates → upload the file. `.env` and user data (`storage/app/public`, `storage/logs`) are never overwritten. |
+
+All three contain identical application code — they only differ in file
+layout (and, for the `hosting` variant, the added `.htaccess` files).
+
+**Which one should I pick?** If unsure, start with `-full`. If the app
+fails to boot with an `open_basedir restriction in effect` error after you
+set the document root, that's the sign you need the `-hosting` variant
+instead.
+
+Each `.zip` ships with a `.sha256` sidecar file (`sha256sum -c` compatible)
+next to it, so you can verify the download without copying the hash from
+the console by hand.
+
+**Upload size limit:** a package is typically several to a few dozen MB
+(it bundles the full `vendor/` directory and the built frontend), and
+PHP's default limits (`post_max_size`, usually 8M; `upload_max_filesize`,
 usually 2M) will reject it outright with a `413 Content Too Large` before
 the request ever reaches the app. This repo's Docker image already raises
 both to `128M`, but on plain hosting you'll need to bump them yourself in
