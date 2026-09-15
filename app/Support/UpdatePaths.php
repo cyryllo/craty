@@ -35,6 +35,13 @@ class UpdatePaths
         'storage/app/public',
         'storage/app/backups',
         'storage/app/updates',
+        // Wyjście samego release:build — bez tego każde kolejne wydanie
+        // pakowałoby ze sobą wszystkie poprzednie .zip-y z tego katalogu
+        // (znalezione realnie: paczka 1.1.0 spuchła do 49 MB, bo wciągnęła
+        // w środek całą paczkę 1.0.1). To samo dotyczy migawki kodu, którą
+        // UpdateService robi tuż przed apply() — również nie ma czego
+        // pakować sam w siebie.
+        'storage/app/releases',
         'storage/logs',
         'storage/framework/cache',
         'storage/framework/sessions',

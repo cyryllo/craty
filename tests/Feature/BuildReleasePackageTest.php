@@ -67,5 +67,14 @@ class BuildReleasePackageTest extends TestCase
         // Sekrety/deweloperskie pliki nie mają prawa się tam znaleźć.
         $this->assertFalse($zip->locateName('.env'));
         $this->assertFalse($zip->locateName('.git'));
+
+        // Regresja: builder pakował sam siebie — poprzednie .zip-y z
+        // storage/app/releases (wyjście tej samej komendy) trafiały do środka
+        // nowej paczki, więc każde kolejne wydanie puchło o rozmiar wszystkich
+        // poprzednich (realnie znalezione: 1.1.0 spuchło do 49 MB, bo
+        // wciągnęło całą paczkę 1.0.1).
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $this->assertStringStartsNotWith('storage/app/releases/', $zip->getNameIndex($i));
+        }
     }
 }
