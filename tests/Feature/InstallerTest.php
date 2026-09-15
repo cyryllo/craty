@@ -144,9 +144,10 @@ class InstallerTest extends TestCase
             $done = $this->get(route('install.done'));
             $done->assertOk()->assertSee('admin@example.com');
 
-            // Bez zapisanego APP_URL zdjęcia/QR (Storage::disk('public')->url())
-            // budowałyby linki z domyślnego http://localhost na stałe, niezależnie
-            // od tego, pod jakim adresem appka faktycznie stoi.
+            // APP_URL nadal warto mieć poprawnie ustawiony (m.in. route()/url()
+            // z kontekstu konsoli, patrz SetRequestForConsole) — zdjęcia/QR w
+            // widokach same w sobie już od tego nie zależą, patrz
+            // config/filesystems.php i PublicAssetUrlTest.
             $this->assertStringContainsString('APP_URL=http://craty.test', file_get_contents($this->tempEnvPath));
         } finally {
             $this->dropScratchDatabase($database);

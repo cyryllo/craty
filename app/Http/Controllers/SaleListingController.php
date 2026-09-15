@@ -131,7 +131,12 @@ class SaleListingController extends Controller
                     $item->category?->name,
                     $item->conditionLabel(),
                     $listing->platform,
-                    $item->photos->map(fn ($p) => $p->url())->implode(', '),
+                    // CSV ląduje poza appką (OLX, Excel), więc w przeciwieństwie
+                    // do zwykłych <img src> w widokach potrzebuje pełnego,
+                    // absolutnego URL-a — ItemPhoto::url() od teraz zwraca
+                    // ścieżkę względem korzenia (patrz config/filesystems.php),
+                    // więc dopełniamy ją tu wprost helperem url().
+                    $item->photos->map(fn ($p) => url($p->url()))->implode(', '),
                 ], ';');
             }
 

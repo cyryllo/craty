@@ -183,7 +183,7 @@
                     <div class="mb-4">
                         <x-input-label for="app_url" :value="__('Application URL')" />
                         <x-text-input id="app_url" name="app_url" class="mt-1 block w-full" value="{{ old('app_url', $defaults['app_url']) }}" placeholder="https://example.com" required />
-                        <p class="mt-1 text-xs text-gray-500">{{ __('The address visitors use to reach this app. Wrong here means broken links in item photos, QR codes, and emails — fix it now, not after uploading data.') }}</p>
+                        <p class="mt-1 text-xs text-gray-500">{{ __('The address visitors use to reach this app. Used for links generated outside of a browser request, e.g. in scheduled tasks or emails — fix it now rather than later.') }}</p>
                         <x-input-error :messages="$errors->get('app_url')" class="mt-1" />
                     </div>
                     <div class="flex justify-between">

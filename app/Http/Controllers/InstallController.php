@@ -225,11 +225,13 @@ class InstallController extends Controller
             'DB_PASSWORD' => $data['db_password'] ?? '',
             'APP_ENV' => 'production',
             'APP_DEBUG' => 'false',
-            // Bez tego appka zostaje na domyślnym APP_URL=http://localhost
-            // z .env.example na stałe — a Storage::disk('public')->url()
-            // (zdjęcia przedmiotów, kody QR) czyta APP_URL statycznie, bez
-            // patrzenia na host bieżącego żądania, więc zły APP_URL psuje
-            // te linki permanentnie, nie tylko przy samej instalacji.
+            // Bez tego appka zostaje na domyślnym APP_URL=http://localhost z
+            // .env.example na stałe. Zdjęcia/QR w widokach już od tego nie
+            // zależą (patrz config/filesystems.php — dysk "public" zwraca
+            // ścieżki względne), ale APP_URL nadal ma znaczenie dla route()/
+            // url() wywoływanych POZA kontekstem żądania HTTP (konsola,
+            // zaplanowane zadania, przyszłe e-maile) — patrz
+            // SetRequestForConsole w Laravelu.
             'APP_URL' => rtrim($data['app_url'], '/'),
         ]);
     }

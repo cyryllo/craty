@@ -51,7 +51,18 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            // Celowo BEZ 'url' => env('APP_URL').'/storage' — to sprawiało, że
+            // Storage::disk('public')->url() zawsze zwracał zdjęcia/QR pod
+            // stałym hostem z .env, więc wchodząc na appkę z telefonu po
+            // adresie IP w sieci lokalnej (inny host niż APP_URL) obrazki
+            // 404-owały (link i tak wskazywał na "localhost"). Bez tego
+            // klucza Laravel (FilesystemAdapter::getLocalUrl()) zwraca ścieżkę
+            // względem korzenia ("/storage/..."), którą przeglądarka sama
+            // dopełnia aktualnym hostem — działa jednocześnie na localhost,
+            // adresie LAN i prawdziwej domenie produkcyjnej, bez konfiguracji.
+            // Tam, gdzie faktycznie potrzeba pełnego URL-a poza kontekstem
+            // strony (eksport CSV do OLX), owijamy tę względną ścieżkę
+            // helperem url() w miejscu użycia — patrz SaleListingController.
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
