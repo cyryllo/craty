@@ -64,9 +64,23 @@ class BuildReleasePackageTest extends TestCase
         $this->assertNotFalse($zip->locateName('vendor/autoload.php'));
         $this->assertNotFalse($zip->locateName('artisan'));
 
+        // Regresja: composer.json wyglądał na czysto deweloperski plik i
+        // trafił na listę wykluczeń przy "sprzątaniu" paczki — ale Laravel
+        // czyta go w RUNTIME (Application::getNamespace()), więc bez niego
+        // appka wywalała się od razu przy starcie. composer.lock nie ma tego
+        // problemu i zostaje wykluczony.
+        $this->assertNotFalse($zip->locateName('composer.json'));
+        $this->assertFalse($zip->locateName('composer.lock'));
+
         // Sekrety/deweloperskie pliki nie mają prawa się tam znaleźć.
         $this->assertFalse($zip->locateName('.env'));
         $this->assertFalse($zip->locateName('.git'));
+
+        // Fixtures ze Storage::fake() z uruchomień testów na maszynie
+        // budującej — czysty śmieć, wielokrotnie realnie łapany w paczce.
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $this->assertStringStartsNotWith('storage/framework/testing/', $zip->getNameIndex($i));
+        }
 
         // Regresja: builder pakował sam siebie — poprzednie .zip-y z
         // storage/app/releases (wyjście tej samej komendy) trafiały do środka

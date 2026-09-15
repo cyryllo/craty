@@ -46,6 +46,9 @@ class UpdatePaths
         'storage/framework/cache',
         'storage/framework/sessions',
         'storage/framework/views',
+        // Fixtures ze Storage::fake() zostawione przez uruchomienia testów na
+        // maszynie budującej — czysto lokalny śmieć, zero związku z appką.
+        'storage/framework/testing',
         // Dokumentacja/meta tego repo — nie jest kodem appki, nie ma czego
         // szukać na docelowym serwerze. CLAUDE.md w szczególności NIE ma
         // prawa nigdzie wyciekać (patrz .gitignore) — bez tego wpisu i tak
@@ -60,11 +63,20 @@ class UpdatePaths
         // Konfiguracja narzędzi budujących/testujących, zbędna po tym, jak
         // `public/build` jest już skompilowane, a `vendor/` już zvendorowany
         // — na docelowym hostingu i tak nikt nie odpali composera ani npm.
+        // UWAGA: composer.json celowo NIE jest na tej liście — Laravel czyta
+        // go w RUNTIME, nie tylko przy `composer install` (Application::
+        // getNamespace() przy każdym starcie artisan/serve, PackageManifest
+        // przy odświeżaniu cache pakietów) — bez niego appka wywala się od
+        // razu błędem "file_get_contents(composer.json): No such file or
+        // directory", zanim cokolwiek zdąży odpowiedzieć (znalezione realnie
+        // przy teście paczki "-full" na świeżo rozpakowanym katalogu).
+        // composer.lock nie ma tego problemu (używany tylko przez sam
+        // composer, nie przez framework), zostaje wykluczony.
         'package.json',
         'package-lock.json',
-        'composer.json',
         'composer.lock',
         'phpunit.xml',
+        '.phpunit.result.cache',
         'vite.config.js',
         'tailwind.config.js',
         'postcss.config.js',

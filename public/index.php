@@ -24,6 +24,12 @@ if ($envWriter->isWritable() && ! $envWriter->get('APP_KEY')) {
     $envWriter->set(['APP_KEY' => 'base64:'.base64_encode(random_bytes(32))]);
 }
 
+// Patrz App\Support\RequiredStorageDirectories — bez tego na świeżo
+// rozpakowanej paczce wysypuje się KAŻDE żądanie (sesje/cache/widoki), jeszcze
+// zanim Instalator zdąży cokolwiek pokazać. Tanie i idempotentne, więc zostaje
+// tutaj, przed startem Laravela.
+App\Support\RequiredStorageDirectories::ensureExist(__DIR__.'/../storage');
+
 // Bootstrap Laravel and handle the request...
 (require_once __DIR__.'/../bootstrap/app.php')
     ->handleRequest(Request::capture());
