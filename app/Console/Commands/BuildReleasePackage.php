@@ -19,7 +19,7 @@ class BuildReleasePackage extends Command
         {version? : Docelowa wersja (domyślnie ta już zapisana w pliku VERSION)}
         {--min-version= : Minimalna wersja appki, z której można zastosować tę paczkę}
         {--changelog=* : Linia changeloga do manifestu — opcja powtarzalna}
-        {--output= : Ścieżka wynikowego .zip (domyślnie storage/app/releases/craty-{wersja}.zip)}';
+        {--output= : Ścieżka wynikowego .zip (domyślnie storage/app/releases/craty-{wersja}-update.zip)}';
 
     protected $description = 'Buduje paczkę .zip aktualizacji do wgrania przez panel administratora.';
 
@@ -33,7 +33,12 @@ class BuildReleasePackage extends Command
             $version = $appVersion->current();
         }
 
-        $output = $this->option('output') ?: storage_path("app/releases/craty-{$version}.zip");
+        // "-update" w nazwie odróżnia paczkę do wgrania przez panel (Ustawienia
+        // → Aktualizacje) od "-full" budowanej ręcznie z --output pod świeżą
+        // instalację na hostingu — treść obu jest dziś identyczna (ta sama
+        // migawka całej appki), to czysto etykieta dla admina, który plik do
+        // czego wgrać.
+        $output = $this->option('output') ?: storage_path("app/releases/craty-{$version}-update.zip");
 
         $manifest = [
             'version' => $version,
