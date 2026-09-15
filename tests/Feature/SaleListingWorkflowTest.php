@@ -103,6 +103,38 @@ class SaleListingWorkflowTest extends TestCase
             ->assertSee(route('sale-listings.mark-listed', $listing), false);
     }
 
+    public function test_exported_tab_shows_the_same_copy_preview_popup(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'do_sprzedazy',
+        ]);
+        $item->saleListings()->create([
+            'platform' => 'olx', 'title' => 'Wiertarka - okazja', 'description' => 'Opis oferty', 'status' => 'wyeksportowana', 'exported_at' => now(),
+        ]);
+
+        $this->actingAs($magazynier)->get(route('sale-listings.exported'))
+            ->assertSee('Wiertarka - okazja')
+            ->assertSee('Opis oferty', false);
+    }
+
+    public function test_preview_popup_includes_item_photos_with_download_links(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'do_sprzedazy',
+        ]);
+        $photo = $item->photos()->create(['path' => 'items/1/a.jpg', 'is_primary' => true, 'sort_order' => 0]);
+        $item->saleListings()->create(['platform' => 'olx', 'title' => 'Wiertarka - okazja', 'price' => 90]);
+
+        // @js() koduje URL do wnętrza JSON.parse('...') z podwójnie
+        // eskejpowanymi ukośnikami — sprawdzamy samą nazwę pliku zamiast
+        // odtwarzać dokładny format eskejpowania.
+        $this->actingAs($magazynier)->get(route('sale-listings.index'))
+            ->assertSee('a.jpg');
+    }
+
     public function test_item_page_shows_withdraw_and_mark_sold_instead_of_prepare_when_already_listed(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);

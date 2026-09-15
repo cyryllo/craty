@@ -12,7 +12,7 @@ class SaleListingController extends Controller
     /** Podstrona "Przygotowane" — oferty-szkice, jeszcze nie wyeksportowane. */
     public function index()
     {
-        $draft = SaleListing::with('item.category', 'item.storageLocation.warehouse')
+        $draft = SaleListing::with('item.category', 'item.storageLocation.warehouse', 'item.photos')
             ->where('status', 'szkic')->latest()->get();
 
         return view('sale-listings.index', [
@@ -30,7 +30,7 @@ class SaleListingController extends Controller
     public function exported()
     {
         return view('sale-listings.exported', [
-            'exported' => SaleListing::with('item.category', 'item.storageLocation.warehouse')
+            'exported' => SaleListing::with('item.category', 'item.storageLocation.warehouse', 'item.photos')
                 ->where('status', 'wyeksportowana')->latest('exported_at')->paginate(24),
             'draftCount' => SaleListing::where('status', 'szkic')->count(),
             'exportedCount' => SaleListing::where('status', 'wyeksportowana')->count(),

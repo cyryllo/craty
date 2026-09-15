@@ -23,6 +23,7 @@
                 'price' => $l->price ? number_format((float) $l->price, 2, ',', ' ').' zł' : '',
                 'platform' => strtoupper($l->platform),
                 'markListedUrl' => route('sale-listings.mark-listed', $l),
+                'photos' => $l->item->photos->map(fn ($p) => $p->url())->values()->all(),
             ])),
             copied: null,
             show(id) {
@@ -126,6 +127,18 @@
                                 </button>
                             </div>
                             <p class="mt-1 text-sm text-gray-800 border border-gray-200 rounded-md px-3 py-2 bg-gray-50 whitespace-pre-line" x-text="listing.description || '—'"></p>
+                        </div>
+
+                        <div x-show="listing.photos.length" x-cloak>
+                            <x-input-label :value="__('Photos')" />
+                            <div class="mt-1 flex flex-wrap gap-2">
+                                <template x-for="photo in listing.photos" :key="photo">
+                                    <a :href="photo" download class="block group relative">
+                                        <img :src="photo" class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                        <span class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-xs opacity-0 group-hover:opacity-100 rounded-md">{{ __('Download') }}</span>
+                                    </a>
+                                </template>
+                            </div>
                         </div>
 
                         <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
