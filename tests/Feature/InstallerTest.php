@@ -143,6 +143,11 @@ class InstallerTest extends TestCase
 
             $done = $this->get(route('install.done'));
             $done->assertOk()->assertSee('admin@example.com');
+
+            // Bez zapisanego APP_URL zdjęcia/QR (Storage::disk('public')->url())
+            // budowałyby linki z domyślnego http://localhost na stałe, niezależnie
+            // od tego, pod jakim adresem appka faktycznie stoi.
+            $this->assertStringContainsString('APP_URL=http://craty.test', file_get_contents($this->tempEnvPath));
         } finally {
             $this->dropScratchDatabase($database);
         }
@@ -213,6 +218,7 @@ class InstallerTest extends TestCase
             'db_username' => 'graty',
             'db_password' => 'graty',
             'app_name' => 'Craty',
+            'app_url' => 'http://craty.test',
             'admin_name' => 'Administrator',
             'admin_email' => 'admin@example.com',
             'admin_password' => 'Passw0rd!123',

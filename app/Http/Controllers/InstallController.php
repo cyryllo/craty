@@ -29,6 +29,12 @@ class InstallController extends Controller
             'defaults' => [
                 'db_host' => $request->old('db_host', '127.0.0.1'),
                 'db_port' => $request->old('db_port', '3306'),
+                // Zgadujemy z aktualnego żądania (schemat+host:port, którym
+                // admin faktycznie dotarł do kreatora) — to dobry punkt
+                // startowy, ale zostawiamy pole edytowalne na wypadek
+                // reverse proxy/innej domeny publicznej niż to, co widzi
+                // sam serwer aplikacji.
+                'app_url' => $request->old('app_url', rtrim($request->getSchemeAndHttpHost(), '/')),
             ],
         ]);
     }
@@ -52,6 +58,7 @@ class InstallController extends Controller
         $data = $request->validate([
             ...$this->databaseRules(),
             'app_name' => ['nullable', 'string', 'max:255'],
+            'app_url' => ['required', 'url', 'max:255'],
             'admin_name' => ['required', 'string', 'max:255'],
             'admin_email' => ['required', 'email', 'max:255'],
             'admin_password' => ['required', 'confirmed', Password::defaults()],
@@ -218,6 +225,12 @@ class InstallController extends Controller
             'DB_PASSWORD' => $data['db_password'] ?? '',
             'APP_ENV' => 'production',
             'APP_DEBUG' => 'false',
+            // Bez tego appka zostaje na domyślnym APP_URL=http://localhost
+            // z .env.example na stałe — a Storage::disk('public')->url()
+            // (zdjęcia przedmiotów, kody QR) czyta APP_URL statycznie, bez
+            // patrzenia na host bieżącego żądania, więc zły APP_URL psuje
+            // te linki permanentnie, nie tylko przy samej instalacji.
+            'APP_URL' => rtrim($data['app_url'], '/'),
         ]);
     }
 

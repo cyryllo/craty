@@ -20,7 +20,7 @@
             $errorStep = 1;
             if ($errors->hasAny(['db_host', 'db_port', 'db_database', 'db_username', 'db_password']) || session('installError')) {
                 $errorStep = 2;
-            } elseif ($errors->has('app_name')) {
+            } elseif ($errors->hasAny(['app_name', 'app_url'])) {
                 $errorStep = 3;
             } elseif ($errors->hasAny(['admin_name', 'admin_email', 'admin_password'])) {
                 $errorStep = 4;
@@ -179,6 +179,12 @@
                         <x-text-input id="app_name" name="app_name" class="mt-1 block w-full" value="{{ old('app_name') }}" placeholder="Craty" />
                         <p class="mt-1 text-xs text-gray-500">{{ __('You can change this and the logo later from Settings → App settings.') }}</p>
                         <x-input-error :messages="$errors->get('app_name')" class="mt-1" />
+                    </div>
+                    <div class="mb-4">
+                        <x-input-label for="app_url" :value="__('Application URL')" />
+                        <x-text-input id="app_url" name="app_url" class="mt-1 block w-full" value="{{ old('app_url', $defaults['app_url']) }}" placeholder="https://example.com" required />
+                        <p class="mt-1 text-xs text-gray-500">{{ __('The address visitors use to reach this app. Wrong here means broken links in item photos, QR codes, and emails — fix it now, not after uploading data.') }}</p>
+                        <x-input-error :messages="$errors->get('app_url')" class="mt-1" />
                     </div>
                     <div class="flex justify-between">
                         <button type="button" @click="step = 2" class="text-sm text-gray-500 hover:underline">{{ __('Back') }}</button>
