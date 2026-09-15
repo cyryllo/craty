@@ -42,7 +42,11 @@
             @endif
             <div>
                 <x-input-label for="password" :value="$user->exists ? __('New password (optional)') : __('Password')" />
-                <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" @if (! $user->exists) required @endif />
+                @if ($user->exists)
+                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" />
+                @else
+                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" required />
+                @endif
                 <x-input-error :messages="$errors->get('password')" class="mt-1" />
             </div>
 
