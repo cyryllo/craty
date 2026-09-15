@@ -11,7 +11,7 @@
             <table class="min-w-full text-sm">
                 <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
                     <tr>
-                        <th class="text-left px-4 py-3">{{ __('Name') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Category name') }}</th>
                         <th class="text-left px-4 py-3">{{ __('Code') }}</th>
                         <th class="text-left px-4 py-3">{{ __('Parent category') }}</th>
                         <th class="text-left px-4 py-3">{{ __('Items') }}</th>

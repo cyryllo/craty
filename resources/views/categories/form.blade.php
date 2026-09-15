@@ -9,7 +9,7 @@
             @if ($category->exists) @method('PUT') @endif
 
             <div>
-                <x-input-label for="name" :value="__('Name')" />
+                <x-input-label for="name" :value="__('Category name')" />
                 <x-text-input id="name" name="name" class="mt-1 block w-full" value="{{ old('name', $category->name) }}" required autofocus />
                 <x-input-error :messages="$errors->get('name')" class="mt-1" />
             </div>

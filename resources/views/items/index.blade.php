@@ -65,7 +65,7 @@
                     <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
                         <tr>
                             <th class="px-4 py-3"></th>
-                            <th class="text-left px-4 py-3">{{ __('Name') }}</th>
+                            <th class="text-left px-4 py-3">{{ __('Item name') }}</th>
                             <th class="text-left px-4 py-3">{{ __('Inventory no.') }}</th>
                             <th class="text-left px-4 py-3">{{ __('Category') }}</th>
                             <th class="text-left px-4 py-3">{{ __('Location') }}</th>

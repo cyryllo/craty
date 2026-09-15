@@ -18,7 +18,7 @@
             </div>
 
             <div>
-                <x-input-label for="item_name" :value="__('Name')" />
+                <x-input-label for="item_name" :value="__('Item name')" />
                 <x-text-input id="item_name" name="item_name" class="mt-1 block w-full" value="{{ old('item_name') }}" autocomplete="off" required autofocus />
                 <x-input-error :messages="$errors->get('item_name')" class="mt-1" />
             </div>

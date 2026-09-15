@@ -34,12 +34,20 @@ class ItemManagementTest extends TestCase
     }
 
     /**
-     * Regresja: pole nazwy przedmiotu w formularzu nazywa się "item_name",
-     * nie "name" — na telefonie zwykłe <input name="name"> jest przez Chrome
-     * traktowane jak "imię i nazwisko" i podpowiada autouzupełnienie danymi
-     * z konta Google nad polem (realnie zgłoszony bug). Sprawdzamy zarówno
-     * że formularz renderuje właściwą nazwę pola, jak i że stary klucz
-     * "name" nadal działa (kompatybilność wsteczna w prepareForValidation()).
+     * Regresja z dwóch powiązanych, ale różnych bugów zgłoszonych po kolei:
+     * 1) pole HTML nazywa się "item_name", nie "name" — na telefonie zwykłe
+     *    <input name="name"> jest przez Chrome rozpoznawane jak "imię i
+     *    nazwisko" po samym atrybucie, nie tylko etykiecie, i podpowiada
+     *    autouzupełnienie danymi z konta Google (autocomplete="off" samo w
+     *    sobie nie wystarczyło).
+     * 2) etykieta pola używała współdzielonego klucza __('Name'), który w
+     *    lang/pl.json jest przetłumaczony jako "Imię i nazwisko" (bo tego
+     *    samego klucza używają formularze użytkownika/profilu) — klasyczna
+     *    kolizja klucza między różnymi kontekstami, patrz CLAUDE.md
+     *    "Watch for key collisions...". Naprawione osobnym kluczem
+     *    __('Item name'), nie tylko zmianą name= atrybutu.
+     * Sprawdzamy też, że stary klucz "name" nadal działa przy submitcie
+     * (kompatybilność wsteczna w prepareForValidation()).
      */
     public function test_item_form_uses_item_name_field_not_name_to_avoid_browser_autofill(): void
     {
@@ -47,7 +55,8 @@ class ItemManagementTest extends TestCase
 
         $this->actingAs($magazynier)->get(route('items.create'))
             ->assertSee('name="item_name"', false)
-            ->assertDontSee('name="name"', false);
+            ->assertDontSee('name="name"', false)
+            ->assertSee('Item name');
 
         $item = Item::create([
             'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'nowy', 'status' => 'dostepny',
