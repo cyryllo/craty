@@ -89,8 +89,10 @@
             </div>
         </form>
 
-        <div class="bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-md p-4">
-            {{ __('Automatic scheduled backups and cleanup require the Laravel scheduler to be wired to a system cron job (run every minute).') }}
+        <div class="bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-md p-4 space-y-2">
+            <p>{{ __('Automatic scheduled backups and cleanup need the Laravel scheduler running — add this single line to the server\'s crontab (:command):', ['command' => 'crontab -e']) }}</p>
+            <code class="block bg-white border border-amber-200 rounded px-3 py-2 font-mono text-xs overflow-x-auto">* * * * * cd {{ base_path() }} && php artisan schedule:run >> /dev/null 2>&1</code>
+            <p>{{ __('No system cron available (e.g. inside Docker)? Run :command in a background process instead — it checks the schedule in a loop, no cron needed.', ['command' => 'php artisan schedule:work']) }}</p>
         </div>
     </div>
 </x-app-layout>
