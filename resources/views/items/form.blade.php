@@ -14,7 +14,7 @@
             <div class="grid sm:grid-cols-2 gap-4">
                 <div class="sm:col-span-2">
                     <x-input-label for="name" :value="__('Name')" />
-                    <x-text-input id="name" name="name" class="mt-1 block w-full" value="{{ old('name', $item->name) }}" required autofocus />
+                    <x-text-input id="name" name="name" class="mt-1 block w-full" value="{{ old('name', $item->name) }}" autocomplete="off" required autofocus />
                     <x-input-error :messages="$errors->get('name')" class="mt-1" />
                 </div>
 

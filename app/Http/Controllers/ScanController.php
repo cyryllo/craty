@@ -49,13 +49,17 @@ class ScanController extends Controller
      */
     public function quickAddStore(Request $request, InventoryNumberGenerator $numbers, QrCodeGenerator $qr)
     {
+        // Pole nazywa się "item_name", nie "name" — na telefonie zwykłe pole
+        // <input name="name"> jest przez Chrome traktowane jak "imię i
+        // nazwisko" i podpowiada autouzupełnienie danymi z konta Google nad
+        // polem, myląc z formularzem nazwy przedmiotu (realnie zgłoszony bug).
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'item_name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:64'],
             'photo' => ['nullable', 'image', 'max:8192'],
         ]);
 
-        $item = new Item(['name' => $data['name'], 'ean' => $data['code']]);
+        $item = new Item(['name' => $data['item_name'], 'ean' => $data['code']]);
         $item->created_by = $request->user()->id;
         $item->inventory_no = $numbers->generate(null, null);
         $item->forceFill(['needs_completion' => true]);

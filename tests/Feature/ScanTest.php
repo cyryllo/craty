@@ -61,7 +61,7 @@ class ScanTest extends TestCase
         $magazynier = User::factory()->create(['role' => 'magazynier']);
 
         $response = $this->actingAs($magazynier)->post(route('scan.quick-add.store'), [
-            'name' => 'Multimetr',
+            'item_name' => 'Multimetr',
             'code' => '5901234123457',
             'photo' => UploadedFile::fake()->image('multimetr.jpg'),
         ]);
@@ -80,7 +80,7 @@ class ScanTest extends TestCase
         $magazynier = User::factory()->create(['role' => 'magazynier']);
 
         $this->actingAs($magazynier)->post(route('scan.quick-add.store'), [
-            'name' => 'Multimetr',
+            'item_name' => 'Multimetr',
             'code' => '5901234123457',
         ])->assertRedirect();
 
