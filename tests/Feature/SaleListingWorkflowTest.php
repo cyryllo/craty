@@ -90,6 +90,19 @@ class SaleListingWorkflowTest extends TestCase
         $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertSee('Wiertarka - okazja');
     }
 
+    public function test_prepared_tab_has_a_direct_list_for_sale_button_per_row(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'do_sprzedazy',
+        ]);
+        $listing = $item->saleListings()->create(['platform' => 'olx', 'title' => 'Wiertarka - okazja', 'price' => 90]);
+
+        $this->actingAs($magazynier)->get(route('sale-listings.index'))
+            ->assertSee(__('list for sale'))
+            ->assertSee(route('sale-listings.mark-listed', $listing), false);
+    }
+
     public function test_item_page_shows_withdraw_and_mark_sold_instead_of_prepare_when_already_listed(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);

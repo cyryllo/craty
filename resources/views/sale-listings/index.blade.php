@@ -63,8 +63,12 @@
                             <td class="px-4 py-3 text-gray-700">{{ $listing->title }}</td>
                             <td class="px-4 py-3 text-gray-700">{{ $listing->price ? number_format((float) $listing->price, 2, ',', ' ').' zł' : '—' }}</td>
                             <td class="px-4 py-3 text-gray-500 uppercase text-xs">{{ $listing->platform }}</td>
-                            <td class="px-4 py-3 text-right">
+                            <td class="px-4 py-3 text-right whitespace-nowrap">
                                 <a href="{{ route('items.sale-listing.create', $listing->item) }}" @click.stop class="text-indigo-600 hover:underline">{{ __('edit content') }}</a>
+                                <form method="POST" action="{{ route('sale-listings.mark-listed', $listing) }}" @click.stop onsubmit="return confirm('{{ __('Mark as listed?') }}');" class="inline ms-3">
+                                    @csrf
+                                    <button class="text-emerald-700 hover:underline">{{ __('list for sale') }}</button>
+                                </form>
                             </td>
                         </tr>
                     @empty
