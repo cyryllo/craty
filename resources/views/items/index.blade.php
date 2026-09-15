@@ -14,6 +14,9 @@
 
         <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap gap-3 items-end">
             <input type="hidden" name="view" value="{{ $view }}">
+            <a href="{{ route('scan.show') }}" title="{{ __('Scan') }}" class="inline-flex items-center justify-center w-9 h-9 shrink-0 rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50">
+                <x-icon name="scan" class="w-4 h-4" />
+            </a>
             <div class="flex-1 min-w-[160px]">
                 <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Search') }}</label>
                 <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="{{ __('name, inventory no., serial no. or EAN') }}"
