@@ -216,3 +216,28 @@ wymagają ponownego podania hasła (Breeze'owy `password.confirm`).
 18 nowych testów, wszystkie operujące na katalogach tymczasowych zamiast na
 tym repo — `apply()`/`rollback()` nadpisują pliki appki, więc uruchomienie
 ich na prawdziwym drzewie kodu w trakcie testów by je zepsuło.
+
+## 2026-09-15 — Naprawa: brakujące pole hasła w formularzu użytkownika
+
+Zgłoszone przez użytkownika: przy dodawaniu/edycji konta w Ustawienia →
+Użytkownicy nie było w ogóle pola do wpisania hasła. Przyczyna: dyrektywa
+Blade wewnątrz tagu komponentu `<x-text-input>` (najpierw `@if...@endif`,
+sprawdzone też `@required(...)` — to samo) psuje parser tagów Blade w
+sposób, który nie rzuca żadnego błędu — cały tag ląduje w HTML-u jako
+dosłowny, nieprzetworzony tekst zamiast `<input>`. Poprawka: rozdzielenie na
+dwa czyste warianty tagu w `@if`/`@else`. Opisane w CLAUDE.md jako ogólna
+pułapka na przyszłość.
+
+## 2026-09-15 — Wymagania dotyczące haseł i podwójne potwierdzenie
+
+Na prośbę użytkownika: hasła w całej appce (zmiana w Profilu, reset hasła,
+konto głównego admina z Instalatora, konta zakładane/edytowane przez admina)
+muszą mieć teraz co najmniej 8 znaków, wielką i małą literę oraz znak
+specjalny — jedna reguła (`Password::defaults()` w
+`AppServiceProvider::boot()`), którą wszystkie te miejsca dziedziczą
+automatycznie. Formularz użytkownika w Ustawienia → Użytkownicy dostał też
+brakujące dotąd pole potwierdzenia hasła (na obu: dodawaniu i edycji).
+
+8 nowych testów (poprawne odrzucanie zbyt krótkich/bez wielkiej litery/bez
+znaku specjalnego haseł, niezgodne potwierdzenie, edycja bez podania hasła
+zostawia stare bez zmian), 124/124 zielone.

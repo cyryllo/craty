@@ -10,6 +10,7 @@ use Database\Seeders\DemoDataSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\Password;
 
 /**
  * Kreator webowy do pierwszego uruchomienia na docelowym hostingu (patrz
@@ -53,7 +54,7 @@ class InstallController extends Controller
             'app_name' => ['nullable', 'string', 'max:255'],
             'admin_name' => ['required', 'string', 'max:255'],
             'admin_email' => ['required', 'email', 'max:255'],
-            'admin_password' => ['required', 'confirmed', 'min:8'],
+            'admin_password' => ['required', 'confirmed', Password::defaults()],
             'demo_data' => ['nullable', 'boolean'],
         ]);
 

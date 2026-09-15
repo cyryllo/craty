@@ -87,6 +87,17 @@ class InstallerTest extends TestCase
             ->assertSessionHasErrors(['db_host', 'db_database', 'db_username', 'admin_name', 'admin_email', 'admin_password']);
     }
 
+    public function test_store_rejects_an_admin_password_that_does_not_meet_complexity_requirements(): void
+    {
+        $response = $this->post(route('install.store'), $this->validPayload([
+            'admin_password' => 'password',
+            'admin_password_confirmation' => 'password',
+        ]));
+
+        $response->assertSessionHasErrors('admin_password');
+        $this->assertFalse(User::query()->exists());
+    }
+
     public function test_store_shows_error_when_database_connection_fails(): void
     {
         $response = $this->post(route('install.store'), $this->validPayload([
@@ -204,8 +215,8 @@ class InstallerTest extends TestCase
             'app_name' => 'Craty',
             'admin_name' => 'Administrator',
             'admin_email' => 'admin@example.com',
-            'admin_password' => 'password123',
-            'admin_password_confirmation' => 'password123',
+            'admin_password' => 'Passw0rd!123',
+            'admin_password_confirmation' => 'Passw0rd!123',
         ], $overrides);
     }
 

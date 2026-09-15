@@ -43,11 +43,21 @@
             <div>
                 <x-input-label for="password" :value="$user->exists ? __('New password (optional)') : __('Password')" />
                 @if ($user->exists)
-                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" />
+                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
                 @else
-                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" required />
+                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" required />
                 @endif
+                <p class="mt-1 text-xs text-gray-500">{{ __('At least 8 characters, with an uppercase and lowercase letter and a special character.') }}</p>
                 <x-input-error :messages="$errors->get('password')" class="mt-1" />
+            </div>
+            <div>
+                <x-input-label for="password_confirmation" :value="__('Confirm password')" />
+                @if ($user->exists)
+                    <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+                @else
+                    <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" required />
+                @endif
+                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1" />
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">

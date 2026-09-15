@@ -26,7 +26,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
             'role' => ['required', Rule::in(['admin', 'magazynier', 'podglad'])],
-            'password' => ['required', Password::defaults()],
+            'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
         $data['password'] = Hash::make($data['password']);
@@ -47,7 +47,7 @@ class UserController extends Controller
             'email' => ['required', 'email', 'unique:users,email,'.$user->id],
             'role' => ['required', Rule::in(['admin', 'magazynier', 'podglad'])],
             'active' => ['boolean'],
-            'password' => ['nullable', Password::defaults()],
+            'password' => ['nullable', 'confirmed', Password::defaults()],
         ]);
 
         $data['active'] = $request->boolean('active');

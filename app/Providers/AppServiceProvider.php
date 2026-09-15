@@ -8,6 +8,7 @@ use App\Services\InstallerCleanupService;
 use App\Support\AppVersion;
 use App\Support\EnvFileWriter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -43,5 +44,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Item::observe(ItemObserver::class);
+
+        // Domyślne wymagania dla KAŻDEGO Password::defaults() w appce —
+        // zmiana hasła w Profilu, reset hasła, konto głównego admina z
+        // Instalatora, konto zakładane/edytowane przez admina w
+        // Ustawienia → Użytkownicy.
+        Password::defaults(fn () => Password::min(8)->mixedCase()->symbols());
     }
 }

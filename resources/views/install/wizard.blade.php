@@ -203,6 +203,7 @@
                         <div>
                             <x-input-label for="admin_password" :value="__('Password')" />
                             <x-text-input id="admin_password" name="admin_password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+                            <p class="mt-1 text-xs text-gray-500">{{ __('At least 8 characters, with an uppercase and lowercase letter and a special character.') }}</p>
                             <x-input-error :messages="$errors->get('admin_password')" class="mt-1" />
                         </div>
                         <div>
