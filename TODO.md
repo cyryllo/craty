@@ -241,7 +241,7 @@ podjęte z użytkownikiem, żeby nie trzeba było dopytywać przy starcie budowy
 
 Kroki kreatora (roboczo):
 
-1. **Wymagania środowiska** — wersja PHP (≥ 8.2 wg `composer.json`),
+1. **Wymagania środowiska** — wersja PHP (≥ 8.3 wg `composer.json`),
    rozszerzenia (`pdo_mysql`, `mbstring`, `gd`, `zip`, `bcmath`, `exif`,
    `intl` — patrz `Dockerfile`), zapisywalność `storage/`,
    `bootstrap/cache/` i pliku `.env` (albo jego katalogu, gdy `.env` jeszcze

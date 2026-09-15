@@ -165,8 +165,8 @@ class InstallController extends Controller
 
         return [
             'php' => [
-                'label' => __('PHP version (:version or newer)', ['version' => '8.2']),
-                'ok' => version_compare(PHP_VERSION, '8.2.0', '>='),
+                'label' => __('PHP version (:version or newer)', ['version' => '8.3']),
+                'ok' => version_compare(PHP_VERSION, '8.3.0', '>='),
                 'detail' => PHP_VERSION,
             ],
             'extensions' => collect($extensions)->map(fn ($ext) => [
