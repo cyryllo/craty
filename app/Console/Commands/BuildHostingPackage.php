@@ -41,11 +41,11 @@ class BuildHostingPackage extends Command
 
     /**
      * Katalogi z kodem/danymi appki — po spłaszczeniu dostają .htaccess
-     * blokujący dostęp z przeglądarki. "storage" (prawdziwy katalog
-     * Laravela — sesje/cache/logi/dane usera) zamienione na "app-storage"
-     * — patrz renameStorageDirectory().
+     * blokujący dostęp z przeglądarki. "app-storage" (prawdziwy katalog
+     * Laravela po zmianie nazwy — patrz renameStorageDirectory()) CELOWO
+     * nie jest tu — blokowany jest inaczej, patrz writeHtaccessFiles().
      */
-    private const PROTECTED_DIRS = ['app', 'bootstrap', 'config', 'database', 'lang', 'resources', 'routes', 'app-storage', 'vendor'];
+    private const PROTECTED_DIRS = ['app', 'bootstrap', 'config', 'database', 'lang', 'resources', 'routes', 'vendor'];
 
     /** Pliki w korzeniu, które nie mają prawa być pobierane wprost (hasła do bazy, klucz appki). */
     private const PROTECTED_ROOT_FILES_PATTERN = '^(\.env.*|composer\.(json|lock)|artisan|VERSION|update-manifest\.json|phpunit\.xml)$';
@@ -223,6 +223,20 @@ class BuildHostingPackage extends Command
         <FilesMatch "$rootFilesPattern">
         $denyAll
         </FilesMatch>
+
+        # app-storage (sesje/cache/logi/baza — prawdziwy storage/ appki po
+        # zmianie nazwy) blokowany PO ADRESIE URL, nie zagnieżdżonym .htaccess
+        # w środku katalogu — inaczej blokada objęłaby też app-storage/app/public,
+        # do którego prowadzi symlink "storage" (Apache stosuje reguły dostępu
+        # po prawdziwej ścieżce docelowej symlinka, nie po jego nazwie), i
+        # zdjęcia/QR znowu dawałyby 403 mimo poprawnego symlinku. Ten katalog
+        # przy tym nie zawsze istnieje jeszcze w chwili budowania paczki
+        # (app/public dokłada się dopiero przy pierwszym uploadzie), więc i tak
+        # nie dałoby się tam z góry podłożyć osobnego .htaccess z wyjątkiem.
+        <IfModule mod_rewrite.c>
+            RewriteCond %{REQUEST_URI} ^/app-storage/
+            RewriteRule .* - [F,L]
+        </IfModule>
         HTACCESS;
 
         file_put_contents($workDir.'/.htaccess', $root);

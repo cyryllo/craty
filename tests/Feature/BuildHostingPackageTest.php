@@ -69,15 +69,23 @@ class BuildHostingPackageTest extends TestCase
         $this->assertStringContainsString('\.env', $rootHtaccess);
 
         // Każdy katalog z kodem/danymi ma własny .htaccess blokujący dostęp z przeglądarki.
-        // "storage" NIE jest na tej liście — to teraz "app-storage" (patrz
-        // renameStorageDirectory()), bo prawdziwy "storage" pod document
-        // rootem musi zostać wolny pod symlink z artisan storage:link.
-        foreach (['app', 'bootstrap', 'config', 'database', 'lang', 'resources', 'routes', 'app-storage', 'vendor'] as $dir) {
+        // "app-storage" (prawdziwy storage/ appki po zmianie nazwy) CELOWO nie
+        // ma własnego zagnieżdżonego .htaccess — patrz niżej.
+        foreach (['app', 'bootstrap', 'config', 'database', 'lang', 'resources', 'routes', 'vendor'] as $dir) {
             $htaccess = $zip->getFromName($dir.'/.htaccess');
             $this->assertNotFalse($htaccess, "Brak {$dir}/.htaccess w paczce.");
             $this->assertStringContainsString('Require all denied', $htaccess);
         }
         $this->assertFalse($zip->locateName('storage/'), 'storage/ powinno zniknąć jako katalog (zmienione na app-storage/, wolne pod symlink).');
+
+        // Regresja: app-storage/.htaccess z blanket "Require all denied"
+        // blokował też app-storage/app/public, do którego prowadzi symlink
+        // "storage" (Apache stosuje reguły dostępu po prawdziwej ścieżce
+        // docelowej symlinka) — zdjęcia/QR dawały 403 mimo poprawnego
+        // symlinku. app-storage jest teraz blokowany PO ADRESIE URL w
+        // korzeniu, nie zagnieżdżonym plikiem w środku katalogu.
+        $this->assertFalse($zip->locateName('app-storage/.htaccess'), 'app-storage nie może mieć własnego .htaccess — blokuje wtedy też pliki dostępne przez symlink storage.');
+        $this->assertStringContainsString('^/app-storage/', $rootHtaccess);
 
         // $app->usePublicPath(__DIR__) — bez tego Vite szuka manifestu pod
         // podwójnym "public/build/..." (publicPath() domyślnie = base_path().
