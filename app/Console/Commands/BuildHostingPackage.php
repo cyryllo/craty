@@ -39,8 +39,13 @@ class BuildHostingPackage extends Command
 
     protected $description = 'Buduje spłaszczoną paczkę .zip do rozpakowania wprost w document roocie hostingu (gdy open_basedir nie pozwala trzymać appki wyżej niż public_html).';
 
-    /** Katalogi z kodem/danymi appki — po spłaszczeniu dostają .htaccess blokujący dostęp z przeglądarki. */
-    private const PROTECTED_DIRS = ['app', 'bootstrap', 'config', 'database', 'lang', 'resources', 'routes', 'storage', 'vendor'];
+    /**
+     * Katalogi z kodem/danymi appki — po spłaszczeniu dostają .htaccess
+     * blokujący dostęp z przeglądarki. "storage" (prawdziwy katalog
+     * Laravela — sesje/cache/logi/dane usera) zamienione na "app-storage"
+     * — patrz renameStorageDirectory().
+     */
+    private const PROTECTED_DIRS = ['app', 'bootstrap', 'config', 'database', 'lang', 'resources', 'routes', 'app-storage', 'vendor'];
 
     /** Pliki w korzeniu, które nie mają prawa być pobierane wprost (hasła do bazy, klucz appki). */
     private const PROTECTED_ROOT_FILES_PATTERN = '^(\.env.*|composer\.(json|lock)|artisan|VERSION|update-manifest\.json|phpunit\.xml)$';
@@ -63,6 +68,7 @@ class BuildHostingPackage extends Command
             $this->extract($tempZip, $workDir);
 
             $this->flattenPublicDirectory($workDir);
+            $this->renameStorageDirectory($workDir);
             $this->rewriteIndexPhp($workDir.'/index.php');
             $this->writeHtaccessFiles($workDir);
 
@@ -111,6 +117,25 @@ class BuildHostingPackage extends Command
     }
 
     /**
+     * Po spłaszczeniu publicPath() == basePath() (patrz rewriteIndexPhp), więc
+     * "storage" pod document rootem musi zostać SYMLINKIEM zrobionym przez
+     * `artisan storage:link` (public_path('storage') -> storage_path(
+     * 'app/public')) — ale prawdziwy katalog storage/ appki (sesje, cache,
+     * logi) leży dosłownie w tym samym miejscu! `symlink()` nie ma prawa
+     * podmienić istniejącego katalogu na link, więc storage:link wywalał się
+     * cicho błędem "No such file or directory", zdjęcia/QR nigdy nie miały
+     * czego serwować pod /storage/... (realnie złapany bug na produkcji —
+     * puste 404 na wszystkich zdjęciach mimo poprawnych linków w HTML-u).
+     * Rozwiązanie: prawdziwy storage appki przenosi się pod "app-storage" (i
+     * $app->useStoragePath() w index.php), zwalniając "storage" wyłącznie
+     * pod symlink do publicznych plików.
+     */
+    private function renameStorageDirectory(string $workDir): void
+    {
+        File::moveDirectory($workDir.'/storage', $workDir.'/app-storage');
+    }
+
+    /**
      * public/index.php zakłada, że appka leży katalog WYŻEJ ("__DIR__.'/../...'")
      * — po spłaszczeniu jest obok, więc "/.." znika. Druga zmiana jest mniej
      * oczywista: Laravel liczy publicPath() jako base_path().'/public' na
@@ -126,6 +151,12 @@ class BuildHostingPackage extends Command
     {
         $contents = str_replace("__DIR__.'/../", "__DIR__.'/", file_get_contents($path));
 
+        // Prawdziwy storage/ appki przeniesiony na app-storage/ (patrz
+        // renameStorageDirectory) — obie linijki w tym pliku, które jeszcze
+        // wskazują na "storage" (sprawdzenie trybu konserwacji i
+        // RequiredStorageDirectories::ensureExist), muszą pójść tam za nim.
+        $contents = str_replace("__DIR__.'/storage", "__DIR__.'/app-storage", $contents);
+
         $contents = str_replace(
             "(require_once __DIR__.'/bootstrap/app.php')\n    ->handleRequest(Request::capture());",
             "\$app = require_once __DIR__.'/bootstrap/app.php';\n".
@@ -134,6 +165,19 @@ class BuildHostingPackage extends Command
                 "// na domyślne base_path().'/public' (inaczej Vite szuka manifestu pod\n".
                 "// podwójnym '/public/build/...' i wywala ViteManifestNotFoundException).\n".
                 "\$app->usePublicPath(__DIR__);\n".
+                "// Prawdziwy storage appki przeniesiony na app-storage/ — public_path\n".
+                "// ('storage') (== __DIR__.'/storage' teraz, że publicPath == basePath)\n".
+                "// musi zostać wolny pod symlink z 'artisan storage:link', inaczej\n".
+                "// koliduje z prawdziwym katalogiem storage/ i storage:link cicho pada.\n".
+                "\$app->useStoragePath(__DIR__.'/app-storage');\n".
+                "// Samo-naprawiające się: zwykle ten symlink zakłada 'artisan storage:link'\n".
+                "// wołane raz z Instalatora, ale na już zainstalowanej appce (np. po\n".
+                "// wgraniu tej poprawki na starszą instalację, gdzie ten symlink nigdy nie\n".
+                "// powstał) nic więcej go nie stworzy — Instalator już się nie pokaże.\n".
+                "// Tanie, więc sprawdzane na każde żądanie zamiast tylko przy instalacji.\n".
+                "if (! is_link(__DIR__.'/storage') && ! is_dir(__DIR__.'/storage') && is_dir(__DIR__.'/app-storage/app/public')) {\n".
+                "    @symlink(__DIR__.'/app-storage/app/public', __DIR__.'/storage');\n".
+                "}\n".
                 "\$app->handleRequest(Request::capture());",
             $contents
         );
