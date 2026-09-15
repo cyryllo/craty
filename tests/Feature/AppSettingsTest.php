@@ -55,11 +55,12 @@ class AppSettingsTest extends TestCase
             ->assertSee('App settings');
     }
 
-    public function test_viewer_cannot_reach_settings_hub(): void
+    public function test_settings_hub_shows_the_app_version(): void
     {
-        $viewer = User::factory()->create(['role' => 'podglad']);
+        $user = User::factory()->create(['role' => 'magazynier']);
 
-        $this->actingAs($viewer)->get(route('settings.index'))->assertForbidden();
+        $this->actingAs($user)->get(route('settings.index'))
+            ->assertSee('Craty v'.app(\App\Support\AppVersion::class)->current());
     }
 
     /**

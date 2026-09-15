@@ -11,8 +11,8 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 // Rejestracja jest celowo wyłączona: to wewnętrzne narzędzie z kontrolą ról
-// (admin/magazynier/podgląd), więc konta zakłada wyłącznie administrator
-// przez /users (patrz UserController), a nie każdy chętny przez formularz.
+// (admin/magazynier), więc konta zakłada wyłącznie administrator przez
+// /users (patrz UserController), a nie każdy chętny przez formularz.
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

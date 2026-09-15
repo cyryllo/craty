@@ -8,8 +8,8 @@ use Illuminate\Database\Seeder;
 /**
  * Dane startowe dla środowiska deweloperskiego: po jednym koncie na każdą
  * rolę + przykładowy spis (patrz DemoDataSeeder — to jedyna część, którą
- * wywołuje też Instalator w prawdziwym wdrożeniu, bez fałszywych kont
- * magazyniera/podglądu).
+ * wywołuje też Instalator w prawdziwym wdrożeniu, bez fałszywego konta
+ * magazyniera).
  */
 class DatabaseSeeder extends Seeder
 {
@@ -28,12 +28,6 @@ class DatabaseSeeder extends Seeder
             'name' => 'Magazynier',
             'email' => 'magazynier@craty.test',
             'role' => 'magazynier',
-        ]);
-
-        User::factory()->create([
-            'name' => 'Podgląd',
-            'email' => 'podglad@craty.test',
-            'role' => 'podglad',
         ]);
 
         $this->call(DemoDataSeeder::class);

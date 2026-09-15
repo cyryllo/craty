@@ -31,16 +31,16 @@ class LocaleTest extends TestCase
     public function test_admin_sets_global_default_language_for_users_without_a_preference(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
-        $viewer = User::factory()->create(['role' => 'podglad']);
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
 
         $this->actingAs($admin)->post(route('settings.app.update'), ['locale' => 'pl'])->assertRedirect();
         $this->assertSame('pl', AppSetting::current()->locale);
 
-        // Viewer nie ustawił własnego języka, więc dostaje globalny domyślny.
-        $this->actingAs($viewer)->get('/items')->assertSee('Przedmioty');
+        // Magazynier nie ustawił własnego języka, więc dostaje globalny domyślny.
+        $this->actingAs($magazynier)->get('/items')->assertSee('Przedmioty');
 
         // Ale osobista preferencja użytkownika i tak wygrywa z globalnym ustawieniem.
-        $viewer->update(['locale' => 'en']);
-        $this->actingAs($viewer)->get('/items')->assertSee('Items');
+        $magazynier->update(['locale' => 'en']);
+        $this->actingAs($magazynier)->get('/items')->assertSee('Items');
     }
 }

@@ -30,7 +30,6 @@
                     <select id="role" name="role" class="mt-1 block w-full rounded-md border-gray-300" required>
                         <option value="admin" @selected(old('role', $user->role) == 'admin')>{{ __('Administrator — full access') }}</option>
                         <option value="magazynier" @selected(old('role', $user->role ?: 'magazynier') == 'magazynier')>{{ __('Warehouse worker — adds and edits items') }}</option>
-                        <option value="podglad" @selected(old('role', $user->role) == 'podglad')>{{ __('Viewer — read-only') }}</option>
                     </select>
                 </div>
                 @if ($user->exists)

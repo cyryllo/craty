@@ -23,7 +23,7 @@ npm install && npm run build
 ```
 
 Aplikacja: http://localhost:8000 — konta startowe (hasło: `password`):
-`admin@craty.test`, `magazynier@craty.test`, `podglad@craty.test`.
+`admin@craty.test`, `magazynier@craty.test`.
 
 **Własne dane logowania do bazy:** przed pierwszym `docker compose up`
 zmień `DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD` (i opcjonalnie

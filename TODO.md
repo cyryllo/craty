@@ -234,8 +234,8 @@ podjęte z użytkownikiem, żeby nie trzeba było dopytywać przy starcie budowy
   historii przeglądarki, jeśli instalacja w międzyczasie już się skończyła.
 - **Dane demo:** opcjonalny checkbox „załaduj dane przykładowe” w ostatnim
   kroku — jeśli zaznaczony, uruchamia samą część przykładowych
-  kategorii/magazynu/przedmiotów z `DatabaseSeeder` (bez fałszywych kont
-  magazyniera/podglądu — to sensowne tylko na dev). Prawdopodobnie trzeba
+  kategorii/magazynu/przedmiotów z `DatabaseSeeder` (bez fałszywego konta
+  magazyniera — to sensowne tylko na dev). Prawdopodobnie trzeba
   rozbić dzisiejszy `DatabaseSeeder` na dwie części: tworzenie kont demo
   (zostaje tylko do dev) i samodzielny `DemoDataSeeder` z
   kategoriami/magazynem/przedmiotami, który wywoła też instalator.
@@ -606,8 +606,8 @@ części:
   dużo przypadków brzegowych, prościej i uczciwiej trzymać to jako prosty
   fakt "ktoś to dotknął po dodaniu ze skanera").
 - Uprawnienia jak przy zwykłym dodawaniu przedmiotu — `role:admin,
-  magazynier`, nie `podglad` (sam skan-do-podglądu istniejącego przedmiotu
-  zostaje dostępny dla każdej roli, tak jak dziś `/items/{item}`).
+  magazynier` (sam skan-do-podglądu istniejącego przedmiotu zostaje
+  dostępny dla każdej roli, tak jak dziś `/items/{item}`).
 
 ## Pomysły do rozważenia później (bez ustalonych decyzji, nie specyfikacja)
 

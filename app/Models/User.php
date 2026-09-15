@@ -83,7 +83,6 @@ class User extends Authenticatable
     public const ROLES = [
         'admin' => 'Administrator',
         'magazynier' => 'Warehouse worker',
-        'podglad' => 'Viewer',
     ];
 
     public function roleLabel(): string

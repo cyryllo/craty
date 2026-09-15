@@ -38,7 +38,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($otherAdmin)->put(route('users.update', $mainAdmin), [
             'name' => $mainAdmin->name,
             'email' => $mainAdmin->email,
-            'role' => 'podglad',
+            'role' => 'magazynier',
             // 'active' celowo pominięte — symuluje odznaczenie checkboxa.
         ]);
 

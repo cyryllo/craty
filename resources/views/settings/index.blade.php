@@ -73,5 +73,7 @@
             </a>
 
         </div>
+
+        <p class="text-center text-xs text-gray-400 mt-8">Craty v{{ $appVersion }}</p>
     </div>
 </x-app-layout>

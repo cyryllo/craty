@@ -33,32 +33,9 @@ class ItemManagementTest extends TestCase
         $this->assertDatabaseHas('item_histories', ['item_id' => $item->id, 'action' => 'created']);
     }
 
-    public function test_viewer_role_cannot_create_items(): void
-    {
-        $viewer = User::factory()->create(['role' => 'podglad']);
-
-        $this->actingAs($viewer)->get('/items/create')->assertForbidden();
-
-        $this->actingAs($viewer)->post('/items', [
-            'name' => 'Próba dodania',
-            'condition' => 'nowy',
-            'status' => 'dostepny',
-        ])->assertForbidden();
-
-        $this->assertDatabaseCount('items', 0);
-    }
-
-    public function test_viewer_can_see_items_but_not_categories(): void
-    {
-        $viewer = User::factory()->create(['role' => 'podglad']);
-
-        $this->actingAs($viewer)->get('/items')->assertOk();
-        $this->actingAs($viewer)->get('/categories')->assertForbidden();
-    }
-
     public function test_items_can_be_found_by_serial_number_or_ean(): void
     {
-        $viewer = User::factory()->create(['role' => 'podglad']);
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
         Item::create([
             'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wkrętarka', 'condition' => 'nowy',
             'status' => 'dostepny', 'serial_number' => 'SN-998877', 'ean' => '5901234123457',
@@ -68,10 +45,10 @@ class ItemManagementTest extends TestCase
             'status' => 'dostepny',
         ]);
 
-        $bySerial = $this->actingAs($viewer)->get('/items?q=998877');
+        $bySerial = $this->actingAs($magazynier)->get('/items?q=998877');
         $bySerial->assertSee('Wkrętarka')->assertDontSee('Inny przedmiot');
 
-        $byEan = $this->actingAs($viewer)->get('/items?q=5901234123457');
+        $byEan = $this->actingAs($magazynier)->get('/items?q=5901234123457');
         $byEan->assertSee('Wkrętarka')->assertDontSee('Inny przedmiot');
     }
 
@@ -121,16 +98,5 @@ class ItemManagementTest extends TestCase
 
         $this->actingAs($magazynier)->delete(route('items.photos.destroy', [$itemTwo, $photo]))->assertNotFound();
         $this->assertModelExists($photo);
-    }
-
-    public function test_viewer_cannot_delete_photos_or_attachments(): void
-    {
-        $viewer = User::factory()->create(['role' => 'podglad']);
-        $item = Item::create(['inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'A', 'condition' => 'nowy', 'status' => 'dostepny']);
-        $photo = $item->photos()->create(['path' => 'items/1/a.jpg', 'is_primary' => true, 'sort_order' => 0]);
-        $attachment = $item->attachments()->create(['path' => 'items/1/f.pdf', 'label' => 'F']);
-
-        $this->actingAs($viewer)->delete(route('items.photos.destroy', [$item, $photo]))->assertForbidden();
-        $this->actingAs($viewer)->delete(route('items.attachments.destroy', [$item, $attachment]))->assertForbidden();
     }
 }

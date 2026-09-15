@@ -23,7 +23,7 @@ npm install && npm run build
 ```
 
 App: http://localhost:8000 — seeded accounts (password: `password`):
-`admin@craty.test`, `magazynier@craty.test`, `podglad@craty.test`.
+`admin@craty.test`, `magazynier@craty.test`.
 
 **Custom database credentials:** before the first `docker compose up`,
 change `DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD` (and optionally
