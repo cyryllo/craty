@@ -135,6 +135,21 @@ class SaleListingWorkflowTest extends TestCase
             ->assertSee('a.jpg');
     }
 
+    public function test_item_page_shows_list_for_sale_and_withdraw_when_a_draft_listing_exists(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'do_sprzedazy',
+        ]);
+        $item->saleListings()->create(['platform' => 'olx', 'title' => 'Wiertarka - okazja']);
+
+        $this->actingAs($magazynier)->get(route('items.show', $item))
+            ->assertSee(__('list for sale'))
+            ->assertSee(__('withdraw'))
+            ->assertDontSee(__('Prepare sale listing'))
+            ->assertDontSee(__('mark as sold'));
+    }
+
     public function test_item_page_shows_withdraw_and_mark_sold_instead_of_prepare_when_already_listed(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);

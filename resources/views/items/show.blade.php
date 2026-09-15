@@ -161,6 +161,17 @@
                                 <button class="w-full px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('mark as sold') }}</button>
                             </form>
                         </div>
+                    @elseif ($item->draftSaleListing)
+                        <div class="flex gap-2">
+                            <form method="POST" action="{{ route('sale-listings.withdraw', $item->draftSaleListing) }}" onsubmit="return confirm('{{ __('Withdraw this listing from sale?') }}');" class="flex-1">
+                                @csrf
+                                <button class="w-full px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 text-red-600">{{ __('withdraw') }}</button>
+                            </form>
+                            <form method="POST" action="{{ route('sale-listings.mark-listed', $item->draftSaleListing) }}" onsubmit="return confirm('{{ __('Mark as listed?') }}');" class="flex-1">
+                                @csrf
+                                <button class="w-full px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('list for sale') }}</button>
+                            </form>
+                        </div>
                     @else
                         <a href="{{ route('items.sale-listing.create', $item) }}" class="block w-full text-center px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50">
                             {{ __('Prepare sale listing') }}

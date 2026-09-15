@@ -80,7 +80,7 @@ class ItemController extends Controller
 
     public function show(Item $item)
     {
-        $item->load(['category', 'storageLocation.warehouse', 'photos', 'attachments', 'histories.user', 'currentLoan.borrower', 'saleListings', 'activeSaleListing']);
+        $item->load(['category', 'storageLocation.warehouse', 'photos', 'attachments', 'histories.user', 'currentLoan.borrower', 'saleListings', 'activeSaleListing', 'draftSaleListing']);
 
         return view('items.show', ['item' => $item]);
     }

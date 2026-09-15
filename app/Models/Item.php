@@ -94,6 +94,12 @@ class Item extends Model
         return $this->hasOne(SaleListing::class)->where('status', 'wyeksportowana')->latestOfMany();
     }
 
+    /** Oferta przygotowana, ale jeszcze nie wystawiona (szkic) — do przycisków "wystaw do sprzedaży"/"wycofaj" na karcie przedmiotu. */
+    public function draftSaleListing()
+    {
+        return $this->hasOne(SaleListing::class)->where('status', 'szkic')->latestOfMany();
+    }
+
     public function statusLabel(): string
     {
         return __(self::STATUSES[$this->status] ?? $this->status);
