@@ -38,6 +38,15 @@ database credentials, and creates the administrator account. Later
 versions are uploaded through the admin panel (Settings → Updates) as a
 `.zip` package — no Composer or npm required on the server.
 
+**Upload size limit:** an update package is typically several to a few
+dozen MB (it bundles the full `vendor/` directory and the built frontend),
+and PHP's default limits (`post_max_size`, usually 8M; `upload_max_filesize`,
+usually 2M) will reject it outright with a `413 Content Too Large` before
+the request ever reaches the app. This repo's Docker image already raises
+both to `128M`, but on plain hosting you'll need to bump them yourself in
+`php.ini` (or via `.htaccess`/your host's control panel if you can't touch
+`php.ini`) and restart PHP/the web server.
+
 ## Documentation
 
 - [CHANGELOG.md](CHANGELOG.md) — change history

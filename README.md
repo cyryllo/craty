@@ -38,6 +38,16 @@ zakłada konto administratora. Kolejne wersje wgrywa się przez panel
 (Ustawienia → Aktualizacje) jako paczkę `.zip`, bez composera/npm na
 serwerze.
 
+**Limit rozmiaru wgrywanego pliku:** paczka aktualizacyjna to zwykle
+kilkanaście–kilkadziesiąt MB (zawiera cały `vendor/` i skompilowany
+frontend), a domyślne limity PHP (`post_max_size`, zwykle 8M;
+`upload_max_filesize`, zwykle 2M) tego nie przepuszczą — upload padnie z
+błędem `413 Content Too Large`, zanim żądanie w ogóle dotrze do aplikacji.
+Obraz Dockera z tego repo ma to już podniesione (`128M`), ale na zwykłym
+hostingu trzeba samodzielnie podbić obie wartości w `php.ini` (albo w
+`.htaccess`/panelu hostingu, jeśli nie ma dostępu do `php.ini`) i
+zrestartować PHP/serwer.
+
 ## Dokumentacja
 
 - [CHANGELOG.md](CHANGELOG.md) — historia zmian
