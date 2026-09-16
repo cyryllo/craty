@@ -5,6 +5,7 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ItemImportController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MailSettingController;
@@ -47,6 +48,13 @@ Route::middleware('auth')->group(function () {
         Route::get('ustawienia', [SettingsController::class, 'index'])->name('settings.index');
         Route::get('items/create', [ItemController::class, 'create'])->name('items.create');
         Route::post('items', [ItemController::class, 'store'])->name('items.store');
+
+        // Import masowy istniejącego spisu (TODO.md) — literały pod "items/",
+        // więc muszą być zarejestrowane tu, przed wildcardem "items/{item}" niżej.
+        Route::get('items/import', [ItemImportController::class, 'create'])->name('items.import.create');
+        Route::post('items/import', [ItemImportController::class, 'store'])->name('items.import.store');
+        Route::post('items/import/nieprzypisane', [ItemImportController::class, 'confirmUnassigned'])->name('items.import.confirm-unassigned');
+        Route::get('items/import/szablon.csv', [ItemImportController::class, 'template'])->name('items.import.template');
         Route::get('items/{item}/edit', [ItemController::class, 'edit'])->name('items.edit');
         Route::put('items/{item}', [ItemController::class, 'update'])->name('items.update');
         Route::delete('items/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
