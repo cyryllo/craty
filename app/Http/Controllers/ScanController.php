@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Item;
+use App\Models\StorageLocation;
 use App\Services\InventoryNumberGenerator;
 use App\Services\QrCodeGenerator;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 /**
  * Skanowanie kamerą (QR/kod kreskowy) — patrz TODO.md "PWA". Własny QR z
@@ -39,13 +42,21 @@ class ScanController extends Controller
 
     public function quickAddCreate(Request $request)
     {
-        return view('scan.quick-add', ['code' => $request->query('code', '')]);
+        return view('scan.quick-add', [
+            'code' => $request->query('code', ''),
+            'categories' => Category::orderBy('name')->get(),
+            'locations' => StorageLocation::with('warehouse')->get(),
+        ]);
     }
 
     /**
-     * Uproszczony formularz z założenia — tylko zdjęcie/nazwa/kod, bez
-     * kategorii/lokalizacji/stanu (te dostają DB-owe defaulty). Ma zająć
-     * kilka sekund w warsztacie, nie zastępować pełnego /items/create.
+     * Nadal celowo krótszy niż pełny /items/create (mniej pól, jedno
+     * zdjęcie z aparatu zamiast galerii) — ale od życzenia użytkownika
+     * (TODO.md, "Priorytet") ma już kategorię/lokalizację/stan/opis, nie
+     * tylko zdjęcie+nazwę+kod. Wszystkie cztery zostają opcjonalne: skan w
+     * warsztacie ma dalej działać w kilka sekund, gdy nie ma czasu ich
+     * wypełniać — brakujące kategoria/lokalizacja dostają wtedy tak jak
+     * dotychczas GEN/BRAK w numerze ewidencyjnym.
      */
     public function quickAddStore(Request $request, InventoryNumberGenerator $numbers, QrCodeGenerator $qr)
     {
@@ -57,11 +68,28 @@ class ScanController extends Controller
             'item_name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:64'],
             'photo' => ['nullable', 'image', 'max:8192'],
+            'category_id' => ['nullable', 'exists:categories,id'],
+            'storage_location_id' => ['nullable', 'exists:storage_locations,id'],
+            'condition' => ['nullable', Rule::in(array_keys(Item::CONDITIONS))],
+            'description' => ['nullable', 'string'],
         ]);
 
-        $item = new Item(['name' => $data['item_name'], 'ean' => $data['code']]);
+        $category = ! empty($data['category_id']) ? Category::find($data['category_id']) : null;
+        $location = ! empty($data['storage_location_id']) ? StorageLocation::find($data['storage_location_id']) : null;
+
+        // array_filter usuwa nieustawione pola zamiast wysyłać jawne NULL —
+        // "condition" ma NOT NULL + default('uzywany') w bazie, więc jawny
+        // NULL wywaliłby insert zamiast po prostu spaść na ten default.
+        $item = new Item(array_filter([
+            'name' => $data['item_name'],
+            'ean' => $data['code'],
+            'category_id' => $data['category_id'] ?? null,
+            'storage_location_id' => $data['storage_location_id'] ?? null,
+            'condition' => $data['condition'] ?? null,
+            'description' => $data['description'] ?? null,
+        ], fn ($value) => $value !== null));
         $item->created_by = $request->user()->id;
-        $item->inventory_no = $numbers->generate(null, null);
+        $item->inventory_no = $numbers->generate($category, $location);
         $item->forceFill(['needs_completion' => true]);
         $item->save();
 

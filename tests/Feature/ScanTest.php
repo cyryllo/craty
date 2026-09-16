@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
 use App\Models\Item;
+use App\Models\StorageLocation;
 use App\Models\User;
+use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -85,6 +88,60 @@ class ScanTest extends TestCase
         ])->assertRedirect();
 
         $this->assertTrue(Item::firstOrFail()->needs_completion);
+    }
+
+    /** Życzenie użytkownika (TODO.md, "Priorytet") — kategoria/lokalizacja/stan/opis dostępne od razu przy skanie. */
+    public function test_quick_add_create_page_offers_category_and_location_pickers(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $category = Category::create(['name' => 'Narzędzia', 'code' => 'NAR']);
+        $warehouse = Warehouse::create(['name' => 'Magazyn główny', 'code' => 'M1']);
+        $location = StorageLocation::create(['warehouse_id' => $warehouse->id, 'rack' => '1', 'shelf' => '2']);
+
+        $this->actingAs($magazynier)->get(route('scan.quick-add.create'))
+            ->assertOk()
+            ->assertSee('Narzędzia')
+            ->assertSee($location->label());
+    }
+
+    public function test_quick_add_accepts_category_location_condition_and_description(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $category = Category::create(['name' => 'Narzędzia', 'code' => 'NAR']);
+        $warehouse = Warehouse::create(['name' => 'Magazyn główny', 'code' => 'M1']);
+        $location = StorageLocation::create(['warehouse_id' => $warehouse->id, 'rack' => '1', 'shelf' => '2']);
+
+        $this->actingAs($magazynier)->post(route('scan.quick-add.store'), [
+            'item_name' => 'Multimetr',
+            'code' => '5901234123457',
+            'category_id' => $category->id,
+            'storage_location_id' => $location->id,
+            'condition' => 'nowy',
+            'description' => 'Kupiony na wyprzedaży, komplet z sondami.',
+        ])->assertRedirect();
+
+        $item = Item::firstOrFail();
+        $this->assertSame($category->id, $item->category_id);
+        $this->assertSame($location->id, $item->storage_location_id);
+        $this->assertSame('nowy', $item->condition);
+        $this->assertSame('Kupiony na wyprzedaży, komplet z sondami.', $item->description);
+        $this->assertStringStartsWith('NAR-', $item->inventory_no);
+    }
+
+    public function test_quick_add_still_falls_back_to_defaults_when_new_fields_are_left_blank(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+
+        $this->actingAs($magazynier)->post(route('scan.quick-add.store'), [
+            'item_name' => 'Multimetr',
+            'code' => '5901234123457',
+        ])->assertRedirect();
+
+        $item = Item::firstOrFail();
+        $this->assertNull($item->category_id);
+        $this->assertNull($item->storage_location_id);
+        $this->assertSame('uzywany', $item->condition);
+        $this->assertStringStartsWith('GEN-BRAK-', $item->inventory_no);
     }
 
     public function test_needs_completion_flag_clears_after_a_regular_edit(): void
