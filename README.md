@@ -103,7 +103,6 @@ zwykłym HTTP w produkcji. Zadbaj o certyfikat, zanim ktoś się zdziwi, że
 ## Dokumentacja
 
 - [CHANGELOG.md](CHANGELOG.md) — historia zmian
-- [TODO.md](TODO.md) — mapa drogowa
 
 ## Licencja
 

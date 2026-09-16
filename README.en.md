@@ -107,7 +107,6 @@ doesn't work".
 ## Documentation
 
 - [CHANGELOG.md](CHANGELOG.md) — change history
-- [TODO.md](TODO.md) — roadmap
 
 ## License
 
