@@ -383,6 +383,71 @@ samowystarczalna (patrz niżej).
 
 </details>
 
+## Struktura projektu: jeden, stały, spłaszczony układ — **Zrobione** (2026-09-16)
+
+Do tej pory istniały dwa różne układy plików appki: klasyczny (ten
+repozytorium, Docker dev, `release:build` — osobny `public/` jako document
+root, kod appki katalog wyżej) i spłaszczony (`release:build-hosting`,
+tylko jako transformacja przy budowaniu paczki — wszystko w jednym
+katalogu, dla hostingów z `open_basedir` ograniczonym do document rootu,
+np. dzisiejsza produkcja graty.protofab.pl). Utrzymywanie obu wymagało
+dwóch komend budujących, dwóch list chronionych ścieżek w `UpdateService`,
+auto-wykrywania układu w locie i osobnych testów dla każdego wariantu — i
+już raz było źródłem realnego buga produkcyjnego (aktualizacja przez panel
+"nie wgrała wszystkiego", bo klasyczna paczka `-update.zip` trafiła na
+spłaszczoną instalację).
+
+**Zdecydowano na wyraźną prośbę użytkownika: układ spłaszczony jest teraz
+jedynym układem projektu — w repo, w Dockerze (dev) i na hostingu, na
+stałe.** Świadomie zaakceptowany kompromis: ochrona `.env`/`app`/`vendor`
+zależy odtąd wyłącznie od `.htaccess` (Apache), nie od fizycznego trzymania
+kodu poza document rootem. Pełny opis docelowej struktury, dwóch
+przemianowań (`storage/`→`app-storage/`, `public/icons/`→`pwa-icons/`) i
+uzasadnienie każdej decyzji — patrz CLAUDE.md "Project layout" (nowa
+sekcja) i "No PHP/Composer na hoście" (Docker teraz na Apache, nie
+`php artisan serve` — inaczej `.htaccess` nigdy nie byłby faktycznie
+testowany lokalnie).
+
+Zmiany w skrócie:
+- `public/` zniknęło — `index.php`, `.htaccess`, `manifest.json`, `sw.js`,
+  `favicon.ico`, `robots.txt`, `pwa-icons/`, `build/` (Vite) leżą teraz w
+  korzeniu repo, obok `app/`, `vendor/` itd.
+- `bootstrap/app.php` na stałe woła `usePublicPath()`/`useStoragePath()`
+  (wcześniej robił to tylko `release:build-hosting` przez podmianę stringów
+  w `index.php` przy budowaniu paczki) — dotyczy KAŻDEGO punktu wejścia
+  (HTTP, artisan, testy), nie tylko HTTP.
+- `App\Console\Commands\BuildHostingPackage` (`release:build-hosting`)
+  skasowane całkowicie — `release:build` produkuje teraz jedną,
+  kompletną paczkę do obu scenariuszy (świeża instalacja + aktualizacja
+  przez panel).
+- `UpdatePaths::PROTECTED_PATHS_FLATTENED` → jedyny `PROTECTED_PATHS`;
+  `UpdateService::isFlattened()` i cała logika auto-wykrywania układu
+  skasowane.
+- Docker: `Dockerfile` przeszedł z `php:8.4-cli-bookworm` (`php artisan
+  serve`) na `php:8.4-apache-bookworm` z własnym vhostem
+  (`docker/apache/`) i `AllowOverride All`; usunięty trzeci serwis
+  (`adminer`) z `docker-compose.yml`.
+- Realnie złapany po drodze bug (nie związany z samym spłaszczeniem, ale
+  odkryty dzięki przejściu na prawdziwy Apache lokalnie): katalog
+  `public/icons/` **musiał** zostać przemianowany na `pwa-icons/` —
+  domyślna konfiguracja Apache (Debian/Ubuntu, także wiele hostingów) ma
+  wbudowany alias `/icons/` na własne ikonki do listowania katalogów
+  (`/usr/share/apache2/icons/`), który po cichu przechwytuje KAŻDE
+  żądanie pod tym prefiksem, niezależnie od `.htaccess` — pliki fizycznie
+  istniały z poprawnymi uprawnieniami, a mimo to dawały 404 bez żadnego
+  śladu w regułach przepisywania. Nigdy nie zostałoby to złapane pod
+  `php artisan serve` (który nie ma pojęcia o takich aliasach) — to
+  jeden z głównych powodów, dla których warto było przejść na prawdziwy
+  Apache lokalnie, a nie tylko na hostingu.
+- Testy: `tests/Feature/BuildHostingPackageTest.php` skasowane, jego
+  wartościowe asercje (obecność/treść `.htaccess`, dwa testy end-to-end:
+  boot przez `php -S` i pełna instalacja z serwowaniem zdjęcia przez
+  symlink na prawdziwej MariaDB) przeniesione do
+  `BuildReleasePackageTest.php`. `UpdateServiceTest`/`UpdateControllerTest`
+  mają teraz jedną wspólną fixture (spłaszczoną, z prawdziwym symlinkiem)
+  zamiast osobnej dla każdego układu. 199/199 testów zielone, w tym oba
+  ciężkie testy end-to-end na prawdziwej bazie.
+
 ## Moduł „Backup” — **Zrobione, potem usunięte** (Faza 1)
 
 Zbudowane wg specyfikacji niżej, z dwoma odstępstwami odnotowanymi na

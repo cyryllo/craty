@@ -5,8 +5,8 @@ services:
       dockerfile: Dockerfile
     working_dir: /var/www/html
     # Ten sam UID/GID co użytkownik na hoście, żeby pliki tworzone przez appkę
-    # (zdjęcia, QR) w zamontowanym storage/ nie stawały się własnością roota.
-    # Jeśli Twój użytkownik ma inne UID/GID niż 1000:1000, wyeksportuj
+    # (zdjęcia, QR) w zamontowanym app-storage/ nie stawały się własnością
+    # roota. Jeśli Twój użytkownik ma inne UID/GID niż 1000:1000, wyeksportuj
     # zmienne UID i GID przed `docker compose up`.
     user: "${UID:-1000}:${GID:-1000}"
     ports:
@@ -16,13 +16,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # --no-reload: bez tego `php artisan serve` restartuje CAŁY proces w
-    # środku żądania, gdy wykryje zmianę pliku .env — a Instalator i Moduł
-    # Aktualizacje właśnie do niego piszą jako część własnej logiki. Restart
-    # w połowie żądania zrywa połączenie z klientem (pusta strona/HTTP 000)
-    # zanim odpowiedź zdąży dotrzeć — nie problem środowiska, tylko
-    # sprzeczność między tą appką a domyślnym trybem dev-serwera Laravela.
-    command: php artisan serve --host=0.0.0.0 --port=8000 --no-reload
+    # Domyślny CMD obrazu (apache2-foreground) wystarcza — Apache, w
+    # przeciwieństwie do `php artisan serve`, nie restartuje się w środku
+    # żądania, gdy Instalator/Moduł Aktualizacje zapiszą .env, więc nie ma
+    # tu odpowiednika dawnego --no-reload do pilnowania.
 
   db:
     image: mariadb:11
@@ -45,12 +42,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
-  adminer:
-    image: adminer:latest
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
 
 volumes:
   db-data:

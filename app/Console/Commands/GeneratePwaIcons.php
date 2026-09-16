@@ -8,7 +8,13 @@ use Illuminate\Console\Command;
  * Generuje statyczne ikony PWA (192×192, 512×512, obie też jako "maskable")
  * z tego samego motywu co domyślne logo appki (regał z półkami — patrz
  * x-application-logo). Uruchamiane RAZ w tym repo przy budowie PWA, wynik
- * commitowany do public/icons/ — świadomie NIE generujemy tego dynamicznie
+ * commitowany do pwa-icons/ (NIE "icons/" — to zarezerwowana ścieżka:
+ * domyślna konfiguracja Apache ma wbudowany alias `/icons/` na własne
+ * ikonki do listowania katalogów, `/usr/share/apache2/icons/`, który po
+ * cichu przechwytuje KAŻDE żądanie pod tym prefiksem, zanim dotrze do
+ * naszego DocumentRoot — realnie złapane: pliki fizycznie istniały,
+ * uprawnienia były poprawne, a mimo to każdy request dawał 404 bez
+ * żadnego śladu w regułach przepisywania). Świadomie NIE generujemy tego dynamicznie
  * z własnego loga admina wgranego w Ustawienia (patrz TODO.md "PWA"), to
  * osobny, większy temat na później.
  *
@@ -21,7 +27,7 @@ class GeneratePwaIcons extends Command
 {
     protected $signature = 'pwa:icons';
 
-    protected $description = 'Generuje ikony PWA (public/icons/) z domyślnego motywu logo appki.';
+    protected $description = 'Generuje ikony PWA (pwa-icons/) z domyślnego motywu logo appki.';
 
     /** Tło: indigo-600, ten sam odcień co akcenty w reszcie UI. */
     private const BG = [79, 70, 229];
@@ -30,7 +36,7 @@ class GeneratePwaIcons extends Command
 
     public function handle(): int
     {
-        $dir = public_path('icons');
+        $dir = public_path('pwa-icons');
         if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
         }

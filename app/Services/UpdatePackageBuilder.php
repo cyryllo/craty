@@ -9,15 +9,15 @@ use SplFileInfo;
 use ZipArchive;
 
 /**
- * Zipuje katalog appki do jednego pliku — używane przez `release:build`/
- * `release:build-hosting` do zbudowania paczki aktualizacji do dystrybucji.
- * Świadomie przyjmuje katalog źródłowy jako parametr zamiast na sztywno
- * `base_path()` — testy tych komend operują na kopii appki w katalogu
- * tymczasowym, nigdy na tym repo.
+ * Zipuje katalog appki do jednego pliku — używane przez `release:build` do
+ * zbudowania paczki aktualizacji/instalacji do dystrybucji. Świadomie
+ * przyjmuje katalog źródłowy jako parametr zamiast na sztywno `base_path()`
+ * — testy tej komendy operują na kopii appki w katalogu tymczasowym, nigdy
+ * na tym repo.
  */
 class UpdatePackageBuilder
 {
-    /** @param  array<int, string>  $excludes  Ścieżki względem $sourceDir (bez wiodącego "/"), np. "storage/logs". */
+    /** @param  array<int, string>  $excludes  Ścieżki względem $sourceDir (bez wiodącego "/"), np. "app-storage/logs". */
     public function build(string $sourceDir, string $outputZipPath, array $excludes = []): void
     {
         $sourceDir = rtrim($sourceDir, '/');

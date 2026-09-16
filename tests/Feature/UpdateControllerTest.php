@@ -23,7 +23,7 @@ class UpdateControllerTest extends TestCase
         // na katalog tymczasowy, żeby ten test nigdy nie dotknął tego repo.
         $this->appRoot = sys_get_temp_dir().'/craty-update-controller-test-'.uniqid();
         mkdir($this->appRoot.'/app', 0755, true);
-        mkdir($this->appRoot.'/storage/app/public', 0755, true);
+        mkdir($this->appRoot.'/app-storage/app/public', 0755, true);
         file_put_contents($this->appRoot.'/VERSION', "1.0.0\n");
         file_put_contents($this->appRoot.'/.env', "APP_KEY=nie-ruszac\n");
 

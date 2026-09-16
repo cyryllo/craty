@@ -1,10 +1,14 @@
 /.phpunit.cache
 /node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
+/build
+/hot
+/storage
+/app-storage/*.key
+/app-storage/pail
+# vendor/ jest ignorowane w całości, ale vendor/.htaccess jest wyjątkowo
+# dodany do repo (git add -f) — patrz CLAUDE.md "Project layout": appka nie
+# ma osobnego document rootu, więc każdy katalog z kodem potrzebuje własnej
+# blokady dostępu z przeglądarki, także ten, który composer regeneruje.
 /vendor
 .env
 .env.backup

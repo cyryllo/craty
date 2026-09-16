@@ -29,26 +29,18 @@ use ZipArchive;
  * złożoność (migawka, stan na dysku, druga uprzywilejowana trasa z
  * `password.confirm`) bez realnej potrzeby korzystania z niej. Jeśli
  * aktualizacja pójdzie źle, powrót do poprzedniej wersji to wgranie
- * poprzedniej paczki `-full`/`-hosting` z manualnym przywróceniem bazy z
- * backupu zrobionego przed aktualizacją — tak samo jak zawsze było zalecane
- * robić z bazą, teraz spójnie i dla kodu.
+ * poprzedniej paczki z manualnym przywróceniem bazy z backupu zrobionego
+ * przed aktualizacją — tak samo jak zawsze było zalecane robić z bazą,
+ * teraz spójnie i dla kodu.
  *
- * **Świadomy zarówno klasycznego, jak i spłaszczonego układu instalacji**
- * (patrz `App\Console\Commands\BuildHostingPackage` — hosting z
- * `open_basedir` ograniczonym do document rootu, gdzie prawdziwy `storage/`
- * appki nazywa się `app-storage/`, a `storage` pod document rootem to
- * SYMLINK). Wykryte automatycznie po istnieniu katalogu `app-storage` w
- * korzeniu appki (`isFlattened()`) — admin nie zaznacza niczego w panelu,
- * po prostu wgrywa paczkę zbudowaną dla swojego układu
- * (`release:build`/`release:build-hosting`). Bez tego rozróżnienia
- * (znalezione po realnym zgłoszeniu: aktualizacja przez panel na
- * spłaszczonej instalacji "wgrała nie wszystko") paczka klasyczna wgrana
- * na spłaszczoną instalację ląduje pod BŁĘDNYMI ścieżkami (`public/build/
- * ...` zamiast `build/...`, bo klasyczna paczka ma `public/` jako osobny
- * katalog, którego na spłaszczonej instalacji w ogóle nie ma) — kod PHP/
- * widoki (leżące na tym samym poziomie w obu układach) aktualizują się
- * poprawnie, ale skompilowane assety (CSS/JS) nie, bo trafiają do
- * nieużywanego, osieroconego podkatalogu zamiast nadpisać prawdziwe pliki.
+ * **Jeden, stały, spłaszczony układ instalacji** (patrz CLAUDE.md "Project
+ * layout") — appka nie ma osobnego document rootu, prawdziwy `storage/`
+ * Laravela nazywa się na stałe `app-storage/`, a `storage` w korzeniu to
+ * zawsze SYMLINK do `app-storage/app/public` (`artisan storage:link`).
+ * Wcześniej appka umiała też działać w klasycznym układzie (osobny
+ * `public/`) i auto-wykrywała, z którym ma do czynienia — usunięte na
+ * wyraźną prośbę, żeby nie trzeba było utrzymywać dwóch wariantów
+ * jednocześnie (dev, hosting, paczki) — patrz TODO.md/CHANGELOG.md.
  */
 class UpdateService
 {
@@ -60,24 +52,6 @@ class UpdateService
     public function appRoot(): string
     {
         return config('app.update_root_path', base_path());
-    }
-
-    /** Instalacja spłaszczona (release:build-hosting) trzyma prawdziwy storage/ pod inną nazwą, patrz storageDirName(). */
-    public function isFlattened(): bool
-    {
-        return is_dir($this->appRoot().'/app-storage');
-    }
-
-    /** "app-storage" na instalacji spłaszczonej, inaczej zwykłe "storage" — jedno miejsce, z którego korzysta workDir(). */
-    private function storageDirName(): string
-    {
-        return $this->isFlattened() ? 'app-storage' : 'storage';
-    }
-
-    /** Krótsza lista ścieżek nigdy nienadpisywanych — dobrana do wykrytego układu instalacji, patrz komentarz klasy. */
-    private function protectedPaths(): array
-    {
-        return $this->isFlattened() ? UpdatePaths::PROTECTED_PATHS_FLATTENED : UpdatePaths::PROTECTED_PATHS;
     }
 
     public function currentVersion(): string
@@ -137,7 +111,7 @@ class UpdateService
 
         try {
             // 2. Podmiana plików "na żywo", z pominięciem chronionych ścieżek.
-            $this->copyInto($extractDir, $root, $this->protectedPaths());
+            $this->copyInto($extractDir, $root, UpdatePaths::PROTECTED_PATHS);
 
             // 3. Migracje z paczki (nowe zostaną wykonane, reszta pominięta).
             Artisan::call('migrate', ['--force' => true]);
@@ -176,10 +150,10 @@ class UpdateService
         return $manifest;
     }
 
-    /** Katalog roboczy modułu (rozpakowywanie paczki przed podmianą plików) — pod prawdziwym storage/ appki, dobranym do wykrytego układu instalacji. */
+    /** Katalog roboczy modułu (rozpakowywanie paczki przed podmianą plików) — pod prawdziwym storage/ appki (app-storage/). */
     private function workDir(): string
     {
-        return $this->appRoot().'/'.$this->storageDirName().'/app/updates';
+        return $this->appRoot().'/app-storage/app/updates';
     }
 
     private function tmpDir(): string

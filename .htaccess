@@ -1,0 +1,49 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Handle X-XSRF-Token Header
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Appka jest w tym samym katalogu co index.php (brak osobnego document
+# rootu) — te pliki w korzeniu NIE mogą być pobierane wprost przez
+# przeglądarkę (zawierają hasła do bazy / klucz appki).
+<FilesMatch "^(\.env.*|composer\.(json|lock)|artisan|VERSION|update-manifest\.json|phpunit\.xml)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# app-storage (sesje/cache/logi/baza — prawdziwy storage/ appki) blokowany
+# PO ADRESIE URL, nie zagnieżdżonym .htaccess w środku katalogu — inaczej
+# blokada objęłaby też app-storage/app/public, do którego prowadzi symlink
+# "storage" (Apache stosuje reguły dostępu po prawdziwej ścieżce docelowej
+# symlinka, nie po jego nazwie), i zdjęcia/QR znowu dawałyby 403 mimo
+# poprawnego symlinku.
+<IfModule mod_rewrite.c>
+    RewriteCond %{REQUEST_URI} ^/app-storage/
+    RewriteRule .* - [F,L]
+</IfModule>

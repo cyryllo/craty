@@ -18,8 +18,8 @@ class PwaTest extends TestCase
         $this->assertSame('/dashboard', $manifest['start_url']);
         $this->assertSame('standalone', $manifest['display']);
         $this->assertCount(2, $manifest['icons']);
-        $this->assertFileExists(public_path('icons/icon-192.png'));
-        $this->assertFileExists(public_path('icons/icon-512.png'));
+        $this->assertFileExists(public_path('pwa-icons/icon-192.png'));
+        $this->assertFileExists(public_path('pwa-icons/icon-512.png'));
     }
 
     public function test_service_worker_file_exists_and_registers_a_fetch_handler(): void

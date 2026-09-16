@@ -30,9 +30,15 @@ what's missing before letting you proceed.
 - **PHP ≥ 8.3**
 - PHP extensions: `pdo_mysql`, `mbstring`, `gd`, `zip`, `bcmath`, `exif`, `intl`
 - **MySQL 8+ or MariaDB 10.3+**
-- A web server with URL rewriting (Apache with `mod_rewrite` and
-  `AllowOverride All`, or Nginx with a rule routing everything to `index.php`)
-- Write access (for the PHP user) to `storage/` and `bootstrap/cache/`
+- **Apache with `mod_rewrite` and `AllowOverride All`.** The app has no
+  separate `public/` directory — all the code (including `.env`) lives in
+  the same directory as `index.php`, and keeping it off the browser depends
+  entirely on the rules in `.htaccess`. Without `AllowOverride All` (many
+  hosts default to `AllowOverride None`), Apache silently ignores those
+  rules and the entire source code becomes publicly downloadable. Nginx
+  doesn't read `.htaccess` at all, so it would need those rules hand-ported
+  to Nginx config — the app doesn't ship a ready-made one.
+- Write access (for the PHP user) to `app-storage/` and `bootstrap/cache/`
 - **HTTPS** — required for camera scanning (PWA) and recommended generally;
   browsers treat plain HTTP in production as an insecure context and block
   camera access
@@ -63,38 +69,22 @@ first with `docker compose down -v` and start over.
 The app ships a web-based installer at `/install` that generates `.env`
 for you, asks for database credentials, and creates the administrator
 account. No Composer or npm needed on the server — `vendor/` and the built
-frontend (`public/build`) already ship inside the package.
+frontend (`build/`) already ship inside the package.
 
-`php artisan release:build*` (run in this repo, not on the target host)
-produces three kinds of packages under `storage/app/releases/`, one per
-scenario:
+`php artisan release:build` (run in this repo, not on the target host)
+produces **one** package at `app-storage/app/releases/craty-{version}.zip`
+— the app has no separate `public/` directory (see the `.htaccess`/
+`index.php` at the repo root), so the same package works both for a fresh
+install and for updating an already-running install through the panel:
 
-| Package | When to use | How to install |
-|---|---|---|
-| **`craty-{version}-full.zip`** | Fresh install on hosting with a classic layout — you can keep the app code **outside** the document root (VPS, or a host that lets you point the document root at an arbitrary subfolder). | Extract **everything** outside the document root (e.g. next to `public_html`), then copy the **contents** of the package's `public/` folder **into** the document root. Visit `/install`. |
-| **`craty-{version}-hosting.zip`** | Hosting with `open_basedir` restricted to the document root itself (typical on cPanel/DirectAdmin) — PHP has no permission to read anything outside `public_html`, so separating code from the document root is impossible. Also works as an **update** for an install already running this layout (see below). | **Fresh install:** extract the **entire contents straight into the document root** (`public_html`) — no manual editing needed. The package already has `index.php`'s paths fixed and ready-made `.htaccess` files blocking browser access to `.env`, the source code, and `vendor/`. Visit `/install`. **Update:** log in as admin → Settings → Updates → upload this *same* `-hosting.zip` (not `-update.zip` — see warning below). |
-| **`craty-{version}-update.zip`** | Updating an install running the **`-full`** layout (classic, code outside the document root). **Do not use on a `-hosting`-layout install** — see warning below. | Log in as admin → Settings → Updates → upload the file. `.env` and user data (`storage/app/public`, `storage/logs`) are never overwritten. |
-
-All three contain identical application code — they only differ in file
-layout (and, for the `hosting` variant, the added `.htaccess` files).
-
-> **Important — upload the update package that matches your install's
-> layout.** The panel (Settings → Updates) automatically detects whether a
-> given install is flattened (`-hosting`) or classic (`-full`) and
-> protects user data accordingly — but it **cannot guess the layout of the
-> package you upload**. If your install is flattened (extracted straight
-> into `public_html` from a `-hosting.zip`), always update it with a
-> **`-hosting.zip`**, never `-update.zip` — the latter has a separate
-> `public/` folder that doesn't exist on a flattened install, so the
-> compiled frontend (CSS/JS) lands in a dead, unused subfolder instead of
-> overwriting the real files (PHP code and views still update correctly,
-> since they sit at the same level in both layouts — only the assets under
-> `public/` don't).
-
-**Which one should I pick?** If unsure, start with `-full`. If the app
-fails to boot with an `open_basedir restriction in effect` error after you
-set the document root, that's the sign you need the `-hosting` variant
-instead.
+- **Fresh install:** extract the **entire contents straight into the
+  document root** (`public_html` or your host's equivalent) — no manual
+  editing needed. The package already has `index.php` ready and `.htaccess`
+  files blocking browser access to `.env`, the source code, and `vendor/`.
+  Visit `/install`.
+- **Update:** log in as admin → Settings → Updates → upload the same
+  package. `.env` and user data (`app-storage/app/public`, `app-storage/
+  logs`, the `storage` symlink) are never overwritten.
 
 Each `.zip` ships with a `.sha256` sidecar file (`sha256sum -c` compatible)
 next to it, so you can verify the download without copying the hash from

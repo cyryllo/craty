@@ -391,3 +391,37 @@ globalnym banerze, raz we własnym banerze strony), co na ekranie wyglądało
 jak zlewające się ze sobą dwa identyczne komunikaty.
 
 202/202 testów zielone.
+
+## 2026-09-16 — Jeden, stały, spłaszczony układ projektu wszędzie
+
+Duża, wieloplikowa zmiana architektoniczna na wyraźną prośbę: zamiast
+dwóch różnych układów plików (klasyczny z osobnym `public/` w tym repo/
+Dockerze/`release:build`, i spłaszczony tylko jako transformacja przy
+budowaniu paczki `release:build-hosting` dla hostingów z `open_basedir`),
+appka ma teraz **jeden, permanentny, spłaszczony układ wszędzie** — bez
+osobnego katalogu `public/`, z ochroną `.env`/`app`/`vendor` wyłącznie
+przez `.htaccess`. `public/` zniknęło (jego zawartość, w tym `index.php`,
+przeniesiona do korzenia repo), `storage/` zostało przemianowane na
+`app-storage/` (nazwa `storage` w korzeniu jest teraz zawsze symlinkiem do
+zdjęć/QR), a `public/icons/` na `pwa-icons/` (Apache ma domyślnie
+zarezerwowany alias `/icons/` na własne ikonki katalogów, który po cichu
+przechwytywał każde żądanie pod tym prefiksem — złapane realnie dopiero
+po przejściu środowiska dev na prawdziwy Apache).
+
+Docker dev przeszedł z `php artisan serve` na prawdziwy Apache
+(`php:8.4-apache-bookworm`, własny vhost z `AllowOverride All`) — inaczej
+`.htaccess`, na którym teraz opiera się całe bezpieczeństwo appki, nigdy
+nie byłby faktycznie sprawdzany lokalnie. Trzeci serwis (`adminer`) usunięty
+z `docker-compose.yml`. Moduł Aktualizacje znacznie uproszczony: jedna
+komenda budująca (`release:build`, `release:build-hosting` skasowane),
+jedna lista chronionych ścieżek, zero auto-wykrywania układu instalacji w
+`UpdateService` — problem, który wcześniej wymagał tej logiki (klasyczna
+paczka aktualizacyjna wgrana na spłaszczoną instalację, patrz poprzednie
+wpisy), przestaje istnieć strukturalnie, bo nie ma już dwóch układów do
+rozróżniania.
+
+199/199 testów zielone, w tym dwa pełne testy end-to-end (instalacja +
+serwowanie zdjęcia przez symlink na prawdziwej MariaDB) i ręczna
+weryfikacja przez `curl` na żywym Apache: `.env`/`vendor/`/`app/` dają 403,
+`manifest.json`/`sw.js`/`pwa-icons/`/skompilowane assety i zdjęcia przez
+symlink `storage` dają 200.

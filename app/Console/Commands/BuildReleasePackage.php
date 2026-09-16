@@ -10,7 +10,12 @@ use Illuminate\Console\Command;
 /**
  * Deweloperska strona Modułu Aktualizacje — buduje samowystarczalną paczkę
  * .zip (kod + vendor/ + skompilowane assety, patrz UpdatePaths::PACKAGE_EXCLUDES)
- * do wgrania przez administratora w Ustawienia → Aktualizacje. Uruchamiana w
+ * do wgrania przez administratora w Ustawienia → Aktualizacje, ALBO do
+ * ręcznego rozpakowania wprost do document rootu na świeżej instalacji —
+ * appka ma dziś jeden, stały, spłaszczony układ (patrz CLAUDE.md "Project
+ * layout"), więc jedna paczka wystarcza na oba przypadki (wcześniej
+ * istniała osobna komenda `release:build-hosting` robiąca spłaszczenie w
+ * locie — zbędna teraz, gdy repo samo jest już spłaszczone). Uruchamiana w
  * tym repo przy każdym wydaniu, nie na docelowym hostingu.
  */
 class BuildReleasePackage extends Command
@@ -19,9 +24,9 @@ class BuildReleasePackage extends Command
         {version? : Docelowa wersja (domyślnie ta już zapisana w pliku VERSION)}
         {--min-version= : Minimalna wersja appki, z której można zastosować tę paczkę}
         {--changelog=* : Linia changeloga do manifestu — opcja powtarzalna}
-        {--output= : Ścieżka wynikowego .zip (domyślnie storage/app/releases/craty-{wersja}-update.zip)}';
+        {--output= : Ścieżka wynikowego .zip (domyślnie app-storage/app/releases/craty-{wersja}.zip)}';
 
-    protected $description = 'Buduje paczkę .zip aktualizacji do wgrania przez panel administratora.';
+    protected $description = 'Buduje paczkę .zip aktualizacji/instalacji do wgrania przez panel administratora albo ręcznego rozpakowania na hostingu.';
 
     public function handle(UpdatePackageBuilder $builder, AppVersion $appVersion): int
     {
@@ -33,12 +38,7 @@ class BuildReleasePackage extends Command
             $version = $appVersion->current();
         }
 
-        // "-update" w nazwie odróżnia paczkę do wgrania przez panel (Ustawienia
-        // → Aktualizacje) od "-full" budowanej ręcznie z --output pod świeżą
-        // instalację na hostingu — treść obu jest dziś identyczna (ta sama
-        // migawka całej appki), to czysto etykieta dla admina, który plik do
-        // czego wgrać.
-        $output = $this->option('output') ?: storage_path("app/releases/craty-{$version}-update.zip");
+        $output = $this->option('output') ?: storage_path("app/releases/craty-{$version}.zip");
 
         $manifest = [
             'version' => $version,

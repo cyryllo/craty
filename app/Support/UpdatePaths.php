@@ -10,12 +10,11 @@ namespace App\Support;
 class UpdatePaths
 {
     /**
-     * Wykluczone z paczki .zip budowanej przez `release:build`/
-     * `release:build-hosting` do dystrybucji — pliki deweloperskie i dane
-     * użytkownika nie mają czego szukać w paczce reprezentującej "całą
-     * działającą appkę". `vendor/` i `public/build` świadomie NIE są tu
-     * wykluczone — mają być w paczce, żeby target nie potrzebował
-     * composera/npm.
+     * Wykluczone z paczki .zip budowanej przez `release:build` do
+     * dystrybucji — pliki deweloperskie i dane użytkownika nie mają czego
+     * szukać w paczce reprezentującej "całą działającą appkę". `vendor/` i
+     * `build/` świadomie NIE są tu wykluczone — mają być w paczce, żeby
+     * target nie potrzebował composera/npm.
      */
     public const PACKAGE_EXCLUDES = [
         '.git',
@@ -31,20 +30,25 @@ class UpdatePaths
         'art',
         'composer',
         'test',
-        'storage/app/public',
-        'storage/app/updates',
+        'app-storage/app/public',
+        'app-storage/app/updates',
         // Wyjście samego release:build — bez tego każde kolejne wydanie
         // pakowałoby ze sobą wszystkie poprzednie .zip-y z tego katalogu
         // (znalezione realnie: paczka 1.1.0 spuchła do 49 MB, bo wciągnęła
         // w środek całą paczkę 1.0.1).
-        'storage/app/releases',
-        'storage/logs',
-        'storage/framework/cache',
-        'storage/framework/sessions',
-        'storage/framework/views',
+        'app-storage/app/releases',
+        'app-storage/logs',
+        'app-storage/framework/cache',
+        'app-storage/framework/sessions',
+        'app-storage/framework/views',
         // Fixtures ze Storage::fake() zostawione przez uruchomienia testów na
         // maszynie budującej — czysto lokalny śmieć, zero związku z appką.
-        'storage/framework/testing',
+        'app-storage/framework/testing',
+        // Symlink "storage" (patrz PROTECTED_PATHS) — na maszynie budującej
+        // wskazuje już na prawdziwe zdjęcia (app-storage/app/public, i tak
+        // wykluczone wyżej); pakowanie go osobno tylko dublowałoby te same
+        // pliki pod drugą nazwą w zipie.
+        'storage',
         // Dokumentacja/meta tego repo — nie jest kodem appki, nie ma czego
         // szukać na docelowym serwerze. CLAUDE.md w szczególności NIE ma
         // prawa nigdzie wyciekać (patrz .gitignore) — bez tego wpisu i tak
@@ -57,15 +61,15 @@ class UpdatePaths
         'TODO.md',
         'LICENSE',
         // Konfiguracja narzędzi budujących/testujących, zbędna po tym, jak
-        // `public/build` jest już skompilowane, a `vendor/` już zvendorowany
-        // — na docelowym hostingu i tak nikt nie odpali composera ani npm.
+        // `build/` jest już skompilowane, a `vendor/` już zvendorowany —
+        // na docelowym hostingu i tak nikt nie odpali composera ani npm.
         // UWAGA: composer.json celowo NIE jest na tej liście — Laravel czyta
         // go w RUNTIME, nie tylko przy `composer install` (Application::
         // getNamespace() przy każdym starcie artisan/serve, PackageManifest
         // przy odświeżaniu cache pakietów) — bez niego appka wywala się od
         // razu błędem "file_get_contents(composer.json): No such file or
         // directory", zanim cokolwiek zdąży odpowiedzieć (znalezione realnie
-        // przy teście paczki "-full" na świeżo rozpakowanym katalogu).
+        // przy teście paczki na świeżo rozpakowanym katalogu).
         // composer.lock nie ma tego problemu (używany tylko przez sam
         // composer, nie przez framework), zostaje wykluczony.
         'package.json',
@@ -81,35 +85,16 @@ class UpdatePaths
     /**
      * Nigdy nie nadpisywane przy podmianie plików „na żywo" przy
      * zastosowaniu aktualizacji. Krótka, świadomie zawężona lista (patrz
-     * specyfikacja): .env i dane, których nie ma w żadnej paczce (bo są
-     * wykluczone wyżej), więc nadpisanie i tak by ich nie dotyczyło — ale
-     * trzymamy to jako osobną, jawną listę na wypadek, gdyby ktoś kiedyś
-     * rozszerzył PACKAGE_EXCLUDES i przypadkiem zaczął pakować np.
-     * storage/app/public.
+     * specyfikacja): `.env` i dane użytkownika, których nie ma w żadnej
+     * paczce (bo są wykluczone wyżej), więc nadpisanie i tak by ich nie
+     * dotyczyło — ale trzymamy to jako osobną, jawną listę na wypadek,
+     * gdyby ktoś kiedyś rozszerzył PACKAGE_EXCLUDES i przypadkiem zaczął
+     * pakować np. app-storage/app/public. `storage` chroni sam SYMLINK do
+     * zdjęć/QR (public_path('storage')) — appka nie ma osobnego document
+     * rootu, więc pakiet mógłby w teorii próbować nadpisać go zwykłym
+     * plikiem/katalogiem, co zerwałoby wszystkie URL-e do zdjęć.
      */
     public const PROTECTED_PATHS = [
-        '.env',
-        'storage/app/public',
-        'storage/logs',
-        'public/storage',
-    ];
-
-    /**
-     * Ta sama rola co PROTECTED_PATHS wyżej, ale dla instalacji spłaszczonej
-     * przez `release:build-hosting` (open_basedir ograniczony do
-     * document rootu — patrz BuildHostingPackage). Tam `storage/` appki
-     * nazywa się `app-storage/` (patrz renameStorageDirectory()), a
-     * "storage" pod document rootem to SYMLINK, nie katalog — musi zostać
-     * chroniony tak samo jak `.env`, żeby paczka zbudowana na maszynie
-     * deweloperskiej (gdzie tego symlinku jeszcze nie ma) nigdy nie
-     * spróbowała nadpisać go czymkolwiek.
-     *
-     * UpdateService sam wybiera, której listy użyć — auto-wykrywając
-     * układ instalacji po istnieniu katalogu `app-storage` w korzeniu
-     * appki, patrz UpdateService::protectedPaths(). Admin nie musi niczego
-     * zaznaczać w panelu.
-     */
-    public const PROTECTED_PATHS_FLATTENED = [
         '.env',
         'app-storage/app/public',
         'app-storage/logs',
