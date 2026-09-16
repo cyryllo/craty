@@ -3,8 +3,8 @@
 namespace App\Exceptions;
 
 /**
- * Odrzucenie paczki aktualizacji/migawki rollbacku z czytelnym powodem do
- * pokazania administratorowi — patrz UpdateService::validatePackage().
+ * Odrzucenie paczki aktualizacji z czytelnym powodem do pokazania
+ * administratorowi — patrz UpdateService::validatePackage()/apply().
  */
 class UpdatePackageException extends \RuntimeException
 {

@@ -120,8 +120,6 @@ Route::middleware('auth')->group(function () {
         // ten sam mechanizm Breeze co przy zwykłej zmianie hasła.
         Route::post('ustawienia/aktualizacje', [UpdateController::class, 'upload'])
             ->middleware('password.confirm')->name('settings.updates.upload');
-        Route::post('ustawienia/aktualizacje/wycofaj', [UpdateController::class, 'rollback'])
-            ->middleware('password.confirm')->name('settings.updates.rollback');
     });
 });
 

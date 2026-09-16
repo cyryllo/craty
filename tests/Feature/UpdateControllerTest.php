@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Services\BackupService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Session;
@@ -89,7 +88,6 @@ class UpdateControllerTest extends TestCase
 
     public function test_admin_can_apply_a_valid_update_package(): void
     {
-        $this->mockSuccessfulBackup();
         $admin = User::factory()->create(['role' => 'admin']);
         $this->confirmPassword();
 
@@ -136,31 +134,9 @@ class UpdateControllerTest extends TestCase
         $this->assertSame("1.0.0\n", file_get_contents($this->appRoot.'/VERSION'));
     }
 
-    public function test_admin_can_roll_back_after_an_update(): void
-    {
-        $this->mockSuccessfulBackup();
-        $admin = User::factory()->create(['role' => 'admin']);
-        $this->confirmPassword();
-
-        $this->actingAs($admin)->post(route('settings.updates.upload'), [
-            'package' => $this->fakeZip(['version' => '1.1.0']),
-        ]);
-
-        $this->actingAs($admin)->post(route('settings.updates.rollback'))
-            ->assertRedirect(route('settings.updates.index'));
-
-        $this->assertSame("1.0.0\n", file_get_contents($this->appRoot.'/VERSION'));
-    }
-
     private function confirmPassword(): void
     {
         Session::put('auth.password_confirmed_at', time());
-    }
-
-    /** Patrz UpdateServiceTest::mockSuccessfulBackup() — samo uzasadnienie. */
-    private function mockSuccessfulBackup(): void
-    {
-        $this->mock(BackupService::class, fn ($mock) => $mock->shouldReceive('run')->once()->andReturn(0));
     }
 
     private function fakeZip(array $manifest): UploadedFile

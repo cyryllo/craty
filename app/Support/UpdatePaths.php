@@ -10,13 +10,12 @@ namespace App\Support;
 class UpdatePaths
 {
     /**
-     * Wykluczone z paczki .zip — zarówno tej budowanej przez `release:build`
-     * do dystrybucji, jak i własnej migawki kodu robionej przez
-     * UpdateService tuż przed zastosowaniem aktualizacji (ta sama lista,
-     * bo obie mają reprezentować "całą działającą appkę" z tym samym
-     * wyjątkiem plików deweloperskich/danych użytkownika). `vendor/` i
-     * `public/build` świadomie NIE są tu wykluczone — mają być w paczce,
-     * żeby target nie potrzebował composera/npm.
+     * Wykluczone z paczki .zip budowanej przez `release:build`/
+     * `release:build-hosting` do dystrybucji — pliki deweloperskie i dane
+     * użytkownika nie mają czego szukać w paczce reprezentującej "całą
+     * działającą appkę". `vendor/` i `public/build` świadomie NIE są tu
+     * wykluczone — mają być w paczce, żeby target nie potrzebował
+     * composera/npm.
      */
     public const PACKAGE_EXCLUDES = [
         '.git',
@@ -38,9 +37,7 @@ class UpdatePaths
         // Wyjście samego release:build — bez tego każde kolejne wydanie
         // pakowałoby ze sobą wszystkie poprzednie .zip-y z tego katalogu
         // (znalezione realnie: paczka 1.1.0 spuchła do 49 MB, bo wciągnęła
-        // w środek całą paczkę 1.0.1). To samo dotyczy migawki kodu, którą
-        // UpdateService robi tuż przed apply() — również nie ma czego
-        // pakować sam w siebie.
+        // w środek całą paczkę 1.0.1).
         'storage/app/releases',
         'storage/logs',
         'storage/framework/cache',
@@ -83,13 +80,13 @@ class UpdatePaths
     ];
 
     /**
-     * Nigdy nie nadpisywane przy podmianie plików „na żywo" — ani przy
-     * zastosowaniu aktualizacji, ani przy rollbacku. Krótka, świadomie
-     * zawężona lista (patrz specyfikacja): .env i dane, których nie ma w
-     * żadnej paczce/migawce kodu (bo są wykluczone wyżej), więc nadpisanie
-     * i tak by ich nie dotyczyło — ale trzymamy to jako osobną, jawną listę
-     * na wypadek, gdyby ktoś kiedyś rozszerzył PACKAGE_EXCLUDES i przypadkiem
-     * zaczął pakować np. storage/app/public.
+     * Nigdy nie nadpisywane przy podmianie plików „na żywo" przy
+     * zastosowaniu aktualizacji. Krótka, świadomie zawężona lista (patrz
+     * specyfikacja): .env i dane, których nie ma w żadnej paczce (bo są
+     * wykluczone wyżej), więc nadpisanie i tak by ich nie dotyczyło — ale
+     * trzymamy to jako osobną, jawną listę na wypadek, gdyby ktoś kiedyś
+     * rozszerzył PACKAGE_EXCLUDES i przypadkiem zaczął pakować np.
+     * storage/app/public.
      */
     public const PROTECTED_PATHS = [
         '.env',

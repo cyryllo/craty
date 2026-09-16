@@ -48,27 +48,12 @@
             </div>
 
             <div class="bg-amber-50 border border-amber-200 text-amber-900 text-sm rounded-md p-4 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-300">
-                {{ __('This overwrites the application code. A copy of the current code is taken automatically first, and can be restored below if something goes wrong. This does not undo database migrations — restore the automatic backup taken just before the update if the new version added any.') }}
+                {{ __('This overwrites the application code and cannot be undone from here. This does not back up the database and does not undo migrations — we recommend creating a database backup yourself (Settings → Backups, or an export from your hosting panel) before applying an update, especially if it adds migrations.') }}
             </div>
 
             <div class="flex justify-end">
                 <x-primary-button>{{ __('Apply update') }}</x-primary-button>
             </div>
         </form>
-
-        <div class="bg-white rounded-lg shadow p-6 dark:bg-gray-800">
-            <h3 class="font-medium text-gray-900 mb-2 dark:text-gray-100">{{ __('Roll back') }}</h3>
-            @if ($canRollback)
-                <p class="text-sm text-gray-600 mb-4 dark:text-gray-400">
-                    {{ __('Restores the code from before the last update (version :version, applied :date). This only restores code, not the database.', ['version' => $state['from_version'], 'date' => \Illuminate\Support\Carbon::parse($state['applied_at'])->format('Y-m-d H:i')]) }}
-                </p>
-                <form method="POST" action="{{ route('settings.updates.rollback') }}" onsubmit="return confirm('{{ __('Roll back to the previous code version?') }}');">
-                    @csrf
-                    <x-secondary-button type="submit">{{ __('Roll back last update') }}</x-secondary-button>
-                </form>
-            @else
-                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No update to roll back yet.') }}</p>
-            @endif
-        </div>
     </div>
 </x-app-layout>

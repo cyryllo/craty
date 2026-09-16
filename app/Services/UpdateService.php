@@ -15,11 +15,23 @@ use ZipArchive;
 
 /**
  * Rozpakowuje i stosuje wgraną paczkę aktualizacji "na żywo" (patrz TODO.md
- * "Moduł Aktualizacje"). Świadomie NIE dotyka bazy danych przy rollbacku —
- * przywraca tylko kod (własna migawka wzięta tuż przed apply()), bo
- * automatyczne cofanie dowolnych migracji nie jest ogólnie bezpieczne.
- * `appRoot()` jest konfigurowalny (nie zawsze `base_path()`), żeby testy
- * operowały na kopii appki w katalogu tymczasowym, nigdy na tym repo.
+ * "Moduł Aktualizacje"). Świadomie NIE dotyka bazy danych — ani migracji
+ * (`migrate --force` tylko dogrywa nowe), ani jej ewentualnego cofnięcia,
+ * bo automatyczne cofanie dowolnych migracji nie jest ogólnie bezpieczne;
+ * panel zaleca zrobienie backupu bazy samemu przed aktualizacją, która
+ * dodaje migracje. `appRoot()` jest konfigurowalny (nie zawsze
+ * `base_path()`), żeby testy operowały na kopii appki w katalogu
+ * tymczasowym, nigdy na tym repo.
+ *
+ * **Świadomie bez cofania aktualizacji (rollback)** — było to wcześniej
+ * osobną funkcją (migawka całego kodu brana przed każdym `apply()`,
+ * przywracana przyciskiem "Wycofaj"), usuniętą na wyraźną prośbę: dodatkowa
+ * złożoność (migawka, stan na dysku, druga uprzywilejowana trasa z
+ * `password.confirm`) bez realnej potrzeby korzystania z niej. Jeśli
+ * aktualizacja pójdzie źle, powrót do poprzedniej wersji to wgranie
+ * poprzedniej paczki `-full`/`-hosting` z manualnym przywróceniem bazy z
+ * backupu zrobionego przed aktualizacją — tak samo jak zawsze było zalecane
+ * robić z bazą, teraz spójnie i dla kodu.
  *
  * **Świadomy zarówno klasycznego, jak i spłaszczonego układu instalacji**
  * (patrz `App\Console\Commands\BuildHostingPackage` — hosting z
@@ -41,9 +53,7 @@ use ZipArchive;
 class UpdateService
 {
     public function __construct(
-        private readonly UpdatePackageBuilder $packageBuilder,
         private readonly AppVersion $version,
-        private readonly BackupService $backups,
     ) {
     }
 
@@ -58,7 +68,7 @@ class UpdateService
         return is_dir($this->appRoot().'/app-storage');
     }
 
-    /** "app-storage" na instalacji spłaszczonej, inaczej zwykłe "storage" — jedno miejsce, z którego korzystają stateDir()/packageExcludesForSnapshot(). */
+    /** "app-storage" na instalacji spłaszczonej, inaczej zwykłe "storage" — jedno miejsce, z którego korzysta workDir(). */
     private function storageDirName(): string
     {
         return $this->isFlattened() ? 'app-storage' : 'storage';
@@ -70,48 +80,9 @@ class UpdateService
         return $this->isFlattened() ? UpdatePaths::PROTECTED_PATHS_FLATTENED : UpdatePaths::PROTECTED_PATHS;
     }
 
-    /**
-     * UpdatePaths::PACKAGE_EXCLUDES zakłada klasyczny "storage/..." — na
-     * instalacji spłaszczonej taka ścieżka nie istnieje na dysku (prawdziwy
-     * katalog to "app-storage/..."), więc bez tego przemianowania migawka
-     * kodu robiona przez apply() złapałaby (i trzymała bezterminowo w
-     * app-storage/app/updates) zdjęcia/logi użytkownika przy każdej
-     * aktualizacji zamiast je pominąć.
-     *
-     * @return array<int, string>
-     */
-    private function packageExcludesForSnapshot(): array
-    {
-        if (! $this->isFlattened()) {
-            return UpdatePaths::PACKAGE_EXCLUDES;
-        }
-
-        return array_map(
-            fn (string $path) => str_starts_with($path, 'storage/') ? 'app-storage/'.substr($path, strlen('storage/')) : $path,
-            UpdatePaths::PACKAGE_EXCLUDES
-        );
-    }
-
     public function currentVersion(): string
     {
         return $this->version->current();
-    }
-
-    /** @return array<string, mixed>|null */
-    public function state(): ?array
-    {
-        if (! file_exists($this->statePath())) {
-            return null;
-        }
-
-        return json_decode(file_get_contents($this->statePath()), true);
-    }
-
-    public function canRollback(): bool
-    {
-        $state = $this->state();
-
-        return $state !== null && ! empty($state['snapshot_path']) && file_exists($state['snapshot_path']);
     }
 
     /**
@@ -153,79 +124,38 @@ class UpdateService
     public function apply(string $zipPath, array $manifest): void
     {
         $root = $this->appRoot();
-        $fromVersion = $this->currentVersion();
 
-        $this->ensureDirectory($this->stateDir());
+        $this->ensureDirectory($this->workDir());
 
-        // 1. Pełny backup (baza + storage/app/public) — twardy wymóg, nie
-        //    opcja (patrz TODO.md "Moduł Aktualizacje"), zanim COKOLWIEK na
-        //    dysku appki się zmieni. Migawka kodu w kroku 2 chroni tylko
-        //    kod — bez tego backupu ewentualne migracje z paczki (krok 4)
-        //    nie miałyby z czego się cofnąć po stronie bazy. Nieudany
-        //    backup przerywa całą aktualizację zamiast ryzykować update bez
-        //    żadnej siatki bezpieczeństwa.
-        if ($this->backups->run() !== 0) {
-            $reason = $this->backups->lastOutput();
+        // Świadomie BRAK automatycznego backupu tutaj — była to wcześniej
+        // twarda blokada (nieudany backup przerywał całą aktualizację), ale
+        // realny przypadek pokazał, że na części hostingów backup bazy
+        // strukturalnie nie może się udać (np. `proc_open` zablokowane przez
+        // hosting — spatie/laravel-backup zawsze woła prawdziwy `mysqldump`
+        // przez `Symfony\Process`, więc żaden retry tego nie naprawi) — taki
+        // admin był trwale zablokowany, bez możliwości wgrania NAWET
+        // poprawki naprawiającej samą diagnostykę backupu, bo aktualizacja
+        // przez panel to właśnie ten sam zablokowany mechanizm. Zamiast
+        // twardego wymogu: rekomendacja ręcznego backupu w UI (patrz
+        // settings/updates.blade.php) — admin decyduje sam, backup bazy
+        // przez Ustawienia → Kopie zapasowe (jeśli działa) albo eksport z
+        // panelu hostingu, PRZED kliknięciem "Zastosuj aktualizację".
 
-            throw new UpdatePackageException(trim(
-                __('The automatic backup before the update failed — the update was aborted so nothing changes without a safety net. Check Settings → Backups, fix the problem, then try again.')
-                .($reason !== '' ? "\n\n".__('Backup output').":\n".$reason : '')
-            ));
-        }
-
-        // 2. Migawka kodu do ewentualnego rollbacku — zanim cokolwiek się zmieni.
-        $snapshotPath = $this->stateDir().'/snapshot-'.now()->format('Y-m-d-His').'.zip';
-        $this->packageBuilder->build($root, $snapshotPath, $this->packageExcludesForSnapshot());
-
-        // 3. Rozpakuj nową paczkę do katalogu tymczasowego.
+        // 1. Rozpakuj nową paczkę do katalogu tymczasowego.
         $extractDir = $this->tmpDir().'/extract-'.now()->format('Y-m-d-His');
         $this->extractSafely($zipPath, $extractDir);
 
         try {
-            // 4. Podmiana plików "na żywo", z pominięciem chronionych ścieżek.
+            // 2. Podmiana plików "na żywo", z pominięciem chronionych ścieżek.
             $this->copyInto($extractDir, $root, $this->protectedPaths());
 
-            // 5. Migracje z paczki (nowe zostaną wykonane, reszta pominięta).
+            // 3. Migracje z paczki (nowe zostaną wykonane, reszta pominięta).
             Artisan::call('migrate', ['--force' => true]);
 
-            // 6. Nowa wersja + czyszczenie cache configu/widoków.
+            // 4. Nowa wersja + czyszczenie cache configu/widoków.
             $this->version->set($manifest['version']);
             Artisan::call('config:clear');
             Artisan::call('view:clear');
-
-            // 7. Stan do ewentualnego rollbacku.
-            $this->writeState([
-                'from_version' => $fromVersion,
-                'to_version' => $manifest['version'],
-                'applied_at' => now()->toIso8601String(),
-                'snapshot_path' => $snapshotPath,
-                'changelog' => $manifest['changelog'] ?? [],
-            ]);
-        } finally {
-            $this->deleteDirectory($extractDir);
-        }
-    }
-
-    /** Przywraca migawkę kodu wziętą tuż przed ostatnią aktualizacją — nie dotyka bazy. */
-    public function rollback(): void
-    {
-        $state = $this->state();
-
-        if (! $state || empty($state['snapshot_path']) || ! file_exists($state['snapshot_path'])) {
-            throw new UpdatePackageException(__('No update to roll back.'));
-        }
-
-        $root = $this->appRoot();
-        $extractDir = $this->tmpDir().'/rollback-'.now()->format('Y-m-d-His');
-        $this->extractSafely($state['snapshot_path'], $extractDir);
-
-        try {
-            $this->copyInto($extractDir, $root, $this->protectedPaths());
-            $this->version->set($state['from_version']);
-            Artisan::call('config:clear');
-            Artisan::call('view:clear');
-            // Rollbacku nie da się cofnąć w tym modelu — celowo prosto, patrz TODO.md.
-            @unlink($this->statePath());
         } finally {
             $this->deleteDirectory($extractDir);
         }
@@ -256,25 +186,15 @@ class UpdateService
         return $manifest;
     }
 
-    private function stateDir(): string
+    /** Katalog roboczy modułu (rozpakowywanie paczki przed podmianą plików) — pod prawdziwym storage/ appki, dobranym do wykrytego układu instalacji. */
+    private function workDir(): string
     {
         return $this->appRoot().'/'.$this->storageDirName().'/app/updates';
     }
 
-    private function statePath(): string
-    {
-        return $this->stateDir().'/state.json';
-    }
-
     private function tmpDir(): string
     {
-        return $this->stateDir().'/tmp';
-    }
-
-    /** @param  array<string, mixed>  $data */
-    private function writeState(array $data): void
-    {
-        file_put_contents($this->statePath(), json_encode($data, JSON_PRETTY_PRINT));
+        return $this->workDir().'/tmp';
     }
 
     private function ensureDirectory(string $path): void

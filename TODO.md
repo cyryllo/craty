@@ -289,35 +289,36 @@ kilkoma technicznymi doprecyzowanymi przy niej:
   bo pochodzi spoza samej paczki. Sama paczka nie niesie sumy samej siebie
   (byłoby to bez znaczenia — uszkodzona/podmieniona paczka miałaby po
   prostu inną, "zgodną z sobą" sumę).
-- **Rollback przywraca tylko kod, nie bazę** — `UpdateService::apply()`
-  robi własną migawkę kodu (zip całej appki, ten sam `UpdatePackageBuilder`
-  co `release:build`, więc też zawiera `vendor/`/skompilowane assety) tuż
-  przed nadpisaniem plików. Rollback rozpakowuje tę migawkę z powrotem.
+- **Nie cofa bazy, nie cofa nawet kodu** — `UpdateService::apply()` nadpisuje
+  pliki „na żywo" bez migawki do rollbacku (patrz niżej — funkcja Wycofaj
+  istniała, usunięta na wyraźną prośbę, nie było potrzeby z niej korzystać).
   Automatyczne cofanie migracji świadomie pominięte (niebezpieczne dla
-  dowolnych przyszłych migracji) — panel przypomina, żeby w razie potrzeby
-  ręcznie przywrócić bazę z automatycznego backupu wziętego tuż przed
-  aktualizacją (Moduł Backup — *uwaga: `UpdateService::apply()` dziś **nie**
-  wywołuje jeszcze `BackupService::run()` automatycznie, tylko robi migawkę
-  kodu; podpięcie prawdziwego backupu bazy jako krok 3 to następny mały
-  krok, patrz "Drobne rzeczy zauważone przy budowie"*).
-- **Dodatkowe potwierdzenie hasłem** przed upload/rollback — nie własny
-  mechanizm, tylko istniejący w appce Breeze'owy `password.confirm`
-  middleware (ten sam co przy standardowej zmianie hasła), zaaplikowany na
-  tych dwóch trasach.
+  dowolnych przyszłych migracji) — panel zaleca zrobienie backupu bazy
+  samemu przed aktualizacją, która dodaje migracje (było to przez chwilę
+  twardym wymogiem wołającym `BackupService::run()` automatycznie, wycofane
+  po realnym przypadku, gdzie to właśnie zablokowało jedyny kanał naprawy).
+- **Dodatkowe potwierdzenie hasłem** przed uploadem — nie własny mechanizm,
+  tylko istniejący w appce Breeze'owy `password.confirm` middleware (ten sam
+  co przy standardowej zmianie hasła).
 - **Manifest (`update-manifest.json`)** zawiera `version`, opcjonalne
   `min_version`, `changelog` (tablica linii) i informacyjną listę wszystkich
   plików migracji w repo (nie diff od ostatniego wydania — `migrate --force`
   i tak samo wykrywa, co jeszcze nie zostało uruchomione, więc lista w
   manifeście służy tylko do pokazania adminowi, nie steruje niczym).
-- **`release:build`** (deweloperska komenda w tym repo) i migawka kodu do
-  rollbacku dzielą tę samą listę wykluczeń (`UpdatePaths::PACKAGE_EXCLUDES`)
-  i tę samą klasę pakującą (`UpdatePackageBuilder`) — obie mają reprezentować
-  "całą działającą appkę" z tym samym wyjątkiem plików deweloperskich/danych
-  użytkownika, więc nie ma sensu ich rozdzielać.
 - **Zip slip** i inne bezpieczeństwo z pierwotnej specyfikacji zaimplementowane
   dokładnie jak opisano: ręczne rozpakowywanie z odrzucaniem wpisów z `../`,
   jawna lista chronionych ścieżek (`UpdatePaths::PROTECTED_PATHS`) nigdy
   nienadpisywanych przy podmianie plików.
+- ~~**Rollback (migawka kodu + przycisk "Wycofaj")**~~ **Usunięte**
+  (2026-09-16): było zbudowane wg pierwotnej specyfikacji (`apply()` brał
+  migawkę całego kodu przed nadpisaniem plików, `POST /ustawienia/
+  aktualizacje/wycofaj` ją przywracał), ale usunięte na wyraźną prośbę —
+  dodatkowa złożoność (migawka, `state.json`, druga uprzywilejowana trasa z
+  `password.confirm`) bez realnej potrzeby korzystania z tego. Jeśli
+  aktualizacja pójdzie źle, powrót do poprzedniej wersji to dziś ręczne
+  wgranie poprzedniej paczki. `UpdatePackageBuilder` zostaje — nadal używany
+  przez `release:build`/`release:build-hosting`, tylko już nie przez
+  `UpdateService`.
 
 18 nowych testów (`UpdateServiceTest`, `UpdateControllerTest`,
 `UpdatePackageBuilderTest`, `BuildReleasePackageTest`, `AppVersionTest`) —
@@ -649,6 +650,19 @@ się aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
 - Dziś wypożyczenie jest „na już”. Rezerwacja na przyszły termin ma sens,
   gdy z warsztatu korzysta więcej niż jedna osoba naraz.
 
+**Backup na hostingach z zablokowanym `proc_open`**
+- `spatie/laravel-backup` zawsze zrzuca bazę przez prawdziwy `mysqldump`
+  odpalany jako proces (`Symfony\Process`), co wymaga `proc_open` — na
+  hostingu z tym zablokowanym (częste zabezpieczenie na tanim/współdzielonym
+  hostingu) backup bazy strukturalnie nie może się udać, niezależnie od
+  configu. Realny przypadek: patrz "Moduł Aktualizacje" wyżej (wycofano stąd
+  twardy wymóg backupu z tego właśnie powodu). Rozważyć zrzut bazy w czystym
+  PHP przez PDO (np. biblioteka typu `druidfi/mysql-php-dump`), żeby moduł
+  Backup faktycznie działał też na takich hostingach — większa zmiana (nowa
+  zależność, wymaga starannego przetestowania na prawdziwych danych przed
+  zaufaniem jej jako jedynej siatce bezpieczeństwa), nie robić naprędce pod
+  presją bycia akurat zablokowanym.
+
 **Widoczność i rozliczalność**
 - Ogólny log aktywności appki (logowania, zmiany użytkowników/ustawień), nie
   tylko historia pojedynczego przedmiotu.
@@ -893,16 +907,23 @@ się aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
   cyklowanie zdjęć ze wskaźnikiem "1/3" w widoku listy. 3 nowe testy w
   `MarketplaceTest`.
 - ~~**Moduł Aktualizacje jeszcze nie woła `BackupService::run()`
-  automatycznie**~~ **Zrobione** (2026-09-16): `UpdateService::apply()`
-  woła teraz `BackupService::run()` jako pierwszy krok, przed migawką kodu
-  i podmianą jakichkolwiek plików — nieudany backup (niezerowy kod wyjścia)
-  przerywa całą aktualizację (`UpdatePackageException`), zamiast pozwolić
-  jej kontynuować bez świeżej kopii bazy. `BackupService::run()` zwraca
-  teraz `int` (kod wyjścia `Artisan::call()`) zamiast `void`, żeby
-  `UpdateService` mógł to sprawdzić. Testy w `UpdateServiceTest`/
-  `UpdateControllerTest` mockują `BackupService`, żeby nie zrzucać naprawdę
-  bazy testowej (sqlite `:memory:`, którego dumper spatie nie otworzy jak
-  zwykłego pliku).
+  automatycznie**~~ **Zrobione, potem wycofane** (2026-09-16): `UpdateService::
+  apply()` przez chwilę wołał `BackupService::run()` jako pierwszy krok,
+  przerywając całą aktualizację (`UpdatePackageException`) przy niezerowym
+  kodzie wyjścia. **Wycofane tego samego dnia** po realnym zgłoszeniu:
+  hosting użytkownika ma `proc_open` zablokowane w `disable_functions`
+  (częste na tanim/współdzielonym hostingu) — `spatie/laravel-backup` zawsze
+  woła prawdziwy `mysqldump` przez `Symfony\Process`, który tego wymaga, więc
+  backup nie miał tam prawa się kiedykolwiek udać, żadną ilością prób. Twardy
+  wymóg backupu zablokował więc temu adminowi **każdą** aktualizację na
+  stałe — łącznie z paczką, która miała naprawić tylko diagnostykę samego
+  backupu, bo to właśnie ten sam zablokowany mechanizm (`apply()`) miał ją
+  dostarczyć. Cofnięto do rekomendacji w UI zamiast twardej blokady — patrz
+  `UpdateService::apply()`'s docblock i CLAUDE.md "Updates module" po pełne
+  uzasadnienie. `BackupService::lastOutput()` (przechwytywanie prawdziwego
+  wyjścia `Artisan::output()`) i poprawka fałszywego "Backup created." w
+  `BackupController::run()` zostały — to osobne, wciąż aktualne poprawki
+  przydatne przy ręcznym "Utwórz kopię teraz" w Ustawieniach.
 - ~~**Wgrywanie paczki aktualizacji może uderzyć w limity PHP**~~
   **Zrobione** (2026-09-16): nowa `App\Support\PhpUploadLimits` czyta
   `upload_max_filesize`/`post_max_size` z php.ini; strona Ustawienia →

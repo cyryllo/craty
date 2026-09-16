@@ -9,12 +9,11 @@ use SplFileInfo;
 use ZipArchive;
 
 /**
- * Zipuje katalog appki do jednego pliku — używane w dwóch miejscach z lekko
- * inną listą wykluczeń: `release:build` (paczka aktualizacji do dystrybucji)
- * i `UpdateService` (własna migawka kodu tuż przed zastosowaniem aktualizacji,
- * do ewentualnego rollbacku). Świadomie przyjmuje katalog źródłowy jako
- * parametr zamiast na sztywno `base_path()` — testy Modułu Aktualizacje
- * operują na kopii appki w katalogu tymczasowym, nigdy na tym repo.
+ * Zipuje katalog appki do jednego pliku — używane przez `release:build`/
+ * `release:build-hosting` do zbudowania paczki aktualizacji do dystrybucji.
+ * Świadomie przyjmuje katalog źródłowy jako parametr zamiast na sztywno
+ * `base_path()` — testy tych komend operują na kopii appki w katalogu
+ * tymczasowym, nigdy na tym repo.
  */
 class UpdatePackageBuilder
 {

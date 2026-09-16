@@ -320,3 +320,38 @@ spłaszczonej, więc nie trzeba już ręcznie kopiować plików przez FTP przy
 każdej kolejnej aktualizacji takiej instalacji.
 
 2 nowe testy, 211/211 zielone.
+
+## 2026-09-16 — Wycofano twardy wymóg backupu przed aktualizacją
+
+Kolejne realne zgłoszenie z tej samej instalacji: automatyczny backup przed
+aktualizacją (dodany wcześniej tego dnia jako twardy wymóg — nieudany backup
+przerywał całą aktualizację) zaczął blokować **każdą** aktualizację na tym
+hostingu, łącznie z paczką, która miała naprawić samą diagnostykę backupu.
+Przyczyna: hosting ma zablokowane `proc_open` w PHP (częste na tanim/
+współdzielonym hostingu) — `spatie/laravel-backup` zawsze zrzuca bazę przez
+prawdziwy `mysqldump` odpalany jako proces, co bez `proc_open` nie ma prawa
+się nigdy udać. Twardy wymóg zamienił więc siatkę bezpieczeństwa w trwałą
+blokadę jedynego kanału naprawy.
+
+Backup przed aktualizacją nie jest już wymagany automatycznie — panel
+pokazuje zamiast tego wyraźną rekomendację zrobienia backupu bazy samemu
+(Ustawienia → Kopie zapasowe albo eksport z panelu hostingu) przed
+aktualizacją, która dodaje migracje. Przy okazji poprawiony też przycisk
+"Utwórz kopię teraz" w Ustawieniach → Kopie zapasowe, który wcześniej
+zawsze pokazywał "Backup created." nawet gdy backup faktycznie się nie
+powiódł — teraz pokazuje prawdziwy powód awarii (wyjście konsolowe
+`backup:run`).
+
+211/211 testów zielone.
+
+## 2026-09-16 — Usunięto funkcję cofania aktualizacji (Wycofaj)
+
+Kolejna decyzja tego samego dnia: usunięta cała funkcja "Wycofaj" na
+stronie Aktualizacji — `apply()` brał wcześniej migawkę całego kodu przed
+każdą aktualizacją, żeby dało się ją przywrócić przyciskiem. Zbędna
+złożoność (migawka, plik stanu, druga uprzywilejowana trasa z ponownym
+podaniem hasła) bez realnej potrzeby korzystania z niej. Jeśli aktualizacja
+pójdzie źle, powrót do poprzedniej wersji to dziś ręczne wgranie
+poprzedniej paczki.
+
+208/208 testów zielone.
