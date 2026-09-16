@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Models\SaleListing;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class MarketplaceTest extends TestCase
@@ -64,6 +65,73 @@ class MarketplaceTest extends TestCase
         $response->assertDontSee($multimeter->title);
         $response->assertSee('Narzędzia');
         $response->assertSee('Elektronika');
+    }
+
+    /**
+     * Wcześniej pchli targ pokazywał tylko `item->primaryPhoto` — jedno
+     * zdjęcie, nawet gdy przedmiot ma ich kilka (patrz TODO.md "Drobne
+     * rzeczy zauważone przy budowie"). Sprawdzamy obie strony przełącznika
+     * widoku, bo mają dwa niezależne bloki markupu w tym samym widoku.
+     */
+    public function test_marketplace_grid_view_shows_every_photo_not_just_the_primary_one(): void
+    {
+        Storage::fake('public');
+        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
+        $listing = $this->createListingWithPhotos(['main-cover.jpg', 'second-photo.jpg', 'third-photo.jpg']);
+
+        $response = $this->get(route('marketplace.index', ['view' => 'grid']));
+
+        $response->assertOk()
+            ->assertSee($listing->title)
+            ->assertSee('main-cover.jpg')
+            ->assertSee('second-photo.jpg')
+            ->assertSee('third-photo.jpg');
+    }
+
+    public function test_marketplace_list_view_shows_every_photo_not_just_the_primary_one(): void
+    {
+        Storage::fake('public');
+        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
+        $listing = $this->createListingWithPhotos(['main-cover.jpg', 'second-photo.jpg']);
+
+        $response = $this->get(route('marketplace.index', ['view' => 'list']));
+
+        $response->assertOk()
+            ->assertSee('main-cover.jpg')
+            ->assertSee('second-photo.jpg');
+    }
+
+    /** Item::photosForGallery() musi dawać okładkę (is_primary) na pierwszym miejscu, niezależnie od sort_order. */
+    public function test_gallery_photo_order_puts_the_primary_photo_first(): void
+    {
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'dostepny',
+        ]);
+        $item->photos()->create(['path' => 'items/1/first-added.jpg', 'is_primary' => false, 'sort_order' => 0]);
+        $item->photos()->create(['path' => 'items/1/actual-cover.jpg', 'is_primary' => true, 'sort_order' => 1]);
+
+        $ordered = $item->photosForGallery();
+
+        $this->assertSame('items/1/actual-cover.jpg', $ordered->first()->path);
+    }
+
+    /** @param  array<int, string>  $filenames */
+    private function createListingWithPhotos(array $filenames): SaleListing
+    {
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'uzywany', 'status' => 'do_sprzedazy',
+        ]);
+
+        foreach ($filenames as $index => $filename) {
+            $item->photos()->create([
+                'path' => 'items/1/'.$filename, 'is_primary' => $index === 0, 'sort_order' => $index,
+            ]);
+        }
+
+        return SaleListing::create([
+            'item_id' => $item->id, 'platform' => 'olx', 'title' => 'Wiertarka - okazja',
+            'description' => 'Opis testowy', 'price' => 90, 'status' => 'wyeksportowana', 'exported_at' => now(),
+        ]);
     }
 
     private function createListing(string $inventoryNo, string $title, string $status, ?int $categoryId = null): SaleListing

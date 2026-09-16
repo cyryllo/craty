@@ -49,7 +49,10 @@ class MarketplaceController extends Controller
 
         $listings = (clone $activeListings)
             ->when($categoryId, fn ($q) => $q->whereHas('item', fn ($q) => $q->where('category_id', $categoryId)))
-            ->with('item.primaryPhoto', 'item.category')
+            // Wcześniej tylko primaryPhoto — dorzucamy całą galerię (patrz
+            // TODO.md "Drobne rzeczy zauważone przy budowie", pasek
+            // miniaturek zamiast pełnej podstrony/lightboxa).
+            ->with('item.photos', 'item.category')
             ->latest('exported_at')
             ->paginate(24)
             ->withQueryString();

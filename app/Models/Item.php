@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Item extends Model
 {
@@ -65,6 +66,20 @@ class Item extends Model
     public function primaryPhoto(): HasMany
     {
         return $this->photos()->where('is_primary', true);
+    }
+
+    /**
+     * Wszystkie zdjęcia, ale z tym oznaczonym jako główne zawsze na
+     * początku — pchli targ (patrz TODO.md "Drobne rzeczy zauważone przy
+     * budowie") pokazuje teraz galerię zamiast samego primaryPhoto, więc
+     * potrzebuje ustalonej kolejności "okładka, potem reszta" zamiast
+     * gołego porządku po sort_order (który primaryPhoto akurat dziś
+     * respektuje, bo jest ustawiane tylko na pierwsze dodane zdjęcie —
+     * ale nie ma gwarancji, że tak zostanie po przyszłych zmianach).
+     */
+    public function photosForGallery(): Collection
+    {
+        return $this->photos->sortByDesc('is_primary')->values();
     }
 
     public function attachments(): HasMany
