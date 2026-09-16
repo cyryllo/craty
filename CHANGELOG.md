@@ -425,3 +425,16 @@ serwowanie zdjęcia przez symlink na prawdziwej MariaDB) i ręczna
 weryfikacja przez `curl` na żywym Apache: `.env`/`vendor/`/`app/` dają 403,
 `manifest.json`/`sw.js`/`pwa-icons/`/skompilowane assety i zdjęcia przez
 symlink `storage` dają 200.
+
+## 2026-09-17 — Wspólna stopka na wszystkich stronach
+
+Dodano stopkę ("Craty v{wersja} · GitHub" z linkiem do repozytorium)
+widoczną na każdej stronie appki, nie tylko w Ustawieniach jak dotychczas.
+Appka nie ma jednego wspólnego layoutu bazowego — cztery niezależne
+"powłoki" HTML (panel zalogowanego użytkownika, ekrany logowania/rejestracji,
+publiczny pchli targ, kreator instalacji) dostały nowy partial
+`layouts/_footer.blade.php` osobno. Stopka celowo pokazuje nazwę projektu
+("Craty"), nie nazwę appki ustawioną przez admina — ma zostać widoczna
+nawet po zmianie brandingu.
+
+202/202 testów zielone.

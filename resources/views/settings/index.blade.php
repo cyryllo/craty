@@ -72,7 +72,5 @@
                 </div>
             </div>
         @endif
-
-        <p class="text-center text-xs text-gray-400 dark:text-gray-500">Craty v{{ $appVersion }}</p>
     </div>
 </x-app-layout>

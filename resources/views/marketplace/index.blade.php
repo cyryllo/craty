@@ -159,5 +159,7 @@
                 </div>
             </div>
         </main>
+
+        @include('layouts._footer')
     </body>
 </html>

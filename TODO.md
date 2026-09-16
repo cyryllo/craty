@@ -1033,3 +1033,15 @@ się aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
   usunięto zdublowane banery sukcesu/błędu na stronach Aktualizacji i Poczty
   (własny baner strony + globalny baner z `layouts/app.blade.php` pokazywały
   ten sam tekst dwa razy). 5 nowych/zmienionych testów w `UpdateControllerTest`.
+- ~~**Wersja appki widoczna tylko w jednym miejscu (Ustawienia)**~~
+  **Zrobione** (2026-09-17): wspólna stopka (`layouts/_footer.blade.php`,
+  "Craty v{wersja} · GitHub" z linkiem do repo) pokazuje się teraz wszędzie
+  — dołączona osobno w każdej z czterech niezależnych "powłok" HTML appki
+  (`layouts/app`, `layouts/guest`, `marketplace/index`, kreator instalacji
+  — nie ma jednego wspólnego layoutu bazowego, więc nie da się tego dopiąć
+  w jednym miejscu). Stopka celowo pokazuje nazwę PROJEKTU ("Craty"), nie
+  `AppSetting::effectiveName()` (nazwa appki wybrana przez admina) — to
+  "powered by", ma zostać "Craty" nawet po white-labelu. Usunięta zdublowana
+  linijka "Craty v..." z `settings/index.blade.php` (teraz zbędna, bo
+  layout ją i tak pokazuje). 4 nowe testy (`FooterTest`, plus jeden w
+  `InstallerTest`, bo kreator wymaga `$withoutDefaultInstalledUser`).

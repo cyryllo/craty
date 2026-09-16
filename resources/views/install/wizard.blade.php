@@ -248,5 +248,7 @@
                 </div>
             </form>
         </div>
+
+        @include('layouts._footer')
     </body>
 </html>

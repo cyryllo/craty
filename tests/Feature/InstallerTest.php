@@ -53,6 +53,15 @@ class InstallerTest extends TestCase
             ->assertSee("localStorage.getItem('theme')", false);
     }
 
+    /** Patrz FooterTest — ten jeden test o stopce siedzi tutaj, bo potrzebuje $withoutDefaultInstalledUser z tej klasy. */
+    public function test_installer_includes_the_footer(): void
+    {
+        $this->get(route('install.show'))
+            ->assertOk()
+            ->assertSee('Craty v'.app(\App\Support\AppVersion::class)->current())
+            ->assertSee('https://github.com/cyryllo/craty', false);
+    }
+
     public function test_installer_redirects_to_login_when_already_installed(): void
     {
         User::factory()->create(['role' => 'admin']);

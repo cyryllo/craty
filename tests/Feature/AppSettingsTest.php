@@ -55,14 +55,6 @@ class AppSettingsTest extends TestCase
             ->assertSee('App settings');
     }
 
-    public function test_settings_hub_shows_the_app_version(): void
-    {
-        $user = User::factory()->create(['role' => 'magazynier']);
-
-        $this->actingAs($user)->get(route('settings.index'))
-            ->assertSee('Craty v'.app(\App\Support\AppVersion::class)->current());
-    }
-
     /**
      * Regresja: przed pierwszą migracją (świeża instalacja, patrz Instalator)
      * `app_settings` w ogóle nie istnieje. `current()` woła się z

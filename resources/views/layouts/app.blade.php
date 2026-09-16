@@ -64,6 +64,8 @@
             <main>
                 {{ $slot }}
             </main>
+
+            @include('layouts._footer')
         </div>
     </body>
 </html>
