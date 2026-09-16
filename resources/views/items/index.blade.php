@@ -64,11 +64,33 @@
             </div>
         </form>
 
+        {{-- Druk etykiet zbiorczo — zaznacz checkboxami (dowolne, np. po
+             przefiltrowaniu powyżej) i kliknij "Drukuj etykiety". Szablon i
+             cenę wybiera się dopiero NA PODGLĄDZIE (labels-print.blade.php),
+             celowo nie tutaj — życzenie użytkownika. Osobny <form> od
+             filtra wyżej (POST, otwiera się w nowej karcie, żeby nie
+             stracić filtrów/widoku na tej stronie). Zaznaczenie działa
+             tylko w obrębie aktualnej strony wyników (paginacja) — przy
+             większej liczbie trzeba powtórzyć na kolejnej stronie. --}}
+        <form method="POST" action="{{ route('items.labels.print') }}" target="_blank"
+              onsubmit="if (!this.querySelector('.item-checkbox:checked')) { alert('{{ __('Select at least one item first.') }}'); return false; }">
+            @csrf
+            <div class="flex items-center justify-between gap-3 bg-white rounded-lg shadow p-3 mb-4 dark:bg-gray-800">
+                <label class="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <input type="checkbox" onclick="document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = this.checked)">
+                    {{ __('Select all') }}
+                </label>
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                    🏷️ {{ __('Print labels') }}
+                </button>
+            </div>
+
         @if ($view === 'list')
             <div class="bg-white rounded-lg shadow overflow-x-auto dark:bg-gray-800">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-gray-500 text-xs uppercase dark:bg-gray-900 dark:text-gray-400">
                         <tr>
+                            <th class="px-4 py-3 w-8"></th>
                             <th class="px-4 py-3"></th>
                             <th class="text-left px-4 py-3">{{ __('Item name') }}</th>
                             <th class="text-left px-4 py-3">{{ __('Inventory no.') }}</th>
@@ -81,6 +103,9 @@
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                         @forelse ($items as $item)
                             <tr class="hover:bg-gray-50 cursor-pointer dark:hover:bg-gray-700" onclick="window.location='{{ route('items.show', $item) }}'">
+                                <td class="px-4 py-2 w-8" onclick="event.stopPropagation()">
+                                    <input type="checkbox" name="items[]" value="{{ $item->id }}" class="item-checkbox">
+                                </td>
                                 <td class="px-4 py-2 w-10">
                                     <div class="w-8 h-8 rounded bg-gray-100 overflow-hidden flex items-center justify-center dark:bg-gray-700">
                                         @if ($item->primaryPhoto->first())
@@ -102,7 +127,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="8" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                                     {{ __('Nothing found.') }} @if (auth()->user()->isMagazynier())<a href="{{ route('items.create') }}" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Add the first item') }}</a>.@endif
                                 </td>
                             </tr>
@@ -113,7 +138,9 @@
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 @forelse ($items as $item)
-                    <a href="{{ route('items.show', $item) }}" class="bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden flex flex-col dark:bg-gray-800">
+                    <div class="relative">
+                        <input type="checkbox" name="items[]" value="{{ $item->id }}" class="item-checkbox absolute top-2 left-2 z-10 w-4 h-4 rounded shadow">
+                        <a href="{{ route('items.show', $item) }}" class="bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden flex flex-col dark:bg-gray-800">
                         <div class="aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden dark:bg-gray-700">
                             @if ($item->primaryPhoto->first())
                                 <img src="{{ $item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
@@ -136,7 +163,8 @@
                                 {{ $item->category?->name ?? __('no category') }} · {{ $item->storageLocation?->label() ?? __('no location') }}
                             </p>
                         </div>
-                    </a>
+                        </a>
+                    </div>
                 @empty
                     <div class="col-span-full bg-white rounded-lg shadow p-8 text-center text-gray-500 dark:bg-gray-800 dark:text-gray-400">
                         {{ __('Nothing found.') }} @if (auth()->user()->isMagazynier())<a href="{{ route('items.create') }}" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Add the first item') }}</a>.@endif
@@ -144,6 +172,7 @@
                 @endforelse
             </div>
         @endif
+        </form>
 
         {{ $items->links() }}
     </div>

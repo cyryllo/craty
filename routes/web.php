@@ -87,6 +87,7 @@ Route::middleware('auth')->group(function () {
     // Ewidencję przedmiotów widzi każdy zalogowany, niezależnie od roli.
     Route::get('items', [ItemController::class, 'index'])->name('items.index');
     Route::get('items/{item}/label', [ItemController::class, 'label'])->name('items.label');
+    Route::post('items/etykiety', [ItemController::class, 'printLabels'])->name('items.labels.print');
     Route::get('items/{item}', [ItemController::class, 'show'])->name('items.show');
 
     // Skanowanie kamerą (patrz TODO.md "PWA") — dostępne dla każdej roli, tak

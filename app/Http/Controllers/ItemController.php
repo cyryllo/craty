@@ -11,8 +11,10 @@ use App\Models\ItemPhoto;
 use App\Models\StorageLocation;
 use App\Services\InventoryNumberGenerator;
 use App\Services\QrCodeGenerator;
+use App\Support\ItemLabelTemplates;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ItemController extends Controller
 {
@@ -128,10 +130,58 @@ class ItemController extends Controller
         return redirect()->route('items.index')->with('status', __('Item removed from inventory.'));
     }
 
-    /** Widok etykiety do wydruku (naklejka z numerem i kodem QR). */
-    public function label(Item $item)
+    /**
+     * Widok etykiety do wydruku. Szablon (rozmiar/zawartość) i włącznik
+     * ceny wybiera się PO otwarciu podglądu (patrz toolbar w
+     * items/label.blade.php) — zwykły GET z query stringiem, bo ID
+     * przedmiotu i tak już jest w adresie, więc zmiana szablonu to tylko
+     * przeładowanie tej samej strony, bez utraty żadnych danych.
+     */
+    public function label(Request $request, Item $item)
     {
-        return view('items.label', ['item' => $item]);
+        return view('items.label', [
+            'item' => $item,
+            'template' => $this->resolveTemplateKey($request),
+            'showPrice' => $request->boolean('price'),
+        ]);
+    }
+
+    /**
+     * Druk wielu etykiet naraz (zaznaczone checkboxami na /items, patrz
+     * items/index.blade.php) — jedna strona z etykietą na etykietę,
+     * oddzielone page-break, żeby każda wydrukowała się osobno na
+     * naklejce/etykiecie z drukarki termicznej. Otwierana w nowej karcie
+     * (target="_blank"), żeby nie tracić filtrów/zaznaczenia na /items.
+     * Szablon/cenę da się zmienić bez wracania do /items — toolbar na
+     * labels-print.blade.php resubmituje ten sam zestaw ID (przeniesiony
+     * jako ukryte pola), tylko z innym szablonem/ceną.
+     */
+    public function printLabels(Request $request)
+    {
+        $data = $request->validate([
+            'items' => ['required', 'array', 'min:1'],
+            'items.*' => ['integer', 'exists:items,id'],
+            'template' => ['nullable', Rule::in(ItemLabelTemplates::keys())],
+            'price' => ['nullable', 'boolean'],
+        ]);
+
+        // orderBy + whereIn nie gwarantuje kolejności zaznaczenia — kolejność
+        // po nazwie jest przewidywalna i wystarczająca (etykiety i tak trafiają
+        // do jednej rolki/arkusza, nie ma znaczenia "kto pierwszy").
+        $items = Item::query()->whereIn('id', $data['items'])->orderBy('name')->get();
+
+        return view('items.labels-print', [
+            'items' => $items,
+            'template' => $data['template'] ?? ItemLabelTemplates::DEFAULT,
+            'showPrice' => $request->boolean('price'),
+        ]);
+    }
+
+    private function resolveTemplateKey(Request $request): string
+    {
+        $key = $request->query('template');
+
+        return in_array($key, ItemLabelTemplates::keys(), true) ? $key : ItemLabelTemplates::DEFAULT;
     }
 
     public function destroyPhoto(Item $item, ItemPhoto $photo)

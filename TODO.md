@@ -752,6 +752,72 @@ się aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
 
 ## Drobne rzeczy zauważone przy budowie
 
+- ~~**Etykiety do druku — dopasować do fizycznej naklejki i dodać druk
+  zbiorczy**~~ **Zrobione** (2026-09-16, życzenie użytkownika): rozmiar
+  etykiety zmieniony z 70mm (za duża) na dokładnie **32×20mm**, ustawiony
+  w jednym miejscu (`items/_label-styles.blade.php`, `@page { size: 32mm
+  20mm; margin: 0 }` — respektowane przez okno drukowania jako rozmiar
+  "papieru", więc drukarka etykiet dostaje dokładnie ten obszar bez
+  marginesów). QR 16mm + tekst (numer ewidencyjny/nazwa) w wąskiej
+  kolumnie obok — ciasno, ale to fizyczne ograniczenie samej naklejki, nie
+  appki. **Poprawka tego samego dnia** (użytkownik zgłosił, ze
+  screenshotem realnego podglądu wydruku: czcionka za duża, tekst się
+  przycina) — czcionka zmniejszona (numer 4pt, nazwa 3.5pt) i `.text`
+  dostał jawną wysokość równą wysokości QR-a (16mm) + `overflow: hidden`
+  zamiast `-webkit-line-clamp` na samej nazwie: przy domyślnym
+  zachowaniu flexboksa (`align-items: center`) kontener tekstu rósł do
+  wysokości WŁASNEJ treści, a nie QR-a, więc dłuższy tekst mógł wystawać
+  ponad `.label{overflow:hidden}` i być przycinany symetrycznie OD GÓRY
+  i OD DOŁU naraz — stąd zgłoszone "przycina tekst". `-webkit-line-clamp`
+  usunięty całkowicie (niestandardowa własność, w kontekście druku
+  paginowanego bywa niestabilna) na rzecz zwykłego, uniwersalnie
+  wspieranego `overflow: hidden` na kontenerze o jawnej wysokości.
+  **I jeszcze jedna poprawka od razu potem** (użytkownik: "teksty na siebie
+  nachodzą") — ten pośredni krok nadal centrował `.no`/`.name` jako GRUPĘ
+  flexboksem (`justify-content: center` w `.text`), co przy większej ilości
+  tekstu ściskało/nakładało linijki zamiast czysto uciąć nadmiar na dole.
+  Docelowo: `.text` to zwykły blokowy kontener (bez `display:flex` w
+  ogóle) — `.no`/`.name` układają się jeden pod drugim zwykłym "block
+  flow", więc fizycznie nie mają jak na siebie nachodzić; `.label` samo
+  dostało `align-items: flex-start` zamiast `center`, żeby QR i tekst
+  zaczynały się od tej samej górnej krawędzi, bez żadnego wyśrodkowania
+  w pionie na żadnym poziomie. Sam markup etykiety
+  (`items/_label.blade.php`) wydzielony jako partial, żeby druk
+  pojedynczy i zbiorczy nigdy się nie rozjechały.
+  **Druk zbiorczy**: `/items` (oba widoki: lista i kafelki) dostał
+  checkboxy przy przedmiotach (działają w obrębie bieżącej strony wyników
+  — paginacja/24 na stronę, nie przez wszystkie strony na raz) +
+  "zaznacz wszystkie" + przycisk "Drukuj etykiety", POSTujący zaznaczone
+  ID (`ItemController::printLabels()`) do nowej strony
+  `items/labels-print.blade.php` otwieranej w nowej karcie (żeby nie
+  tracić filtrów/zaznaczenia na liście) — jedna etykieta na etykietę,
+  oddzielone `page-break-after` w druku, żeby każda wyszła osobno na
+  rolce/arkuszu naklejek.
+  **Rozbudowa tego samego dnia, jeszcze później** (życzenie użytkownika):
+  zamiast jednego sztywnego rozmiaru — **trzy szablony do wyboru**, jedno
+  źródło prawdy w nowej `App\Support\ItemLabelTemplates`:
+  - `32x20` (domyślny) — QR + nazwa przedmiotu (bez numeru).
+  - `35x25` — sam QR, wyśrodkowany, bez żadnego tekstu.
+  - `50x30` — QR + nazwa + numer ewidencyjny, na większym polu więc
+    czytelniejszą czcionką.
+  Do każdego opcjonalnie dochodzi **cena** (`Item::value`, format
+  "149,90 zł") — jeśli przedmiot nie ma wartości, linijka ceny po prostu
+  się nie pojawia, nawet gdy zaznaczona. Szablon "sam QR" (35×25) z
+  włączoną ceną zmienia układ z "QR obok tekstu" na "QR nad ceną"
+  (`qr_with_price` — mniejszy QR, żeby zrobić miejsce na linijkę pod
+  spodem), bo bez tego nie ma tam gdzie zmieścić tekstu obok.
+  **Wybór dzieje się na podglądzie, nie na `/items`** — świadoma decyzja
+  użytkownika ("niech da możliwość przy podglądzie do wyboru i
+  wyklikania i dopiero potem drukuj", potem jeszcze "nie dodawaj na items
+  tych filtrów, chcę je mieć tylko w podglądzie"): `/items` ma tylko
+  checkboxy + zwykły przycisk "Drukuj etykiety" (zawsze domyślny
+  szablon), a selektor szablonu/ceny (`items/_label-options.blade.php`,
+  współdzielony partial) siedzi na samej stronie podglądu — dla
+  pojedynczej etykiety to zwykłe przeładowanie GET-em (ID przedmiotu i
+  tak już jest w adresie), dla druku zbiorczego `labels-print.blade.php`
+  resubmituje cały zaznaczony zestaw ID jako ukryte pola w POST-cie przy
+  każdej zmianie, żeby dało się przełączać szablon/cenę bez powrotu do
+  `/items` i zaznaczania od nowa. 13 testów razem (`ItemLabelPrintingTest`).
 - ~~**Ikony głównych pozycji menu obok loga w wersji mobilnej**~~ **Zrobione**
   (2026-09-16, życzenie użytkownika): dotąd na mobile jedyny dostęp do
   Panelu/Przedmiotów/Sprzedaży szedł przez rozwijane menu z hamburgera —
