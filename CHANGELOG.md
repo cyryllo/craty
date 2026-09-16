@@ -241,3 +241,57 @@ brakujące dotąd pole potwierdzenia hasła (na obu: dodawaniu i edycji).
 8 nowych testów (poprawne odrzucanie zbyt krótkich/bez wielkiej litery/bez
 znaku specjalnego haseł, niezgodne potwierdzenie, edycja bez podania hasła
 zostawia stare bez zmian), 124/124 zielone.
+
+## 2026-09-15/16 — Instalator na realnym hostingu, PWA, tryb ciemny, druk etykiet
+
+Duży pakiet zmian wynikłych z pierwszego prawdziwego wdrożenia poza
+Dockerem — część znaleziona dopiero na produkcji, część to nowe funkcje
+zamówione po drodze.
+
+**Wdrożenie i moduł Aktualizacje**
+- Trzy warianty paczki instalacyjnej: `-full` (klasyczny układ, kod poza
+  document rootem), `-hosting` (spłaszczony układ dla hostingów z
+  `open_basedir` ograniczonym do `public_html` — nowa komenda
+  `release:build-hosting`, ze samo-naprawiającym się symlinkiem
+  `storage` i `.htaccess` chroniącym kod/`.env`), `-update` (wgrywana
+  przez panel). Każda z sumą kontrolną `.sha256`.
+- Realny minimalny PHP appki obniżony do **8.3** (wcześniej `composer
+  update` na PHP 8.4 tego kontenera dev cicho podbijał wymaganie do
+  8.4.1) — `config.platform.php` w `composer.json` pilnuje tego na
+  przyszłość.
+- `UpdateService::apply()` woła teraz automatyczny backup bazy
+  (`BackupService::run()`) jako pierwszy krok, przed migawką kodu —
+  nieudany backup przerywa całą aktualizację.
+- Ostrzeżenie na Ustawienia → Aktualizacje, gdy `upload_max_filesize`/
+  `post_max_size` serwera jest za niski na paczkę (~27 MB), plus czytelny
+  komunikat gdy PHP po cichu utnie za duży upload.
+
+**PWA i skaner**
+- Instalowalność (manifest + service worker), skanowanie QR/kodów
+  kreskowych kamerą (`@zxing/browser`), szybkie dodanie przedmiotu po
+  nietrafionym skanie — rozbudowane później o wybór kategorii/lokalizacji/
+  stanu/opisu wprost w tym formularzu (wcześniej tylko zdjęcie+nazwa+kod).
+
+**Wygoda i drobne poprawki**
+- **Tryb ciemny** w całej appce — przełącznik w nawigacji, zapamiętywany
+  per przeglądarkę, z anty-migotaniowym skryptem; kilka poprawek
+  kontrastu znalezionych dopiero na realnym podglądzie (formularze,
+  przyciski, wskaźnik kroków instalatora).
+- Ikony głównych pozycji menu obok loga w wersji mobilnej — nie trzeba
+  już otwierać rozwijanego menu do Panelu/Przedmiotów/Sprzedaży.
+- **Import masowy przedmiotów z CSV** (`/items/import`) — dopasowanie
+  kategorii/lokalizacji po kodzie; nierozpoznany kod nie odrzuca wiersza,
+  tylko czeka na potwierdzenie jako "nieprzypisany".
+- **Druk etykiet** przeprojektowany: trzy szablony fizycznych rozmiarów
+  naklejek (32×20mm, 35×25mm, 50×30mm) z opcjonalną ceną, wybierane na
+  podglądzie przed wydrukiem, plus druk zbiorczy wielu przedmiotów naraz
+  (checkboxy na `/items`).
+- Pchli targ pokazuje teraz galerię wszystkich zdjęć oferty, nie tylko
+  głównego.
+- Naprawiona surowa flaga Breeze (`profile-updated` itp.) wyciekająca
+  wprost na ekran zamiast przetłumaczonego potwierdzenia.
+- Usunięta rola `podglad` (appka ma dziś tylko `admin`/`magazynier`),
+  Ustawienia podzielone na podstawowe/zaawansowane, scalone pole
+  "Specyfikacja techniczna" z "Opis".
+
+209 testów PHPUnit, wszystkie zielone.
