@@ -15,6 +15,11 @@ adding the item instead of a dead end.
 
 Built with Laravel 12 + MariaDB, fully bilingual (EN/PL).
 
+> Where does the name come from? "Craty" blends the Polish "Graty"
+> (workshop odds and ends/equipment) with the English "crate" — the app
+> started out as an internal tool called "Graty" and kept a similar sound
+> when it was renamed for the open-source release.
+
 ## Requirements (self-hosting)
 
 Applies to installs outside Docker (see

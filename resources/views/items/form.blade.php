@@ -1,13 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">
             {{ $item->exists ? __('Edit item') : __('New item') }}
         </h2>
     </x-slot>
 
     <div class="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <form method="POST" action="{{ $item->exists ? route('items.update', $item) : route('items.store') }}"
-              enctype="multipart/form-data" class="bg-white rounded-lg shadow p-6 space-y-6">
+              enctype="multipart/form-data" class="bg-white rounded-lg shadow p-6 space-y-6 dark:bg-gray-800">
             @csrf
             @if ($item->exists) @method('PUT') @endif
 
@@ -32,7 +32,7 @@
 
                 <div>
                     <x-input-label for="category_id" :value="__('Category')" />
-                    <select id="category_id" name="category_id" class="mt-1 block w-full rounded-md border-gray-300">
+                    <select id="category_id" name="category_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600">
                         <option value="">— {{ __('none') }} —</option>
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}" @selected(old('category_id', $item->category_id) == $category->id)>{{ $category->name }} ({{ $category->code }})</option>
@@ -43,7 +43,7 @@
 
                 <div>
                     <x-input-label for="storage_location_id" :value="__('Location')" />
-                    <select id="storage_location_id" name="storage_location_id" class="mt-1 block w-full rounded-md border-gray-300">
+                    <select id="storage_location_id" name="storage_location_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600">
                         <option value="">— {{ __('none') }} —</option>
                         @foreach ($locations as $location)
                             <option value="{{ $location->id }}" @selected(old('storage_location_id', $item->storage_location_id) == $location->id)>{{ $location->label() }}</option>
@@ -66,7 +66,7 @@
 
                 <div>
                     <x-input-label for="condition" :value="__('Condition')" />
-                    <select id="condition" name="condition" class="mt-1 block w-full rounded-md border-gray-300" required>
+                    <select id="condition" name="condition" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600" required>
                         @foreach (\App\Models\Item::CONDITIONS as $value => $label)
                             <option value="{{ $value }}" @selected(old('condition', $item->condition ?: 'uzywany') == $value)>{{ __($label) }}</option>
                         @endforeach
@@ -75,7 +75,7 @@
 
                 <div>
                     <x-input-label for="status" :value="__('Status')" />
-                    <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300" required>
+                    <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600" required>
                         @foreach (\App\Models\Item::STATUSES as $value => $label)
                             <option value="{{ $value }}" @selected(old('status', $item->status ?: 'dostepny') == $value)>{{ __($label) }}</option>
                         @endforeach
@@ -84,7 +84,7 @@
 
                 <div class="sm:col-span-2">
                     <x-input-label for="description" :value="__('Description')" />
-                    <textarea id="description" name="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300" placeholder="{{ __('model, parameters, condition, anything worth noting...') }}">{{ old('description', $item->description) }}</textarea>
+                    <textarea id="description" name="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600" placeholder="{{ __('model, parameters, condition, anything worth noting...') }}">{{ old('description', $item->description) }}</textarea>
                 </div>
 
                 <div class="sm:col-span-2">
@@ -98,15 +98,15 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
-                <a href="{{ $item->exists ? route('items.show', $item) : route('items.index') }}" class="text-sm text-gray-500 hover:underline">{{ __('Cancel') }}</a>
+            <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+                <a href="{{ $item->exists ? route('items.show', $item) : route('items.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>
                 <x-primary-button>{{ $item->exists ? __('Save changes') : __('Add to inventory') }}</x-primary-button>
             </div>
         </form>
 
         @if ($item->exists && $item->photos->isNotEmpty())
-            <div class="bg-white rounded-lg shadow p-6 mt-6">
-                <h3 class="text-sm font-medium text-gray-700 mb-3">{{ __('Photos') }}</h3>
+            <div class="bg-white rounded-lg shadow p-6 mt-6 dark:bg-gray-800">
+                <h3 class="text-sm font-medium text-gray-700 mb-3 dark:text-gray-300">{{ __('Photos') }}</h3>
                 <div class="flex flex-wrap gap-3">
                     @foreach ($item->photos as $photo)
                         <div class="relative group">
@@ -122,15 +122,15 @@
         @endif
 
         @if ($item->exists && $item->attachments->isNotEmpty())
-            <div class="bg-white rounded-lg shadow p-6 mt-6">
-                <h3 class="text-sm font-medium text-gray-700 mb-3">{{ __('Attachments (invoice, manual...)') }}</h3>
+            <div class="bg-white rounded-lg shadow p-6 mt-6 dark:bg-gray-800">
+                <h3 class="text-sm font-medium text-gray-700 mb-3 dark:text-gray-300">{{ __('Attachments (invoice, manual...)') }}</h3>
                 <ul class="space-y-2 text-sm">
                     @foreach ($item->attachments as $attachment)
                         <li class="flex items-center justify-between gap-3">
-                            <a href="{{ $attachment->url() }}" class="text-indigo-600 hover:underline" target="_blank">{{ $attachment->label }}</a>
+                            <a href="{{ $attachment->url() }}" class="text-indigo-600 hover:underline dark:text-indigo-400" target="_blank">{{ $attachment->label }}</a>
                             <form method="POST" action="{{ route('items.attachments.destroy', [$item, $attachment]) }}" onsubmit="return confirm('{{ __('Remove this attachment?') }}');">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:underline">{{ __('remove') }}</button>
+                                <button type="submit" class="text-red-600 hover:underline dark:text-red-400">{{ __('remove') }}</button>
                             </form>
                         </li>
                     @endforeach

@@ -5,3 +5,49 @@
 [x-cloak] {
     display: none;
 }
+
+@layer base {
+    /* @tailwindcss/forms narzuca "background-color:#fff" globalnie na każdym
+       select/textarea/tekstowym input przez selektor :where(...) (zero
+       specyficzności, warstwa "base") — bez tego dopisania KAŻDE zwykłe pole
+       formularza w appce bez jawnego "dark:bg-*" (czyli wszystko poza
+       komponentem x-text-input, który ma to ustawione punktowo) zostaje
+       białym prostokątem z czarnym tekstem w trybie ciemnym, niezależnie od
+       ciemnego tła wokół niego (zgłoszone jako "co jest na czarno i mało
+       widoczne" — pola "Komu wypożyczono"/data w items/show.blade.php,
+       przełączniki widoku itd.). Warstwa "utilities" (gdzie trafiają
+       wszystkie klasy dark:*) zawsze wygrywa z warstwą "base" niezależnie od
+       specyficzności, więc to bezpiecznie współistnieje z jawnymi
+       dark:bg-gray-700 na x-text-input, nie nadpisuje ich. */
+    .dark input:where(
+        [type='text'], [type='email'], [type='url'], [type='password'],
+        [type='number'], [type='date'], [type='datetime-local'], [type='month'],
+        [type='search'], [type='tel'], [type='time'], [type='week']
+    ),
+    .dark select,
+    .dark textarea {
+        background-color: theme('colors.gray.700');
+        color: theme('colors.gray.100');
+        border-color: theme('colors.gray.600');
+    }
+
+    .dark input:where([type='checkbox'], [type='radio']) {
+        background-color: theme('colors.gray.700');
+        border-color: theme('colors.gray.600');
+    }
+
+    /* <input type="file"> — samej natywnej kontrolki (przycisk systemowy)
+       nie da się ostylować w 100% przenośnie, ale tekst "Nie wybrano
+       pliku"/nazwa pliku obok niej w Chrome/Firefox/Edge reaguje na "color"
+       (zgłoszony problem: ten tekst był nieczytelny na ciemnym tle). */
+    .dark input[type='file'] {
+        color: theme('colors.gray.300');
+    }
+
+    .dark input[type='file']::file-selector-button,
+    .dark input[type='file']::-webkit-file-upload-button {
+        background-color: theme('colors.gray.600');
+        color: theme('colors.gray.100');
+        border-color: theme('colors.gray.500');
+    }
+}

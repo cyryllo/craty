@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $warehouse->exists ? __('Edit warehouse') : __('New warehouse') }}</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">{{ $warehouse->exists ? __('Edit warehouse') : __('New warehouse') }}</h2>
     </x-slot>
 
     <div class="max-w-lg mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <form method="POST" action="{{ $warehouse->exists ? route('warehouses.update', $warehouse) : route('warehouses.store') }}" class="bg-white rounded-lg shadow p-6 space-y-4">
+        <form method="POST" action="{{ $warehouse->exists ? route('warehouses.update', $warehouse) : route('warehouses.store') }}" class="bg-white rounded-lg shadow p-6 space-y-4 dark:bg-gray-800">
             @csrf
             @if ($warehouse->exists) @method('PUT') @endif
 
@@ -23,8 +23,8 @@
                 <x-text-input id="address" name="address" class="mt-1 block w-full" value="{{ old('address', $warehouse->address) }}" />
             </div>
 
-            <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
-                <a href="{{ route('warehouses.index') }}" class="text-sm text-gray-500 hover:underline">{{ __('Cancel') }}</a>
+            <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+                <a href="{{ route('warehouses.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>
                 <x-primary-button>{{ __('Save') }}</x-primary-button>
             </div>
         </form>

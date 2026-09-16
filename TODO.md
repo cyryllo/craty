@@ -11,6 +11,25 @@ Ułożone wg zależności między zadaniami (co blokuje co) i tego, co już dzi�
 daje wartość vs. co ma sens dopiero po czymś innym. Każda faza zakłada, że
 poprzednia jest zrobiona — w obrębie jednej fazy kolejność jest dowolna.
 
+~~**Priorytet** — rozbudować formularz szybkiego dodawania przedmiotu ze
+skanera o kategorię/lokalizację/stan/opis.~~ **Zrobione** (2026-09-16):
+`ScanController::quickAddCreate`/`quickAddStore` i
+`resources/views/scan/quick-add.blade.php` dostały selecty kategorii i
+lokalizacji, select stanu technicznego (domyślnie "używany", tak jak pełny
+`/items/create`) i pole opisu. Rozstrzygnięcie otwartego pytania: wszystkie
+cztery zostały **opcjonalne**, zgodnie z sugestią w oryginalnej notatce —
+brak kategorii/lokalizacji nadal dostaje `GEN`/`BRAK` w numerze
+ewidencyjnym (`InventoryNumberGenerator` bez zmian), a `ScanController`
+pomija w `array_filter()` nieustawione pola zamiast wysyłać jawny `NULL` do
+kolumny `condition`, która ma `NOT NULL DEFAULT 'uzywany'` w bazie — inaczej
+insert wywaliłby się zamiast spaść na domyślną wartość. `Item::
+needs_completion` zostawione bez zmian (nadal ustawiane zawsze przy
+szybkim dodaniu, niezależnie od tego, czy nowe pola wypełniono) — flaga i
+tak oznacza tylko "dodane ze skanera, ktoś jeszcze nie przejrzał pełnej
+edycji", co zostaje prawdziwe nawet gdy admin wypełni wszystko na miejscu.
+3 nowe testy w `ScanTest` (pikery widoczne na stronie, zapis wszystkich
+nowych pól, fallback na domyślne wartości gdy pominięte).
+
 **Faza 0 — tanie poprawki przy okazji (nie blokują niczego, zrobić najpierw
 bo są małe)**
 1. ~~`StorageLocationController::update()` — złapać wyjątek unikalności
@@ -55,58 +74,45 @@ realny hosting, nie tylko zostać w Dockerze na tej maszynie)**
 9. ~~**Moduł Aktualizacje** (pełna specyfikacja niżej) — zależny wprost od
    Backupu (krok 3) i sensowny dopiero, gdy istnieje już jakaś instalacja do
    aktualizowania (czyli po punkcie 8).~~ **Zrobione** (`UpdateService`,
-   `release:build`, 18 testów) — backup bazy jako krok 3 jeszcze nie
-   podpięty automatycznie, patrz "Drobne rzeczy zauważone przy budowie".
+   `release:build`, 18 testów) — backup bazy jako krok 3 dopięty
+   automatycznie później, patrz "Drobne rzeczy zauważone przy budowie".
 
-**Faza 3 — wartość dla codziennego użytku (z mapy drogowej + pomysły
-niezależne od decyzji biznesowych)**
-10. **Raporty** — korzysta z tego, co już jest w bazie, zero zmian modelu.
-11. **Powiadomienia e-mail** — teraz odblokowane przez SMTP z fazy 1.
-12. **Import masowy** istniejącego spisu z arkusza — najbardziej przydatne
-    właśnie przy pierwszym realnym wdrożeniu u kogoś z istniejącym majątkiem
-    (czyli naturalnie pasuje zaraz po fazie 2).
-13. ~~**PWA** (pełna specyfikacja niżej — instalowalność + prawdziwy skan QR
+**Faza 3 — wartość dla codziennego użytku**
+10. ~~**PWA** (pełna specyfikacja niżej — instalowalność + prawdziwy skan QR
     kamerą; **bez trybu offline**, świadomie odłożonego) — spory skok
     wygody na telefonie, niezależny od reszty.~~ **Zrobione** (manifest +
     service worker minimalny, skaner `@zxing/browser` na `/scan`, szybkie
     dodawanie po nietrafionym skanie z flagą `needs_completion`, 12 testów).
-14. **Wygoda dnia codziennego** (filtry, masowe skanowanie, autouzupełnianie
-    po EAN, dark mode) — drobne, można wpleść w dowolnym momencie później,
-    niezależnie od kolejności innych faz.
+11. ~~**Import masowy** istniejącego spisu z arkusza.~~ **Zrobione**
+    (2026-09-16): `App\Services\ItemImporter` + `ItemImportController`
+    (`/items/import`), świadomie **tylko CSV, nie natywny .xlsx** — arkusz
+    eksportuje się do CSV jednym kliknięciem, a prawdziwy parser .xlsx
+    (`maatwebsite/laravel-excel`/PhpSpreadsheet) to spora zależność, która
+    trafiłaby do każdej paczki aktualizacji/instalacyjnej tylko dla tej
+    wygody. Kategoria/lokalizacja dopasowywane po ich krótkim, unikalnym
+    `code` (np. `NAR`, `M1-R3-P2`); automatyczna konwersja z Windows-1250
+    (domyślne kodowanie polskiego CSV z Excela na Windows) do UTF-8;
+    bezpiecznik na 2000 wierszy (import jest synchroniczny, appka nie ma
+    kolejek). Wynik importu pokazuje raport wiersz-po-wierszu, błędne
+    wiersze nie przerywają reszty. **Doprecyzowane później tego samego dnia**
+    (życzenie użytkownika): nierozpoznany kod kategorii/lokalizacji
+    pierwotnie odrzucał cały wiersz — zmienione na dwuetapowe: wiersz
+    trafia do "oczekujących" (`ItemImporter::confirmUnassigned()`,
+    `session('import_pending_rows')`), admin widzi w podsumowaniu co
+    dokładnie się nie rozpoznało i dopiero przyciskiem "Dodaj do
+    nieprzypisanych" tworzy te przedmioty bez tego pola (`category_id`/
+    `storage_location_id` = NULL — "nieprzypisany" to nie osobna kategoria
+    w bazie). Świadomie nieautomatyczne — admin ma zobaczyć problem, zanim
+    cokolwiek powstanie. Pole, które SIĘ rozpoznało, zostaje przypisane
+    normalnie, nawet gdy drugie w tym samym wierszu nie. 18 testów razem
+    (`ItemImportTest`).
 
-**Faza 4 — rozszerzenia sensowne dopiero po realnym użytkowaniu albo
-większe zmiany modelu danych**
-15. **Inwentaryzacja okresowa** — technicznie tanie (fundament QR+lokalizacje
-    już jest), ale sensowne dopiero jak jest co inwentaryzować, czyli po
-    jakimś czasie realnego użycia.
-16. **Serwis i konserwacja sprzętu** (przeglądy, dziennik serwisowy,
-    gwarancje) — naturalnie korzysta z powiadomień e-mail z punktu 11.
-17. **Rezerwacje sprzętu** — ma sens dopiero przy wielu osobach
-    współdzielących warsztat naraz.
-18. **Log aktywności + raport PDF wartości majątku**.
-19. **Materiały eksploatacyjne** (tryb ilościowy) — duża zmiana modelu
-    danych, robić świadomie i osobno, nie przy okazji czegoś innego.
-20. **Eksport OLX krok C** — dopiero jeśli sprzedaż stanie się regularna;
-    to zależy od realnego użycia, nie od nas, więc nie przyspieszać na siłę.
-21. **Integracja z Nextcloud** — opcjonalna, niezależna od reszty listy.
-
-**Faza 5 — duże decyzje, warunkowe**
-22. **Multi-tenancy + publiczne API** — tylko jeśli appka ma faktycznie
-    trafić do innych pracowni, nie tylko własnej (decyzja produktowa, nie
-    techniczna — ustalić to *przed* tą fazą, nie w jej trakcie).
-23. **Appka natywna Android** — dopiero jeśli PWA z punktu 13 się nie sprawdzi.
-
-## Z mapy drogowej (kolejne etapy)
-
-- **Raporty** — wartość magazynu w czasie, zestawienia wg kategorii/lokalizacji.
-- **Import masowy** istniejącego spisu z arkusza CSV/Excel.
-- **Integracja z Nextcloud** (opcjonalna) — SSO logowania (OIDC), zdjęcia/
-  załączniki na WebDAV zamiast lokalnego dysku.
-- **Eksport OLX krok C** — jeśli sprzedaż stanie się regularna: integracja z
-  narzędziem pośredniczącym (BaseLinker/Apilo) albo własny dostęp do OLX API.
-  Patrz uzasadnienie w dokumencie koncepcyjnym, sekcja 07 — nie ma publicznego
-  bulk-API dla zwykłych kont, więc to świadomie odłożone, nie zapomniane.
-- Appka natywna (Android), jeśli PWA się nie sprawdzi.
+Reszta pomysłów (raporty, powiadomienia e-mail, wygoda dnia codziennego,
+inwentaryzacja, serwis sprzętu, rezerwacje, materiały eksploatacyjne,
+eksport OLX krok C, Nextcloud, multi-tenancy, appka natywna) przeniesiona
+do jednego worka niżej — **Optymalne usprawnienia** — bez sztywnej
+kolejności faz, bo żadne z nich nie blokuje ani nie jest blokowane przez
+nic innego z tej listy; wybierać wg tego, co akurat najbardziej się przyda.
 
 ## Instalator aplikacji — **Zrobione** (Faza 2)
 
@@ -608,13 +614,19 @@ części:
   magazynier` (sam skan-do-podglądu istniejącego przedmiotu zostaje
   dostępny dla każdej roli, tak jak dziś `/items/{item}`).
 
-## Pomysły do rozważenia później (bez ustalonych decyzji, nie specyfikacja)
+## Optymalne usprawnienia (kiedyś, do przemyślenia — bez ustalonych decyzji, nie specyfikacja)
 
 Luźny brainstorm, co jeszcze bywa przydatne w tego typu systemach (CMMS /
-asset management, jak Snipe-IT czy EZOfficeInventory) — nic z tego nie jest
-ustalone ani uzgodnione co do sposobu działania, w przeciwieństwie do
-instalatora/aktualizacji/backupu wyżej. Gdy któryś kierunek stanie się
-aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
+asset management, jak Snipe-IT czy EZOfficeInventory), plus reszta pomysłów
+z dawnej mapy drogowej/podziału na fazy — nic z tego nie jest ustalone ani
+uzgodnione co do sposobu działania, w przeciwieństwie do instalatora/
+aktualizacji/backupu wyżej, i nic z tego nie ma dziś przypisanej kolejności
+ani terminu — to worek do wybierania, nie plan. Gdy któryś kierunek stanie
+się aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
+
+**Raporty**
+- Wartość magazynu w czasie, zestawienia wg kategorii/lokalizacji — korzysta
+  wyłącznie z tego, co już jest w bazie, zero zmian modelu.
 
 **Serwis i konserwacja sprzętu**
 - Harmonogram przeglądów (np. „co 6 miesięcy”) z ostrzeżeniem na dashboardzie,
@@ -655,42 +667,143 @@ aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
   bierze tylko zdjęcie+nazwę+kod bez zewnętrznego źródła danych; to jest
   wersja "plus" tamtego pomysłu, gdyby się okazało, że ręczne wpisywanie
   nazwy przy skanowaniu jednak przeszkadza.
-- Tryb ciemny UI.
+- ~~Tryb ciemny UI.~~ **Zrobione** (2026-09-16): Tailwind `darkMode: 'class'`
+  (nie tylko `prefers-color-scheme`), przycisk przełącznika w nawigacji
+  (`layouts/_theme-toggle.blade.php`) na każdej niezależnej stronie HTML
+  appki (panel, ekrany logowania, kreator instalacji, strona podsumowania
+  po instalacji, pchli targ), zapamiętywany w `localStorage` per
+  przeglądarkę (celowo NIE w bazie/na koncie jak `User::locale` — to
+  jednorazowa wygoda, nie ustawienie do synchronizacji między
+  urządzeniami), z anty-migotaniowym skryptem w `<head>`
+  (`layouts/_theme-head.blade.php`) wykonywanym synchronicznie przed
+  pierwszym malowaniem strony. `dark:` warianty dodane mechanicznie
+  (skryptem) do ~490 atrybutów `class="..."` w 42 widokach plus ręcznie do
+  wszystkich współdzielonych komponentów Breeze (`x-input-label`,
+  `x-text-input`, `x-primary-button`/`x-secondary-button`, `x-dropdown*`,
+  `x-nav-link`/`x-responsive-nav-link`) i miejsc używających `@class([...])`
+  (odznaki statusu, przełącznik widoku kafelki/lista) — te ostatnie
+  ominęłyby każdy skrypt oparty o dosłowne `class="..."`, więc wymagały
+  ręcznego audytu. Drukowana etykieta QR (`items/label.blade.php`) celowo
+  pominięta — to strona do wydruku, zawsze ma zostać jasna niezależnie od
+  motywu przeglądarki. 5 nowych testów (`DarkModeTest` + jeden w
+  `InstallerTest`) sprawdzających tylko, że mechanizm (przycisk + skrypt)
+  trafia na każdą stronę — nie że kolory wyglądają dobrze, tego PHPUnit nie
+  zweryfikuje.
+  **Poprawka tego samego dnia** (zgłoszone przez użytkownika, ze
+  screenshotem): zwykłe `<input>`/`<select>`/`<textarea>` (poza komponentem
+  `x-text-input`) zostawały białe z czarnym tekstem w trybie ciemnym, np.
+  pola "Komu wypożyczono"/data w `items/show.blade.php`, i tekst "Nie
+  wybrano pliku" przy uploadach zdjęć — bo `@tailwindcss/forms` narzuca
+  `background-color:#fff` globalnie przez selektor `:where(...)` (zero
+  specyficzności, warstwa `base`), a mój wcześniejszy mechaniczny skrypt
+  łapał tylko dosłowne `class="..."`, nie dotykając kontrolek bez żadnej
+  klasy tła. Naprawione RAZEM w jednym miejscu (`resources/css/app.css`,
+  `@layer base`) zamiast po pliku — nowe reguły `.dark input:where(...),
+  .dark select, .dark textarea {...}` bezpiecznie współistnieją z warstwą
+  `utilities` (gdzie trafiają wszystkie klasy `dark:*`) dzięki kolejności
+  warstw CSS, która zawsze wygrywa niezależnie od specyficzności — więc to
+  NIE nadpisuje jawnego `dark:bg-gray-700` na `x-text-input`. Dodatkowo
+  `input[type=file]::file-selector-button`/`::-webkit-file-upload-button`
+  dla samego przycisku wyboru pliku. Przy okazji naprawione też: kreator
+  instalacji miał wskaźnik kroków z jasnoszarym, praktycznie niewidocznym
+  na ciemnym tle kółkiem numeru nieaktywnego kroku (`bg-gray-200
+  text-gray-500` bez wariantu `dark:`, bo to Alpine `:class` — ternary
+  string, nie zwykłe `class="..."`, więc żaden skrypt by tego nie złapał);
+  i `layouts/app.blade.php`'s `<body>` w ogóle nie miało jawnego koloru
+  tekstu (w przeciwieństwie do guest/install/pchli targu, które miały
+  `text-gray-900` od początku) — stąd np. przyciski "Drukuj etykietę"/
+  "Edytuj" (bez własnej klasy `text-*`) dziedziczyły domyślny czarny
+  kolor przeglądarki. Jedna linijka (`dark:text-gray-100` na `<body>`)
+  naprawia to wszędzie na raz, bo `color` jest dziedziczone.
+  **I jeszcze jedna poprawka tego samego dnia**: przycisk „Zapisz” w
+  Profilu (`x-primary-button`) był praktycznie niewidoczny w trybie
+  ciemnym — jego tło (`bg-gray-800`, celowo niezmienione w trybie ciemnym,
+  bo samo w sobie ciemne i kontrastowe na jasnym tle) okazało się
+  DOKŁADNIE tym samym odcieniem co karta, na której leży
+  (`dark:bg-gray-800` na kontenerach kart) — przycisk wtapiał się w tło
+  bez żadnej krawędzi. Naprawione dodaniem `dark:border-gray-500` do
+  samego komponentu `x-primary-button` (nadpisuje `border-transparent`
+  wyżej po specyficzności selektora `:is(.dark *)`) — obejmuje to od razu
+  każdy przycisk "Zapisz"/podstawowa akcja w całej appce, nie tylko Profil.
 - **Ikona PWA z własnego loga admina**, zamiast stałego domyślnego zestawu
   ustalonego w specyfikacji PWA — wymaga rasteryzacji wgranego obrazka do
   wymaganych rozmiarów/wariantu maskable przy każdej zmianie loga w
   Ustawienia → Ustawienia aplikacji, więc świadomie odłożone na potem.
 
+**Eksport OLX krok C**
+- Jeśli sprzedaż stanie się regularna: integracja z narzędziem
+  pośredniczącym (BaseLinker/Apilo) albo własny dostęp do OLX API. Patrz
+  uzasadnienie w dokumencie koncepcyjnym, sekcja 07 — nie ma publicznego
+  bulk-API dla zwykłych kont, więc to świadomie odłożone, nie zapomniane.
+  Zależy od realnego użycia, nie od nas, więc nie przyspieszać na siłę.
+
+**Integracja z Nextcloud**
+- Opcjonalna: SSO logowania (OIDC), zdjęcia/załączniki na WebDAV zamiast
+  lokalnego dysku. Niezależna od reszty listy.
+
 **Jeśli appka miałaby trafić do innych pracowni, nie tylko własnej**
 - Multi-tenancy (wiele niezależnych organizacji w jednej instalacji) i
   publiczne REST API do integracji z innymi narzędziami — duże decyzje
   architektoniczne, więc przemyśleć wcześniej niż później, jeśli to realny
-  kierunek (paczki aktualizacji „dla użytkowników” już na to wskazują).
+  kierunek (paczki aktualizacji „dla użytkowników” już na to wskazują). To
+  decyzja produktowa, nie techniczna — ustalić ją *przed* budową, nie w
+  jej trakcie.
+- Appka natywna (Android) — dopiero jeśli PWA się nie sprawdzi.
 
 ## Drobne rzeczy zauważone przy budowie
 
+- ~~**Ikony głównych pozycji menu obok loga w wersji mobilnej**~~ **Zrobione**
+  (2026-09-16, życzenie użytkownika): dotąd na mobile jedyny dostęp do
+  Panelu/Przedmiotów/Sprzedaży szedł przez rozwijane menu z hamburgera —
+  teraz `layouts/navigation.blade.php` pokazuje też same ikony (bez
+  podpisów, `title` na hover/long-press) tuż obok loga, widoczne tylko
+  `sm:hidden` (na desktopie i tak są pełne linki tekstowe). Aktywna pozycja
+  podświetlona kolorem (`text-indigo-600`/`dark:text-indigo-400`), tak jak
+  `x-nav-link`. Hamburger zostaje bez zmian — nadal jedyna droga do
+  Ustawień/Profilu/Wylogowania na mobile. 1 nowy test (`NavigationTest`).
+- **Eksport/import CSV do dopracowania i ulepszenia** (życzenie użytkownika,
+  2026-09-16) — dotyczy zarówno importu masowego (`ItemImporter`,
+  `/items/import`) jak i eksportu ofert sprzedażowych
+  (`SaleListingController::exportCsv()`). Jedna konkretna poprawka już
+  wdrożona (patrz punkt 11 w "Kolejność prac" — nierozpoznana kategoria/
+  lokalizacja → "oczekujące" + przycisk "Dodaj do nieprzypisanych", zamiast
+  odrzucania wiersza). Reszta pomysłów użytkownika (w tym cokolwiek
+  dotyczące eksportu) jeszcze nie doprecyzowana — nie zgadywać zakresu z
+  wyprzedzeniem, dopytać/poczekać na konkrety, zanim zacznie się to budować.
 - Brak `assertSee`-owych testów Blade dla widoków (`items/index`,
   `sale-listings/*`) poza tym, co pokrywają testy feature na kontrolerach —
   wystarczające jak na szkielet, ale warto rozbudować przy większych zmianach UI.
 - `.env.testing` ma zaszyty na sztywno `APP_KEY` — jeśli kiedyś repo trafi do
   współdzielonego CI, rozważ wygenerowanie go w pipeline zamiast trzymania w
   repo (ryzyko niskie, to tylko klucz do efemerycznej bazy testowej).
-- **Pchli targ pokazuje tylko główne zdjęcie przedmiotu**, nawet gdy jest ich
-  kilka — świadomie odłożone (pytanie użytkownika, decyzja: zostawić jak
-  jest na razie), bo strona celowo nie ma podstron per-oferta, gdzie dałoby
-  się pokazać galerię. Gdy to wróci jako temat, rozważyć pasek miniaturek pod
-  głównym zdjęciem (podmiana przez Alpine, bez nowego URL-a) zamiast pełnej
-  podstrony/lightboxa.
-- **Moduł Aktualizacje jeszcze nie woła `BackupService::run()` automatycznie**
-  przed zastosowaniem paczki (krok 3 z oryginalnej specyfikacji) — dziś robi
-  tylko własną migawkę kodu. Podpięcie prawdziwego backupu bazy jako
-  kolejny krok `UpdateService::apply()` to małe, osobne zadanie (backup
-  moduł już istnieje i ma dokładnie taki interfejs, `app(BackupService::
-  class)->run()`, żeby dało się to łatwo dopisać).
-- **Wgrywanie paczki aktualizacji może uderzyć w limity PHP**
-  (`upload_max_filesize`/`post_max_size` w php.ini) — pełna paczka z
-  `vendor/`/skompilowanymi assetami waży dziś ~26 MB, a domyślne limity PHP
-  bywają dużo niższe (często 2-8 MB). Warto to dopisać do przyszłego kroku
-  1 Instalatora ("Wymagania środowiska") albo przynajmniej pokazać czytelny
-  komunikat na stronie Ustawienia → Aktualizacje, zamiast pozwolić appce
-  ucinać upload w milczeniu.
+- ~~**Pchli targ pokazuje tylko główne zdjęcie przedmiotu**, nawet gdy jest
+  ich kilka.~~ **Zrobione** (2026-09-16): `MarketplaceController` ładuje
+  teraz `item.photos` zamiast samego `item.primaryPhoto`; nowa
+  `Item::photosForGallery()` zwraca zdjęcia z okładką (`is_primary`) zawsze
+  na pierwszym miejscu. Widok (`marketplace/index.blade.php`) dostał pasek
+  miniaturek pod głównym zdjęciem w widoku kafelkowym (przełączanie przez
+  Alpine, bez nowego URL-a — dokładnie jak planowano niżej) i klikalne
+  cyklowanie zdjęć ze wskaźnikiem "1/3" w widoku listy. 3 nowe testy w
+  `MarketplaceTest`.
+- ~~**Moduł Aktualizacje jeszcze nie woła `BackupService::run()`
+  automatycznie**~~ **Zrobione** (2026-09-16): `UpdateService::apply()`
+  woła teraz `BackupService::run()` jako pierwszy krok, przed migawką kodu
+  i podmianą jakichkolwiek plików — nieudany backup (niezerowy kod wyjścia)
+  przerywa całą aktualizację (`UpdatePackageException`), zamiast pozwolić
+  jej kontynuować bez świeżej kopii bazy. `BackupService::run()` zwraca
+  teraz `int` (kod wyjścia `Artisan::call()`) zamiast `void`, żeby
+  `UpdateService` mógł to sprawdzić. Testy w `UpdateServiceTest`/
+  `UpdateControllerTest` mockują `BackupService`, żeby nie zrzucać naprawdę
+  bazy testowej (sqlite `:memory:`, którego dumper spatie nie otworzy jak
+  zwykłego pliku).
+- ~~**Wgrywanie paczki aktualizacji może uderzyć w limity PHP**~~
+  **Zrobione** (2026-09-16): nowa `App\Support\PhpUploadLimits` czyta
+  `upload_max_filesize`/`post_max_size` z php.ini; strona Ustawienia →
+  Aktualizacje pokazuje czytelne ostrzeżenie, gdy limit serwera jest niższy
+  niż zalecane 35 MB (dzisiejsza pełna paczka waży ~27 MB). Dodatkowo
+  `UpdateController::upload()` wykrywa sytuację, w której PHP po cichu
+  wyczyściło `$_POST`/`$_FILES` po przekroczeniu `post_max_size` (jedyny
+  ślad to niepusty `Content-Length` przy pustych obu paczkach danych) i
+  pokazuje konkretny komunikat zamiast mylącej walidacji "pole jest
+  wymagane". 12 nowych testów (`PhpUploadLimitsTest`, plus rozszerzenia
+  `UpdateControllerTest`).

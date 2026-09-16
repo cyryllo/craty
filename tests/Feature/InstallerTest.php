@@ -44,6 +44,15 @@ class InstallerTest extends TestCase
             ->assertSee('PHP');
     }
 
+    /** Patrz DarkModeTest — ten jeden test o trybie ciemnym siedzi tutaj, bo potrzebuje $withoutDefaultInstalledUser z tej klasy. */
+    public function test_installer_includes_the_theme_toggle_and_anti_flash_script(): void
+    {
+        $this->get(route('install.show'))
+            ->assertOk()
+            ->assertSee('toggleTheme()', false)
+            ->assertSee("localStorage.getItem('theme')", false);
+    }
+
     public function test_installer_redirects_to_login_when_already_installed(): void
     {
         User::factory()->create(['role' => 'admin']);

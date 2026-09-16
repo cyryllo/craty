@@ -7,12 +7,18 @@
 
         <title>{{ __('Installation') }} — Craty</title>
 
+        @include('layouts._theme-head')
+
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased bg-gray-100 min-h-screen py-10">
+    <body class="font-sans text-gray-900 antialiased bg-gray-100 min-h-screen py-10 dark:bg-gray-700 dark:text-gray-100 relative">
+        <div class="absolute top-4 right-4">
+            @include('layouts._theme-toggle')
+        </div>
+
         @php
             // Krok, na którym ma się otworzyć kreator po nieudanej próbie
             // zapisu — czysto widokowa logika, żeby nie chować od razu w
@@ -59,53 +65,53 @@
             },
         }">
             <div class="flex flex-col items-center gap-2 mb-6">
-                <x-application-logo class="w-14 h-14 text-gray-700" />
-                <h1 class="font-semibold text-xl text-gray-800">{{ __('Craty installation') }}</h1>
+                <x-application-logo class="w-14 h-14 text-gray-700 dark:text-gray-300" />
+                <h1 class="font-semibold text-xl text-gray-800 dark:text-gray-200">{{ __('Craty installation') }}</h1>
             </div>
 
             {{-- Wskaźnik kroków --}}
-            <div class="flex items-center justify-center gap-2 mb-6 text-xs font-medium text-gray-400">
+            <div class="flex items-center justify-center gap-2 mb-6 text-xs font-medium text-gray-400 dark:text-gray-500">
                 @foreach ([1 => __('Requirements'), 2 => __('Database'), 3 => __('App name'), 4 => __('Administrator'), 5 => __('Finish')] as $n => $label)
                     <button type="button" @click="step = {{ $n }}"
-                            :class="step === {{ $n }} ? 'text-indigo-600' : ''"
-                            class="flex items-center gap-1.5 hover:text-gray-600">
-                        <span :class="step === {{ $n }} ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'" class="w-5 h-5 rounded-full flex items-center justify-center text-[11px]">{{ $n }}</span>
+                            :class="step === {{ $n }} ? 'text-indigo-600 dark:text-indigo-400' : ''"
+                            class="flex items-center gap-1.5 hover:text-gray-600 dark:hover:text-gray-300">
+                        <span :class="step === {{ $n }} ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500 dark:bg-gray-600 dark:text-gray-300'" class="w-5 h-5 rounded-full flex items-center justify-center text-[11px]">{{ $n }}</span>
                         <span class="hidden sm:inline">{{ $label }}</span>
                     </button>
-                    @if ($n < 5) <span class="text-gray-300">—</span> @endif
+                    @if ($n < 5) <span class="text-gray-300 dark:text-gray-600">—</span> @endif
                 @endforeach
             </div>
 
             @if (session('installError'))
-                <div class="bg-red-50 border border-red-200 text-red-800 text-sm rounded-md p-4 mb-4">
+                <div class="bg-red-50 border border-red-200 text-red-800 text-sm rounded-md p-4 mb-4 dark:bg-red-950 dark:border-red-800 dark:text-red-300">
                     {{ session('installError') }}
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('install.store') }}" class="bg-white rounded-lg shadow p-6">
+            <form method="POST" action="{{ route('install.store') }}" class="bg-white rounded-lg shadow p-6 dark:bg-gray-800">
                 @csrf
 
                 {{-- Krok 1: Wymagania --}}
                 <div x-show="step === 1" x-cloak>
-                    <h2 class="font-medium text-gray-900 mb-4">{{ __('Environment requirements') }}</h2>
+                    <h2 class="font-medium text-gray-900 mb-4 dark:text-gray-100">{{ __('Environment requirements') }}</h2>
                     <ul class="space-y-2 text-sm mb-4">
-                        <li class="flex items-center justify-between border-b border-gray-100 pb-2">
+                        <li class="flex items-center justify-between border-b border-gray-100 pb-2 dark:border-gray-700">
                             <span>{{ $requirements['php']['label'] }}</span>
                             <span class="flex items-center gap-2">
-                                <span class="text-gray-400">{{ $requirements['php']['detail'] }}</span>
-                                <span class="{{ $requirements['php']['ok'] ? 'text-emerald-600' : 'text-red-600' }}">{{ $requirements['php']['ok'] ? '✓' : '✗' }}</span>
+                                <span class="text-gray-400 dark:text-gray-500">{{ $requirements['php']['detail'] }}</span>
+                                <span class="{{ $requirements['php']['ok'] ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' }}">{{ $requirements['php']['ok'] ? '✓' : '✗' }}</span>
                             </span>
                         </li>
                         @foreach ($requirements['extensions'] as $ext)
-                            <li class="flex items-center justify-between border-b border-gray-100 pb-2">
+                            <li class="flex items-center justify-between border-b border-gray-100 pb-2 dark:border-gray-700">
                                 <span>{{ $ext['label'] }}</span>
-                                <span class="{{ $ext['ok'] ? 'text-emerald-600' : 'text-red-600' }}">{{ $ext['ok'] ? '✓' : '✗' }}</span>
+                                <span class="{{ $ext['ok'] ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' }}">{{ $ext['ok'] ? '✓' : '✗' }}</span>
                             </li>
                         @endforeach
                         @foreach (['storage', 'bootstrap_cache', 'env'] as $key)
-                            <li class="flex items-center justify-between border-b border-gray-100 pb-2">
+                            <li class="flex items-center justify-between border-b border-gray-100 pb-2 dark:border-gray-700">
                                 <span>{{ $requirements[$key]['label'] }}</span>
-                                <span class="{{ $requirements[$key]['ok'] ? 'text-emerald-600' : 'text-red-600' }}">{{ $requirements[$key]['ok'] ? '✓' : '✗' }}</span>
+                                <span class="{{ $requirements[$key]['ok'] ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' }}">{{ $requirements[$key]['ok'] ? '✓' : '✗' }}</span>
                             </li>
                         @endforeach
                     </ul>
@@ -115,7 +121,7 @@
                             && $requirements['storage']['ok'] && $requirements['bootstrap_cache']['ok'] && $requirements['env']['ok'];
                     @endphp
                     @unless ($allOk)
-                        <p class="text-sm text-red-600 mb-4">{{ __('Fix the issues marked in red above before continuing.') }}</p>
+                        <p class="text-sm text-red-600 mb-4 dark:text-red-400">{{ __('Fix the issues marked in red above before continuing.') }}</p>
                     @endunless
                     <div class="flex justify-end">
                         <button type="button" @click="step = 2" @disabled(! $allOk) class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed">{{ __('Next') }}</button>
@@ -124,7 +130,7 @@
 
                 {{-- Krok 2: Baza danych --}}
                 <div x-show="step === 2" x-cloak>
-                    <h2 class="font-medium text-gray-900 mb-4">{{ __('Database') }}</h2>
+                    <h2 class="font-medium text-gray-900 mb-4 dark:text-gray-100">{{ __('Database') }}</h2>
                     <div class="grid grid-cols-3 gap-4 mb-4">
                         <div class="col-span-2">
                             <x-input-label for="db_host" :value="__('Host')" />
@@ -161,40 +167,40 @@
                             <span x-show="dbTesting" x-cloak>{{ __('Testing…') }}</span>
                         </x-secondary-button>
                         <p class="mt-2 text-sm" x-show="dbResult" x-cloak
-                           :class="dbResult && dbResult.ok ? 'text-emerald-600' : 'text-red-600'"
+                           :class="dbResult && dbResult.ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'"
                            x-text="dbResult ? dbResult.message : ''"></p>
                     </div>
 
                     <div class="flex justify-between">
-                        <button type="button" @click="step = 1" class="text-sm text-gray-500 hover:underline">{{ __('Back') }}</button>
+                        <button type="button" @click="step = 1" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Back') }}</button>
                         <button type="button" @click="step = 3" class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('Next') }}</button>
                     </div>
                 </div>
 
                 {{-- Krok 3: Nazwa aplikacji --}}
                 <div x-show="step === 3" x-cloak>
-                    <h2 class="font-medium text-gray-900 mb-4">{{ __('App name') }}</h2>
+                    <h2 class="font-medium text-gray-900 mb-4 dark:text-gray-100">{{ __('App name') }}</h2>
                     <div class="mb-4">
                         <x-input-label for="app_name" :value="__('App name')" />
                         <x-text-input id="app_name" name="app_name" class="mt-1 block w-full" value="{{ old('app_name') }}" placeholder="Craty" />
-                        <p class="mt-1 text-xs text-gray-500">{{ __('You can change this and the logo later from Settings → App settings.') }}</p>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('You can change this and the logo later from Settings → App settings.') }}</p>
                         <x-input-error :messages="$errors->get('app_name')" class="mt-1" />
                     </div>
                     <div class="mb-4">
                         <x-input-label for="app_url" :value="__('Application URL')" />
                         <x-text-input id="app_url" name="app_url" class="mt-1 block w-full" value="{{ old('app_url', $defaults['app_url']) }}" placeholder="https://example.com" required />
-                        <p class="mt-1 text-xs text-gray-500">{{ __('The address visitors use to reach this app. Used for links generated outside of a browser request, e.g. in scheduled tasks or emails — fix it now rather than later.') }}</p>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('The address visitors use to reach this app. Used for links generated outside of a browser request, e.g. in scheduled tasks or emails — fix it now rather than later.') }}</p>
                         <x-input-error :messages="$errors->get('app_url')" class="mt-1" />
                     </div>
                     <div class="flex justify-between">
-                        <button type="button" @click="step = 2" class="text-sm text-gray-500 hover:underline">{{ __('Back') }}</button>
+                        <button type="button" @click="step = 2" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Back') }}</button>
                         <button type="button" @click="step = 4" class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('Next') }}</button>
                     </div>
                 </div>
 
                 {{-- Krok 4: Konto administratora --}}
                 <div x-show="step === 4" x-cloak>
-                    <h2 class="font-medium text-gray-900 mb-4">{{ __('Administrator account') }}</h2>
+                    <h2 class="font-medium text-gray-900 mb-4 dark:text-gray-100">{{ __('Administrator account') }}</h2>
                     <div class="mb-4">
                         <x-input-label for="admin_name" :value="__('Name')" />
                         <x-text-input id="admin_name" name="admin_name" class="mt-1 block w-full" value="{{ old('admin_name') }}" />
@@ -209,7 +215,7 @@
                         <div>
                             <x-input-label for="admin_password" :value="__('Password')" />
                             <x-text-input id="admin_password" name="admin_password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-                            <p class="mt-1 text-xs text-gray-500">{{ __('At least 8 characters, with an uppercase and lowercase letter and a special character.') }}</p>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('At least 8 characters, with an uppercase and lowercase letter and a special character.') }}</p>
                             <x-input-error :messages="$errors->get('admin_password')" class="mt-1" />
                         </div>
                         <div>
@@ -217,26 +223,26 @@
                             <x-text-input id="admin_password_confirmation" name="admin_password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 mb-4">{{ __('This account cannot be deleted or demoted later — it is your permanent way back into the app.') }}</p>
+                    <p class="text-xs text-gray-500 mb-4 dark:text-gray-400">{{ __('This account cannot be deleted or demoted later — it is your permanent way back into the app.') }}</p>
                     <div class="flex justify-between">
-                        <button type="button" @click="step = 3" class="text-sm text-gray-500 hover:underline">{{ __('Back') }}</button>
+                        <button type="button" @click="step = 3" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Back') }}</button>
                         <button type="button" @click="step = 5" class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('Next') }}</button>
                     </div>
                 </div>
 
                 {{-- Krok 5: Dane przykładowe + podsumowanie --}}
                 <div x-show="step === 5" x-cloak>
-                    <h2 class="font-medium text-gray-900 mb-4">{{ __('Finish') }}</h2>
+                    <h2 class="font-medium text-gray-900 mb-4 dark:text-gray-100">{{ __('Finish') }}</h2>
                     <label class="flex items-start gap-2 mb-6">
-                        <input type="checkbox" name="demo_data" value="1" @checked(old('demo_data')) class="mt-1 rounded border-gray-300">
-                        <span class="text-sm text-gray-700">
+                        <input type="checkbox" name="demo_data" value="1" @checked(old('demo_data')) class="mt-1 rounded border-gray-300 dark:border-gray-600">
+                        <span class="text-sm text-gray-700 dark:text-gray-300">
                             {{ __('Load sample data') }}
-                            <span class="block text-xs text-gray-500">{{ __('A few example categories, a warehouse and items, so the app has something to show right away.') }}</span>
+                            <span class="block text-xs text-gray-500 dark:text-gray-400">{{ __('A few example categories, a warehouse and items, so the app has something to show right away.') }}</span>
                         </span>
                     </label>
-                    <p class="text-sm text-gray-500 mb-4">{{ __('Clicking "Install" will write your database credentials to .env, run migrations, and create the administrator account.') }}</p>
+                    <p class="text-sm text-gray-500 mb-4 dark:text-gray-400">{{ __('Clicking "Install" will write your database credentials to .env, run migrations, and create the administrator account.') }}</p>
                     <div class="flex justify-between">
-                        <button type="button" @click="step = 4" class="text-sm text-gray-500 hover:underline">{{ __('Back') }}</button>
+                        <button type="button" @click="step = 4" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Back') }}</button>
                         <x-primary-button>{{ __('Install') }}</x-primary-button>
                     </div>
                 </div>

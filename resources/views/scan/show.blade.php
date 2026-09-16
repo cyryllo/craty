@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Scan') }}</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">{{ __('Scan') }}</h2>
     </x-slot>
 
     @vite(['resources/js/scan.js'])
@@ -12,9 +12,9 @@
              data-err-no-camera="{{ __('No camera found on this device.') }}"
              data-err-permission="{{ __('Camera access was denied. Allow it in your browser settings and reload the page.') }}"
              data-err-generic="{{ __('Something went wrong while scanning. Try again.') }}"
-             class="bg-white rounded-lg shadow p-5 space-y-4">
+             class="bg-white rounded-lg shadow p-5 space-y-4 dark:bg-gray-800">
 
-            <p class="text-sm text-gray-500">{{ __('Point the camera at an item\'s QR label or its manufacturer barcode.') }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Point the camera at an item\'s QR label or its manufacturer barcode.') }}</p>
 
             <div class="relative bg-gray-900 rounded-lg overflow-hidden aspect-square">
                 <video class="w-full h-full object-cover" muted playsinline></video>
@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            <div data-panel="error" class="hidden rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700" data-error-text></div>
+            <div data-panel="error" class="hidden rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:border-red-800 dark:text-red-400" data-error-text></div>
         </div>
     </div>
 </x-app-layout>

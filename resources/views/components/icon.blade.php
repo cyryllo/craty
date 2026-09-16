@@ -142,4 +142,19 @@
             <line x1="3.5" y1="10" x2="16.5" y2="10" stroke-width="1.4"/>
         </svg>
         @break
+
+    @case('sun')
+        {{-- słońce: przełącznik na jasny motyw (patrz layouts/_theme-toggle) --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" {{ $attributes }}>
+            <circle cx="10" cy="10" r="3.2"/>
+            <path d="M10 2.5v2M10 15.5v2M17.5 10h-2M4.5 10h-2M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4M15.3 15.3l-1.4-1.4M6.1 6.1 4.7 4.7"/>
+        </svg>
+        @break
+
+    @case('moon')
+        {{-- księżyc: przełącznik na ciemny motyw (patrz layouts/_theme-toggle) --}}
+        <svg viewBox="0 0 20 20" fill="currentColor" {{ $attributes }}>
+            <path d="M16.5 12.8A6.8 6.8 0 0 1 7.2 3.5a7 7 0 1 0 9.3 9.3Z"/>
+        </svg>
+        @break
 @endswitch

@@ -15,6 +15,11 @@ proponuje szybkie dodanie nowego przedmiotu.
 
 Zbudowana na Laravel 12 + MariaDB, w pełni dwujęzyczna (PL/EN).
 
+> Skąd nazwa? „Craty” to połączenie polskiego „Graty” (sprzęt/rupiecie w
+> warsztacie) i angielskiego „crate” (skrzynka) — appka zaczynała jako
+> wewnętrzne narzędzie „Graty” i zachowała podobne brzmienie przy zmianie
+> nazwy na wersję open source.
+
 ## Wymagania (własny hosting)
 
 Dotyczy instalacji poza Dockerem (patrz [Wdrożenie na hostingu](#wdrożenie-na-hostingu-bez-dockera-i-ssh)
