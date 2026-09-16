@@ -192,6 +192,72 @@ class UpdateServiceTest extends TestCase
     }
 
     /**
+     * Regresja realnie zgłoszona przez użytkownika: aktualizacja przez panel
+     * na instalacji spłaszczonej (release:build-hosting, open_basedir
+     * ograniczony do document rootu) "nie wgrała wszystkiego" — bo
+     * UpdateService zakładał wyłącznie klasyczny układ (storage/, nie
+     * app-storage/). Ten test buduje WŁASNY, osobny katalog symulujący
+     * prawdziwą instalację spłaszczoną (z realnym symlinkiem "storage",
+     * dokładnie jak na produkcji), nie używa współdzielonego $this->appRoot
+     * z setUp() (ten jest na sztywno klasyczny).
+     */
+    public function test_apply_on_a_flattened_install_protects_app_storage_and_the_storage_symlink(): void
+    {
+        $this->mockSuccessfulBackup();
+
+        $flatRoot = sys_get_temp_dir().'/craty-update-flat-test-'.uniqid();
+        mkdir($flatRoot.'/app', 0755, true);
+        mkdir($flatRoot.'/app-storage/app/public', 0755, true);
+        mkdir($flatRoot.'/app-storage/logs', 0755, true);
+        file_put_contents($flatRoot.'/app/placeholder.php', "<?php\n// stary kod\n");
+        file_put_contents($flatRoot.'/.env', "APP_KEY=nie-ruszac\n");
+        file_put_contents($flatRoot.'/app-storage/app/public/real-photo.jpg', 'prawdziwe zdjęcie użytkownika');
+        file_put_contents($flatRoot.'/app-storage/logs/laravel.log', 'stary log');
+        file_put_contents($flatRoot.'/VERSION', "1.0.0\n");
+        // Prawdziwy symlink, dokładnie jak ten, który stawia storage:link/
+        // samo-naprawiający się kod w index.php spłaszczonej paczki.
+        symlink($flatRoot.'/app-storage/app/public', $flatRoot.'/storage');
+
+        config([
+            'app.update_root_path' => $flatRoot,
+            'app.version_file_path' => $flatRoot.'/VERSION',
+        ]);
+
+        $zip = $this->buildPackageZip(['version' => '1.1.0'], [
+            'app/placeholder.php' => "<?php\n// nowy kod\n",
+            '.env' => 'ATTEMPT-TO-OVERWRITE-ENV',
+            'app-storage/app/public/real-photo.jpg' => 'ATTEMPT-TO-OVERWRITE-PHOTO',
+            'app-storage/logs/laravel.log' => 'ATTEMPT-TO-OVERWRITE-LOG',
+            // Symuluje paczkę, która (błędnie) próbowałaby nadpisać sam
+            // symlink zwykłym plikiem — musi zostać pominięta tak samo jak
+            // .env, inaczej strona traci dostęp do wszystkich zdjęć/QR.
+            'storage' => 'ATTEMPT-TO-OVERWRITE-SYMLINK',
+        ]);
+
+        try {
+            $updates = app(UpdateService::class);
+            $this->assertTrue($updates->isFlattened());
+
+            $manifest = $updates->validatePackage($zip);
+            $updates->apply($zip, $manifest);
+
+            $this->assertSame('1.1.0', $updates->currentVersion());
+            $this->assertStringContainsString('nowy kod', file_get_contents($flatRoot.'/app/placeholder.php'));
+
+            // Chronione ścieżki spłaszczonego układu — nietknięte mimo że paczka próbowała je nadpisać.
+            $this->assertSame("APP_KEY=nie-ruszac\n", file_get_contents($flatRoot.'/.env'));
+            $this->assertSame('prawdziwe zdjęcie użytkownika', file_get_contents($flatRoot.'/app-storage/app/public/real-photo.jpg'));
+            $this->assertSame('stary log', file_get_contents($flatRoot.'/app-storage/logs/laravel.log'));
+            $this->assertTrue(is_link($flatRoot.'/storage'), 'Symlink "storage" nie powinien zniknąć/zostać nadpisany plikiem.');
+
+            $this->assertTrue($updates->canRollback());
+        } finally {
+            @unlink($flatRoot.'/storage'); // symlink najpierw — deleteDirectory() nie przechodzi po nim bezpiecznie
+            $this->deleteDirectory($flatRoot);
+        }
+    }
+
+    /**
      * `apply()` teraz woła prawdziwy `BackupService::run()` jako pierwszy
      * krok — bez tej podmiany testy próbowałyby zrzucić prawdziwą bazę
      * testową (sqlite ":memory:", której dumper spatie nie potrafi otworzyć

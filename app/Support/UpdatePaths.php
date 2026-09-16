@@ -97,4 +97,26 @@ class UpdatePaths
         'storage/logs',
         'public/storage',
     ];
+
+    /**
+     * Ta sama rola co PROTECTED_PATHS wyżej, ale dla instalacji spłaszczonej
+     * przez `release:build-hosting` (open_basedir ograniczony do
+     * document rootu — patrz BuildHostingPackage). Tam `storage/` appki
+     * nazywa się `app-storage/` (patrz renameStorageDirectory()), a
+     * "storage" pod document rootem to SYMLINK, nie katalog — musi zostać
+     * chroniony tak samo jak `.env`, żeby paczka zbudowana na maszynie
+     * deweloperskiej (gdzie tego symlinku jeszcze nie ma) nigdy nie
+     * spróbowała nadpisać go czymkolwiek.
+     *
+     * UpdateService sam wybiera, której listy użyć — auto-wykrywając
+     * układ instalacji po istnieniu katalogu `app-storage` w korzeniu
+     * appki, patrz UpdateService::protectedPaths(). Admin nie musi niczego
+     * zaznaczać w panelu.
+     */
+    public const PROTECTED_PATHS_FLATTENED = [
+        '.env',
+        'app-storage/app/public',
+        'app-storage/logs',
+        'storage',
+    ];
 }

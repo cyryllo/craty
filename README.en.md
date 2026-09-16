@@ -72,11 +72,24 @@ scenario:
 | Package | When to use | How to install |
 |---|---|---|
 | **`craty-{version}-full.zip`** | Fresh install on hosting with a classic layout — you can keep the app code **outside** the document root (VPS, or a host that lets you point the document root at an arbitrary subfolder). | Extract **everything** outside the document root (e.g. next to `public_html`), then copy the **contents** of the package's `public/` folder **into** the document root. Visit `/install`. |
-| **`craty-{version}-hosting.zip`** | Hosting with `open_basedir` restricted to the document root itself (typical on cPanel/DirectAdmin) — PHP has no permission to read anything outside `public_html`, so separating code from the document root is impossible. | Extract the **entire contents straight into the document root** (`public_html`) — no manual editing needed. The package already has `index.php`'s paths fixed and ready-made `.htaccess` files blocking browser access to `.env`, the source code, and `vendor/`. Visit `/install`. |
-| **`craty-{version}-update.zip`** | Updating an already-installed app (either variant above). | Log in as admin → Settings → Updates → upload the file. `.env` and user data (`storage/app/public`, `storage/logs`) are never overwritten. |
+| **`craty-{version}-hosting.zip`** | Hosting with `open_basedir` restricted to the document root itself (typical on cPanel/DirectAdmin) — PHP has no permission to read anything outside `public_html`, so separating code from the document root is impossible. Also works as an **update** for an install already running this layout (see below). | **Fresh install:** extract the **entire contents straight into the document root** (`public_html`) — no manual editing needed. The package already has `index.php`'s paths fixed and ready-made `.htaccess` files blocking browser access to `.env`, the source code, and `vendor/`. Visit `/install`. **Update:** log in as admin → Settings → Updates → upload this *same* `-hosting.zip` (not `-update.zip` — see warning below). |
+| **`craty-{version}-update.zip`** | Updating an install running the **`-full`** layout (classic, code outside the document root). **Do not use on a `-hosting`-layout install** — see warning below. | Log in as admin → Settings → Updates → upload the file. `.env` and user data (`storage/app/public`, `storage/logs`) are never overwritten. |
 
 All three contain identical application code — they only differ in file
 layout (and, for the `hosting` variant, the added `.htaccess` files).
+
+> **Important — upload the update package that matches your install's
+> layout.** The panel (Settings → Updates) automatically detects whether a
+> given install is flattened (`-hosting`) or classic (`-full`) and
+> protects user data accordingly — but it **cannot guess the layout of the
+> package you upload**. If your install is flattened (extracted straight
+> into `public_html` from a `-hosting.zip`), always update it with a
+> **`-hosting.zip`**, never `-update.zip` — the latter has a separate
+> `public/` folder that doesn't exist on a flattened install, so the
+> compiled frontend (CSS/JS) lands in a dead, unused subfolder instead of
+> overwriting the real files (PHP code and views still update correctly,
+> since they sit at the same level in both layouts — only the assets under
+> `public/` don't).
 
 **Which one should I pick?** If unsure, start with `-full`. If the app
 fails to boot with an `open_basedir restriction in effect` error after you

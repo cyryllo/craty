@@ -72,11 +72,24 @@ scenariusz:
 | Paczka | Kiedy używać | Jak zainstalować |
 |---|---|---|
 | **`craty-{wersja}-full.zip`** | Świeża instalacja na hostingu z klasyczną strukturą — da się trzymać kod appki **poza** document rootem (np. VPS, hosting z możliwością ustawienia document rootu na dowolny podkatalog). | Rozpakuj **całość** poza document rootem serwera (np. obok `public_html`), a **zawartość** folderu `public/` z paczki skopiuj **do** document rootu. Wejdź na `/install`. |
-| **`craty-{wersja}-hosting.zip`** | Hosting z `open_basedir` ograniczonym do samego document rootu (typowe na cPanel/DirectAdmin) — PHP fizycznie nie ma prawa czytać niczego poza `public_html`, więc rozdzielenie kodu i document rootu jest niemożliwe. | Rozpakuj **całą zawartość wprost do document rootu** (`public_html`) — bez żadnej ręcznej edycji. Paczka ma już poprawione ścieżki w `index.php` i gotowe pliki `.htaccess` blokujące dostęp z przeglądarki do `.env`, kodu źródłowego i `vendor/`. Wejdź na `/install`. |
-| **`craty-{wersja}-update.zip`** | Aktualizacja już zainstalowanej appki (dowolny z powyższych wariantów). | Zaloguj się jako admin → Ustawienia → Aktualizacje → wgraj plik. `.env` i dane użytkowników (`storage/app/public`, `storage/logs`) nigdy nie są nadpisywane. |
+| **`craty-{wersja}-hosting.zip`** | Hosting z `open_basedir` ograniczonym do samego document rootu (typowe na cPanel/DirectAdmin) — PHP fizycznie nie ma prawa czytać niczego poza `public_html`, więc rozdzielenie kodu i document rootu jest niemożliwe. Nadaje się **też** jako aktualizacja instalacji już postawionej w tym wariancie (patrz niżej). | **Świeża instalacja:** rozpakuj **całą zawartość wprost do document rootu** (`public_html`) — bez żadnej ręcznej edycji. Paczka ma już poprawione ścieżki w `index.php` i gotowe pliki `.htaccess` blokujące dostęp z przeglądarki do `.env`, kodu źródłowego i `vendor/`. Wejdź na `/install`. **Aktualizacja:** zaloguj się jako admin → Ustawienia → Aktualizacje → wgraj *tę samą* paczkę `-hosting.zip` (nie `-update.zip` — patrz ostrzeżenie niżej). |
+| **`craty-{wersja}-update.zip`** | Aktualizacja instalacji w wariancie **`-full`** (klasyczny układ, kod poza document rootem). **Nie używać na instalacji w wariancie `-hosting`** — patrz ostrzeżenie niżej. | Zaloguj się jako admin → Ustawienia → Aktualizacje → wgraj plik. `.env` i dane użytkowników (`storage/app/public`, `storage/logs`) nigdy nie są nadpisywane. |
 
 Wszystkie trzy mają identyczną zawartość kodu — różnią się tylko układem
 plików i (w wariancie `hosting`) dodanymi `.htaccess`.
+
+> **Ważne — wybierz paczkę aktualizacji zgodną z układem swojej
+> instalacji.** Panel (Ustawienia → Aktualizacje) sam wykrywa, czy dana
+> instalacja jest spłaszczona (`-hosting`) czy klasyczna (`-full`), i
+> odpowiednio chroni dane użytkownika — ale **nie potrafi zgadnąć układu
+> samej wgrywanej paczki**. Jeśli Twoja instalacja jest spłaszczona
+> (rozpakowana z `-hosting.zip` prosto do `public_html`), aktualizuj ją
+> **zawsze paczką `-hosting.zip`**, nigdy `-update.zip` — ten drugi ma
+> osobny katalog `public/`, którego na spłaszczonej instalacji nie ma, więc
+> skompilowany frontend (CSS/JS) wyląduje w martwym, nieużywanym
+> podkatalogu zamiast nadpisać prawdziwe pliki (kod PHP i widoki
+> zaktualizują się poprawnie, bo leżą na tym samym poziomie w obu
+> układach — tylko assety spod `public/` nie).
 
 **Skąd wiadomo, który wybrać?** Jeśli nie masz pewności, zacznij od
 `-full`. Jeśli po rozpakowaniu i ustawieniu document rootu appka nie

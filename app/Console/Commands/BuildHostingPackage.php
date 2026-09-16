@@ -35,9 +35,11 @@ class BuildHostingPackage extends Command
 {
     protected $signature = 'release:build-hosting
         {version? : Docelowa wersja (domyślnie ta już zapisana w pliku VERSION)}
+        {--min-version= : Minimalna wersja appki, z której można zastosować tę paczkę jako aktualizację}
+        {--changelog=* : Linia changeloga do manifestu — opcja powtarzalna}
         {--output= : Ścieżka wynikowego .zip (domyślnie storage/app/releases/craty-{wersja}-hosting.zip)}';
 
-    protected $description = 'Buduje spłaszczoną paczkę .zip do rozpakowania wprost w document roocie hostingu (gdy open_basedir nie pozwala trzymać appki wyżej niż public_html).';
+    protected $description = 'Buduje spłaszczoną paczkę .zip do rozpakowania wprost w document roocie hostingu (gdy open_basedir nie pozwala trzymać appki wyżej niż public_html) — nadaje się zarówno na świeżą instalację, jak i jako aktualizacja przez panel na instalacji już spłaszczonej.';
 
     /**
      * Katalogi z kodem/danymi appki — po spłaszczeniu dostają .htaccess
@@ -76,6 +78,8 @@ class BuildHostingPackage extends Command
             // dodatkowych wykluczeń przy pakowaniu z powrotem.
             $builder->build($workDir, $output, []);
 
+            $this->writeManifest($output, $version);
+
             $hash = $builder->writeChecksumFile($output);
 
             $this->info('Gotowe: '.$output);
@@ -88,6 +92,34 @@ class BuildHostingPackage extends Command
                 unlink($tempZip);
             }
         }
+    }
+
+    /**
+     * Bez tego pliku UpdateService::validatePackage() odrzuciłby tę paczkę
+     * jako "brakuje update-manifest.json" — potrzebny, żeby dało się ją
+     * wgrać przez panel jako aktualizację na instalacji już spłaszczonej
+     * (nie tylko rozpakować ręcznie na świeżej), patrz UpdateService.
+     * Ta sama zawartość co w BuildReleasePackage — świadomie nie
+     * refaktoryzowane do wspólnej metody, bo to jedyne dwa miejsca, które
+     * tego potrzebują, a każde ma inny sposób ustalania $version.
+     */
+    private function writeManifest(string $zipPath, string $version): void
+    {
+        $manifest = [
+            'version' => $version,
+            'min_version' => $this->option('min-version') ?: null,
+            'built_at' => now()->toIso8601String(),
+            'changelog' => $this->option('changelog'),
+            'migrations' => collect(glob(database_path('migrations/*.php')))
+                ->map(fn ($path) => basename($path))
+                ->values()
+                ->all(),
+        ];
+
+        $zip = new ZipArchive();
+        $zip->open($zipPath);
+        $zip->addFromString('update-manifest.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $zip->close();
     }
 
     private function extract(string $zipPath, string $destination): void

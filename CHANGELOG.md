@@ -295,3 +295,28 @@ zamówione po drodze.
   "Specyfikacja techniczna" z "Opis".
 
 209 testów PHPUnit, wszystkie zielone.
+
+## 2026-09-16 — Naprawa: aktualizacja przez panel na instalacji spłaszczonej
+
+Realne zgłoszenie z produkcji zaraz po wydaniu 1.1.0: wgranie
+`craty-1.1.0-update.zip` przez panel na instalacji spłaszczonej (hosting z
+`open_basedir`) "nie wgrało wszystkiego" — nowy tryb ciemny miał przycisk,
+ale nic się nie przełączało. Przyczyna: `-update.zip` ma klasyczny układ
+(osobny katalog `public/`), którego na instalacji spłaszczonej w ogóle
+nie ma — skompilowane assety CSS/JS lądowały w martwym, nieużywanym
+podkatalogu zamiast nadpisać prawdziwe pliki. Kod PHP/widoki
+aktualizowały się poprawnie (leżą na tym samym poziomie w obu układach),
+więc problem był niewidoczny na pierwszy rzut oka.
+
+Naprawione właściwie: `UpdateService` wykrywa teraz automatycznie układ
+instalacji (obecność `app-storage/`) i dobiera chronione ścieżki oraz
+katalog na własne potrzeby (migawki kodu, stan rollbacku) do wykrytego
+układu — bez tego update na instalacji spłaszczonej próbowałby pisać
+swoje pliki robocze PRZEZ symlink `storage` prosto do katalogu ze
+zdjęciami użytkownika. `release:build-hosting` dostał manifest
+(`update-manifest.json`) — ta sama paczka `-hosting.zip` służy teraz i do
+świeżej instalacji, i jako aktualizacja przez panel na instalacji już
+spłaszczonej, więc nie trzeba już ręcznie kopiować plików przez FTP przy
+każdej kolejnej aktualizacji takiej instalacji.
+
+2 nowe testy, 211/211 zielone.

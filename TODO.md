@@ -752,6 +752,31 @@ się aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
 
 ## Drobne rzeczy zauważone przy budowie
 
+- ~~**Aktualizacja przez panel na instalacji spłaszczonej "nie wgrywała
+  wszystkiego"**~~ **Zrobione** (2026-09-16, realne zgłoszenie z produkcji
+  po wgraniu `craty-1.1.0-update.zip` na graty.protofab.pl — nowy CSS trybu
+  ciemnego nigdy nie dotarł, przycisk działał, ale nie było czego
+  przełączać). Przyczyna: `-update.zip` ma klasyczny układ (osobny katalog
+  `public/`), którego na instalacji spłaszczonej (`release:build-hosting`)
+  w ogóle nie ma — skompilowane assety (`public/build/...`, `manifest.
+  json`, `sw.js`, `icons/`) lądowały w martwym, nieużywanym podkatalogu
+  `public_html/public/...` zamiast nadpisać prawdziwe pliki. Kod PHP/
+  widoki aktualizowały się poprawnie (leżą na tym samym poziomie w obu
+  układach), więc problem był niewidoczny na pierwszy rzut oka.
+  Naprawione właściwie, nie ręcznym FTP: `UpdateService` wykrywa teraz
+  automatycznie układ instalacji (obecność `app-storage/` w korzeniu) i
+  dobiera do niego chronione ścieżki (`UpdatePaths::
+  PROTECTED_PATHS_FLATTENED` — m.in. sam symlink `storage`, żeby paczka
+  nigdy nie mogła go nadpisać zwykłym plikiem) oraz katalog na własne
+  potrzeby (migawki kodu, stan rollbacku — wcześniej na sztywno `storage/
+  app/updates`, co na instalacji spłaszczonej próbowałoby pisać PRZEZ
+  symlink prosto do katalogu ze zdjęciami użytkownika). `release:
+  build-hosting` dostał manifest (`update-manifest.json`, jak `release:
+  build`) — ta sama paczka `-hosting.zip` służy teraz i do świeżej
+  instalacji, i jako aktualizacja przez panel na instalacji już
+  spłaszczonej. Jedna twarda zasada zostaje: na instalacji spłaszczonej
+  zawsze wgrywać `-hosting.zip`, nigdy `-update.zip` (opisane w README).
+  2 nowe testy (`UpdateServiceTest`, `BuildHostingPackageTest`).
 - ~~**Surowa flaga Breeze "profile-updated" wyświetlała się wprost na
   ekranie**~~ **Zrobione** (2026-09-16, zgłoszenie użytkownika:
   "powiadomienia typu profile-updated powinny być w danym języku a widzę

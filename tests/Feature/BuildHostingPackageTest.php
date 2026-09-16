@@ -110,6 +110,31 @@ class BuildHostingPackageTest extends TestCase
     }
 
     /**
+     * Bez update-manifest.json ta paczka nadawałaby się TYLKO do ręcznego
+     * rozpakowania na świeżej instalacji, nigdy do wgrania przez panel jako
+     * aktualizacja na instalacji już spłaszczonej — patrz UpdateService.
+     */
+    public function test_the_built_package_includes_an_update_manifest(): void
+    {
+        $this->artisan('release:build-hosting', [
+            'version' => '2.5.0',
+            '--min-version' => '2.0.0',
+            '--changelog' => ['Pierwsza linijka', 'Druga linijka'],
+            '--output' => $this->outputZip,
+        ])->assertSuccessful();
+
+        $zip = new ZipArchive();
+        $zip->open($this->outputZip);
+        $manifestJson = $zip->getFromName('update-manifest.json');
+
+        $this->assertNotFalse($manifestJson, 'Brak update-manifest.json w paczce hostingowej.');
+        $manifest = json_decode($manifestJson, true);
+        $this->assertSame('2.5.0', $manifest['version']);
+        $this->assertSame('2.0.0', $manifest['min_version']);
+        $this->assertSame(['Pierwsza linijka', 'Druga linijka'], $manifest['changelog']);
+    }
+
+    /**
      * Nie tylko sprawdzamy zawartość plików — realnie ROZPAKOWUJEMY paczkę i
      * odpytujemy ją prawdziwym żądaniem HTTP przez php -S wprost na
      * spłaszczonym katalogu (tak jak Apache na hostingu, NIE przez
