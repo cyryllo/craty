@@ -109,6 +109,11 @@ Route::middleware('auth')->group(function () {
         // ten sam mechanizm Breeze co przy zwykłej zmianie hasła.
         Route::post('ustawienia/aktualizacje', [UpdateController::class, 'upload'])
             ->middleware('password.confirm')->name('settings.updates.upload');
+        // GET, żeby dało się "przećwiczyć" cały cykl potwierdzenia hasła (przejście
+        // na /confirm-password i z powrotem) PRZED wybraniem pliku — patrz komentarz
+        // przy $passwordConfirmed w UpdateController::index().
+        Route::get('ustawienia/aktualizacje/potwierdz-haslo', [UpdateController::class, 'confirmed'])
+            ->middleware('password.confirm')->name('settings.updates.confirm');
     });
 });
 

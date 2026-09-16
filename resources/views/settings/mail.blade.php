@@ -5,18 +5,6 @@
 
     <div class="max-w-lg mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
 
-        @if (session('status'))
-            <div class="bg-green-50 border border-green-200 text-green-800 text-sm rounded-md p-4 dark:bg-green-950 dark:border-green-800 dark:text-green-300">
-                {{ session('status') }}
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="bg-red-50 border border-red-200 text-red-800 text-sm rounded-md p-4 dark:bg-red-950 dark:border-red-800 dark:text-red-300">
-                {{ session('error') }}
-            </div>
-        @endif
-
         <div class="bg-sky-50 border border-sky-200 text-sky-800 text-sm rounded-md p-4 dark:bg-sky-950 dark:text-sky-300 dark:border-sky-800">
             {{ __('Leave these fields empty to keep using the server\'s own mail configuration (today: :mailer).', ['mailer' => config('mail.default')]) }}
         </div>

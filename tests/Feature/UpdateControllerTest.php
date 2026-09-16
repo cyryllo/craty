@@ -60,6 +60,7 @@ class UpdateControllerTest extends TestCase
     public function test_updates_page_does_not_warn_about_upload_limits_on_this_dev_environment(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
+        $this->confirmPassword();
 
         $this->actingAs($admin)->get(route('settings.updates.index'))
             ->assertOk()
@@ -84,6 +85,47 @@ class UpdateControllerTest extends TestCase
         ]);
 
         $response->assertRedirect(route('password.confirm'));
+    }
+
+    /**
+     * Realnie zgłoszony bug: bez tego admin wybierał plik, submitował
+     * formularz, i DOPIERO WTEDY trafiał na password.confirm (bo hasło nie
+     * było świeże) — a po jego podaniu przeglądarka nie potrafi odtworzyć
+     * multipart body z plikiem, więc trzeba było wybierać paczkę od nowa.
+     * Rozwiązanie: gdy hasło nie jest świeże, strona w ogóle nie pokazuje
+     * formularza uploadu, tylko link do potwierdzenia z wyprzedzeniem.
+     */
+    public function test_updates_page_shows_a_confirm_password_prompt_instead_of_the_upload_form_when_password_is_stale(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)->get(route('settings.updates.index'))
+            ->assertOk()
+            ->assertSee(__('Confirm password'))
+            ->assertDontSee('name="package"', false);
+    }
+
+    public function test_updates_page_shows_the_upload_form_when_password_was_recently_confirmed(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $this->confirmPassword();
+
+        $this->actingAs($admin)->get(route('settings.updates.index'))
+            ->assertOk()
+            ->assertSee('name="package"', false);
+    }
+
+    public function test_confirm_route_requires_a_recently_confirmed_password_and_then_returns_to_the_updates_page(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)->get(route('settings.updates.confirm'))
+            ->assertRedirect(route('password.confirm'));
+
+        $this->confirmPassword();
+
+        $this->actingAs($admin)->get(route('settings.updates.confirm'))
+            ->assertRedirect(route('settings.updates.index'));
     }
 
     public function test_admin_can_apply_a_valid_update_package(): void

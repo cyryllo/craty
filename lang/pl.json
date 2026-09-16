@@ -119,6 +119,7 @@
     "Encrypted environment file not found.": "Nie znaleziono zaszyfrowanego pliku konfiguracji środowiska.",
     "Encryption": "Szyfrowanie",
     "Ensure your account is using a long, random password to stay secure.": "Upewnij się, że Twoje konto używa długiego, losowego hasła, aby zachować bezpieczeństwo.",
+    "Enter your password to apply an update.": "Aby wykonać aktualizację, wprowadź swoje hasło.",
     "Environment file already exists.": "Plik konfiguracji środowiska już istnieje.",
     "Environment file not found.": "Nie znaleziono pliku konfiguracji środowiska.",
     "Environment requirements": "Wymagania środowiska",

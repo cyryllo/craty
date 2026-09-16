@@ -369,3 +369,25 @@ częścią tanich/współdzielonych hostingów (patrz poprzednie wpisy o
 inspirowane osobnym projektem, zamiast łatania tego podejścia dalej.
 
 199/199 testów zielone.
+
+## 2026-09-16 — Naprawa: gubienie wybranej paczki po potwierdzeniu hasła
+
+Realne zgłoszenie: przy wgrywaniu aktualizacji, gdy hasło nie było ostatnio
+potwierdzone, appka po chwili prosiła o ponowne podanie hasła — ale po jego
+wpisaniu NIE kontynuowała wgrywania, tylko wracała na stronę Aktualizacji z
+niewybranym plikiem, więc trzeba było wybierać paczkę i klikać "Zastosuj
+aktualizację" jeszcze raz. Przyczyna: przekierowanie `password.confirm` przy
+żądaniu innym niż GET (czyli przy POST-cie z plikiem) wraca po potwierdzeniu
+na stronę, z KTÓREJ przyszło żądanie, a nie ponawia samego POST-a z plikiem —
+czego zresztą przeglądarka i tak nie umie zrobić (dane wybranego pliku nie
+przetrwają przekierowania). Naprawione przez pokazywanie formularza uploadu
+dopiero, gdy hasło jest już świeżo potwierdzone — w przeciwnym razie strona
+pokazuje link "Potwierdź hasło", który przechodzi cały cykl potwierdzenia
+(przez GET, więc bezpiecznie wraca na tę samą stronę) PRZED wybraniem pliku.
+
+Przy okazji usunięto też zdublowane komunikaty o sukcesie/błędzie na
+stronach Aktualizacji i Poczty — pokazywały ten sam tekst dwa razy (raz w
+globalnym banerze, raz we własnym banerze strony), co na ekranie wyglądało
+jak zlewające się ze sobą dwa identyczne komunikaty.
+
+202/202 testów zielone.

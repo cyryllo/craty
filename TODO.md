@@ -953,3 +953,18 @@ się aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
   pokazuje konkretny komunikat zamiast mylącej walidacji "pole jest
   wymagane". 12 nowych testów (`PhpUploadLimitsTest`, plus rozszerzenia
   `UpdateControllerTest`).
+- ~~**Wgrywanie aktualizacji gubiło wybraną paczkę po potwierdzeniu
+  hasła**~~ **Zrobione** (2026-09-16, realne zgłoszenie): `password.confirm`
+  na trasie uploadu przy POST-cie (nie GET) wraca po potwierdzeniu na stronę,
+  Z KTÓREJ przyszło żądanie, a nie ponawia sam POST z plikiem — czego
+  przeglądarka i tak nie potrafi zrobić, więc plik po prostu znikał i trzeba
+  było wybierać paczkę od nowa. Naprawione przez pokazywanie formularza
+  uploadu dopiero, gdy hasło jest już świeżo potwierdzone
+  (`UpdateController::index()`'s `$passwordConfirmed`, ta sama logika co
+  `RequirePassword`) — inaczej strona pokazuje link do nowej trasy
+  `settings.updates.confirm` (GET, `password.confirm`-gated,
+  przekierowującej z powrotem na `settings.updates.index`), która bezpiecznie
+  przechodzi cały cykl potwierdzenia PRZED wybraniem pliku. Przy okazji
+  usunięto zdublowane banery sukcesu/błędu na stronach Aktualizacji i Poczty
+  (własny baner strony + globalny baner z `layouts/app.blade.php` pokazywały
+  ten sam tekst dwa razy). 5 nowych/zmienionych testów w `UpdateControllerTest`.

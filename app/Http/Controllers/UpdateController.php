@@ -15,13 +15,35 @@ use Illuminate\Http\Request;
  */
 class UpdateController extends Controller
 {
-    public function index(UpdateService $updates)
+    public function index(Request $request, UpdateService $updates)
     {
         return view('settings.updates', [
             'currentVersion' => $updates->currentVersion(),
             'maxUploadBytes' => PhpUploadLimits::maxUploadBytes(),
             'uploadLimitSufficient' => PhpUploadLimits::meetsRecommendedMinimum(),
+            // Pokazujemy formularz uploadu tylko gdy hasło jest już świeżo
+            // potwierdzone (ta sama logika co Illuminate\Auth\Middleware\
+            // RequirePassword) — inaczej admin wybiera plik, submituje, i
+            // dopiero WTEDY password.confirm na trasie upload przekierowuje
+            // go na /confirm-password. Ponowne wysłanie POST-a z plikiem po
+            // takim przekierowaniu jest niemożliwe (przeglądarka nie potrafi
+            // "odtworzyć" multipart body pliku po redirect()->intended()) —
+            // realnie zgłoszone przez użytkownika jako "po wpisaniu hasła
+            // nie kontynuuje wgrywania, trzeba wybrać paczkę od nowa".
+            // Rozwiązanie: jeśli hasło nie jest świeże, w ogóle nie pokazuj
+            // formularza — pokaż link do settings.updates.confirm zamiast
+            // niego, który przechodzi przez cały cykl potwierdzenia (GET,
+            // więc redirect()->intended() bezpiecznie wraca na tę samą
+            // trasę) PRZED tym, jak admin zdąży wybrać plik.
+            'passwordConfirmed' => (time() - $request->session()->get('auth.password_confirmed_at', 0))
+                <= config('auth.password_timeout', 10800),
         ]);
+    }
+
+    /** Cel przekierowania password.confirm dla settings.updates.confirm — patrz komentarz w index(). */
+    public function confirmed()
+    {
+        return redirect()->route('settings.updates.index');
     }
 
     public function upload(Request $request, UpdateService $updates)
