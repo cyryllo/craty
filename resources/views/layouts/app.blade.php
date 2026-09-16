@@ -21,7 +21,22 @@
         <div class="min-h-screen bg-gray-100 dark:bg-gray-700">
             @include('layouts.navigation')
 
-            @if (session('status'))
+            @php
+                // Breeze zostawia w "status" surowe, NIEPRZETŁUMACZONE flagi
+                // wewnętrzne (nie tekst do wyświetlenia) — konkretny
+                // formularz (profil/hasło/język/weryfikacja e-maila) sam
+                // sprawdza je przez === i pokazuje własne przetłumaczone
+                // potwierdzenie (__('Saved.')). Reszta appki zawsze wkłada
+                // do "status" już gotowy, przetłumaczony tekst
+                // (with('status', __('Item added to inventory.')) itd.) —
+                // ten globalny baner ma pokazywać TYLKO takie, więc pomija
+                // znane flagi Breeze, żeby nie wyświetlić wprost np. słowa
+                // "profile-updated" na ekranie niezależnie od języka
+                // (zgłoszone przez użytkownika: "powiadomienia typu
+                // profile-updated powinny być w danym języku").
+                $breezeStatusFlags = ['profile-updated', 'password-updated', 'locale-updated', 'verification-link-sent'];
+            @endphp
+            @if (session('status') && ! in_array(session('status'), $breezeStatusFlags, true))
                 <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
                     <div class="rounded-md bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300 dark:bg-emerald-950 dark:border-emerald-800">
                         {{ session('status') }}

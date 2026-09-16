@@ -752,6 +752,22 @@ się aktualny, przegadać go tak samo jak tamte, zanim zacznie się budować.
 
 ## Drobne rzeczy zauważone przy budowie
 
+- ~~**Surowa flaga Breeze "profile-updated" wyświetlała się wprost na
+  ekranie**~~ **Zrobione** (2026-09-16, zgłoszenie użytkownika:
+  "powiadomienia typu profile-updated powinny być w danym języku a widzę
+  że nie są") — to nie był brakujący przekład, tylko wyciek wewnętrznej,
+  nieprzetłumaczonej flagi. Cztery formularze Breeze (profil, hasło,
+  język, ponowna wysyłka linku weryfikacyjnego) flashują do `session
+  ('status')` goły identyfikator (np. `'profile-updated'`), który ich
+  WŁASNY formularz sprawdza przez `===` i pokazuje swoje własne, już
+  przetłumaczone potwierdzenie (`__('Saved.')`) — reszta appki wkłada do
+  tego samego klucza sesji od razu gotowy, przetłumaczony tekst. Globalny
+  baner statusu w `layouts/app.blade.php` (`{{ session('status') }}` bez
+  `__()`, bo reszta appki i tak wkłada już przetłumaczony tekst) łapał
+  też te cztery surowe flagi i wypisywał je dosłownie. Naprawione listą
+  wykluczeń (`$breezeStatusFlags`) w tym jednym miejscu — patrz CLAUDE.md
+  "Localization" po pełne wyjaśnienie i listę wszystkich czterech
+  kontrolerów. 1 nowy test regresyjny (`ProfileTest`).
 - ~~**Etykiety do druku — dopasować do fizycznej naklejki i dodać druk
   zbiorczy**~~ **Zrobione** (2026-09-16, życzenie użytkownika): rozmiar
   etykiety zmieniony z 70mm (za duża) na dokładnie **32×20mm**, ustawiony
