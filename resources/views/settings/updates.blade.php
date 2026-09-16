@@ -12,7 +12,7 @@
         @endif
 
         @if (session('updateError'))
-            <div class="bg-red-50 border border-red-200 text-red-800 text-sm rounded-md p-4 dark:bg-red-950 dark:border-red-800 dark:text-red-300">
+            <div class="bg-red-50 border border-red-200 text-red-800 text-sm rounded-md p-4 whitespace-pre-line dark:bg-red-950 dark:border-red-800 dark:text-red-300">
                 {{ session('updateError') }}
             </div>
         @endif

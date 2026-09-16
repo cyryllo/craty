@@ -48,6 +48,8 @@
     "Back": "Wstecz",
     "Backup created.": "Kopia zapasowa utworzona.",
     "Backup deleted.": "Kopia zapasowa usunięta.",
+    "Backup failed: :reason": "Kopia zapasowa nie powiodła się: :reason",
+    "Backup output": "Wyjście polecenia backupu",
     "Backup settings": "Ustawienia kopii zapasowych",
     "Backup settings saved.": "Ustawienia kopii zapasowych zapisane.",
     "Backups": "Kopie zapasowe",
@@ -454,6 +456,7 @@
     "system": "system",
     "these items have a category and/or location code that wasn't recognized. You can add them now without it (\"unassigned\"), or fix the CSV and upload it again.": "te przedmioty mają kod kategorii i/lub lokalizacji, który nie został rozpoznany. Możesz dodać je teraz bez niego (\"nieprzypisane\") albo poprawić CSV i wgrać ponownie.",
     "to": "do",
+    "unknown reason — nothing in the command output.": "nieznana przyczyna — brak treści w wyjściu polecenia.",
     "view all": "zobacz wszystkie",
     "withdraw": "wycofaj"
 }

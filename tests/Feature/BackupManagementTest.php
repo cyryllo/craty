@@ -38,10 +38,29 @@ class BackupManagementTest extends TestCase
             ->once()
             ->with('backup:run', ['--disable-notifications' => true])
             ->andReturn(0);
+        Artisan::shouldReceive('output')->andReturn('');
         $admin = User::factory()->create(['role' => 'admin']);
 
         $this->actingAs($admin)->post(route('settings.backup.run'))
-            ->assertRedirect(route('settings.backup.index'));
+            ->assertRedirect(route('settings.backup.index'))
+            ->assertSessionHas('status', __('Backup created.'));
+    }
+
+    public function test_a_failed_backup_run_shows_the_real_reason_instead_of_a_false_success(): void
+    {
+        Storage::fake('backups');
+        Artisan::shouldReceive('call')
+            ->once()
+            ->with('backup:run', ['--disable-notifications' => true])
+            ->andReturn(1);
+        Artisan::shouldReceive('output')->andReturn('Backup failed because disk "backups" does not exist.');
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)->post(route('settings.backup.run'))
+            ->assertRedirect()
+            ->assertSessionHas('error', __('Backup failed: :reason', [
+                'reason' => 'Backup failed because disk "backups" does not exist.',
+            ]));
     }
 
     public function test_admin_can_update_backup_settings(): void

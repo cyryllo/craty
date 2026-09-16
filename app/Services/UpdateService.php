@@ -165,7 +165,12 @@ class UpdateService
         //    backup przerywa całą aktualizację zamiast ryzykować update bez
         //    żadnej siatki bezpieczeństwa.
         if ($this->backups->run() !== 0) {
-            throw new UpdatePackageException(__('The automatic backup before the update failed — the update was aborted so nothing changes without a safety net. Check Settings → Backups, fix the problem, then try again.'));
+            $reason = $this->backups->lastOutput();
+
+            throw new UpdatePackageException(trim(
+                __('The automatic backup before the update failed — the update was aborted so nothing changes without a safety net. Check Settings → Backups, fix the problem, then try again.')
+                .($reason !== '' ? "\n\n".__('Backup output').":\n".$reason : '')
+            ));
         }
 
         // 2. Migawka kodu do ewentualnego rollbacku — zanim cokolwiek się zmieni.

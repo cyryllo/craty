@@ -16,6 +16,18 @@ use Illuminate\Support\Facades\Storage;
  */
 class BackupService
 {
+    /**
+     * Wyjście konsolowe ostatniego run() — spatie/laravel-backup wypisuje
+     * PRAWDZIWY powód porażki (np. brak binarki mysqldump, exec()
+     * zablokowany przez hosting, brak miejsca na dysku) na wyjście komendy,
+     * nie tylko przez kod wyjścia. Bez tego admin na hostingu bez dostępu
+     * do logów (typowy scenariusz na hostingu bez SSH, patrz TODO.md) nie
+     * miał ŻADNEGO sposobu dowiedzieć się, co dokładnie nie zadziałało —
+     * tylko generyczne "backup się nie powiódł" (realnie zgłoszone przez
+     * użytkownika, zablokowanego tym przy próbie zastosowania aktualizacji).
+     */
+    private string $lastOutput = '';
+
     public function disk(): string
     {
         return config('backup.backup.destination.disks')[0];
@@ -26,7 +38,8 @@ class BackupService
      * włączone). Zwraca kod wyjścia komendy — `0` sukces, cokolwiek innego
      * porażka — żeby wołający (np. `UpdateService::apply()`, patrz TODO.md
      * "Moduł Aktualizacje") mógł sam zdecydować, czy przerwać dalsze
-     * działanie zamiast kontynuować bez świeżego backupu.
+     * działanie zamiast kontynuować bez świeżego backupu. Prawdziwą treść
+     * błędu (nie tylko kod) daje `lastOutput()` zaraz po tym wywołaniu.
      */
     public function run(): int
     {
@@ -39,7 +52,16 @@ class BackupService
             ]);
         }
 
-        return Artisan::call('backup:run', ['--disable-notifications' => true]);
+        $exitCode = Artisan::call('backup:run', ['--disable-notifications' => true]);
+        $this->lastOutput = trim(Artisan::output());
+
+        return $exitCode;
+    }
+
+    /** Pełne wyjście konsolowe ostatniego run() — patrz komentarz przy $lastOutput. */
+    public function lastOutput(): string
+    {
+        return $this->lastOutput;
     }
 
     /** Usuwa kopie starsze niż retencja ustawiona przez admina (Ustawienia → Kopie zapasowe). */

@@ -147,7 +147,10 @@ class UpdateServiceTest extends TestCase
      */
     public function test_apply_aborts_before_touching_anything_when_the_automatic_backup_fails(): void
     {
-        $this->mock(BackupService::class, fn ($mock) => $mock->shouldReceive('run')->once()->andReturn(1));
+        $this->mock(BackupService::class, function ($mock) {
+            $mock->shouldReceive('run')->once()->andReturn(1);
+            $mock->shouldReceive('lastOutput')->andReturn('');
+        });
         $zip = $this->buildPackageZip(['version' => '1.1.0'], [
             'app/placeholder.php' => "<?php\n// nowy kod\n",
         ]);
@@ -163,6 +166,33 @@ class UpdateServiceTest extends TestCase
             $this->assertSame('1.0.0', $updates->currentVersion());
             $this->assertStringContainsString('stary kod', file_get_contents($this->appRoot.'/app/placeholder.php'));
             $this->assertFalse($updates->canRollback());
+        }
+    }
+
+    /**
+     * Bez tego admin na hostingu bez SSH/logów widział tylko generyczny
+     * komunikat "backup się nie powiódł" i nie miał jak się dowiedzieć,
+     * co konkretnie nie zadziałało (np. brak mysqldump, exec()
+     * zablokowany) — patrz BackupService::$lastOutput.
+     */
+    public function test_apply_surfaces_the_real_backup_failure_reason_in_the_exception_message(): void
+    {
+        $this->mock(BackupService::class, function ($mock) {
+            $mock->shouldReceive('run')->once()->andReturn(1);
+            $mock->shouldReceive('lastOutput')->andReturn('exec() has been disabled for security reasons');
+        });
+        $zip = $this->buildPackageZip(['version' => '1.1.0'], [
+            'app/placeholder.php' => "<?php\n// nowy kod\n",
+        ]);
+
+        $updates = app(UpdateService::class);
+        $manifest = $updates->validatePackage($zip);
+
+        try {
+            $updates->apply($zip, $manifest);
+            $this->fail('Expected UpdatePackageException.');
+        } catch (UpdatePackageException $e) {
+            $this->assertStringContainsString('exec() has been disabled for security reasons', $e->getMessage());
         }
     }
 

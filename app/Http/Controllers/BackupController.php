@@ -30,10 +30,19 @@ class BackupController extends Controller
         return redirect()->route('settings.backup.index')->with('status', __('Backup settings saved.'));
     }
 
-    /** Tworzy backup od razu (synchronicznie) — dla niedużej appki wystarczające, patrz TODO. */
+    /**
+     * Tworzy backup od razu (synchronicznie) — dla niedużej appki
+     * wystarczające, patrz TODO. Sprawdza kod wyjścia i pokazuje PRAWDZIWY
+     * błąd zamiast fałszywego "Backup created." — wcześniej ten widok w
+     * ogóle nie sprawdzał, czy backup() się w ogóle udał (realnie
+     * zgłoszone: admin klikał "Utwórz kopię teraz" jako diagnostykę awarii
+     * modułu Aktualizacje i dostawał fałszywe potwierdzenie sukcesu).
+     */
     public function run(BackupService $backups)
     {
-        $backups->run();
+        if ($backups->run() !== 0) {
+            return back()->with('error', __('Backup failed: :reason', ['reason' => $backups->lastOutput() ?: __('unknown reason — nothing in the command output.')]));
+        }
 
         return redirect()->route('settings.backup.index')->with('status', __('Backup created.'));
     }

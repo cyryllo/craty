@@ -45,7 +45,7 @@
             @endif
             @if (session('error'))
                 <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
-                    <div class="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-300">
+                    <div class="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800 whitespace-pre-line dark:bg-red-950 dark:border-red-800 dark:text-red-300">
                         {{ session('error') }}
                     </div>
                 </div>
