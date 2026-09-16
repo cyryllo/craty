@@ -26,6 +26,7 @@ class UpdateService
     public function __construct(
         private readonly UpdatePackageBuilder $packageBuilder,
         private readonly AppVersion $version,
+        private readonly BackupService $backups,
     ) {
     }
 
@@ -99,27 +100,38 @@ class UpdateService
 
         $this->ensureDirectory($this->stateDir());
 
-        // 1. Migawka kodu do ewentualnego rollbacku — zanim cokolwiek się zmieni.
+        // 1. Pełny backup (baza + storage/app/public) — twardy wymóg, nie
+        //    opcja (patrz TODO.md "Moduł Aktualizacje"), zanim COKOLWIEK na
+        //    dysku appki się zmieni. Migawka kodu w kroku 2 chroni tylko
+        //    kod — bez tego backupu ewentualne migracje z paczki (krok 4)
+        //    nie miałyby z czego się cofnąć po stronie bazy. Nieudany
+        //    backup przerywa całą aktualizację zamiast ryzykować update bez
+        //    żadnej siatki bezpieczeństwa.
+        if ($this->backups->run() !== 0) {
+            throw new UpdatePackageException(__('The automatic backup before the update failed — the update was aborted so nothing changes without a safety net. Check Settings → Backups, fix the problem, then try again.'));
+        }
+
+        // 2. Migawka kodu do ewentualnego rollbacku — zanim cokolwiek się zmieni.
         $snapshotPath = $this->stateDir().'/snapshot-'.now()->format('Y-m-d-His').'.zip';
         $this->packageBuilder->build($root, $snapshotPath, UpdatePaths::PACKAGE_EXCLUDES);
 
-        // 2. Rozpakuj nową paczkę do katalogu tymczasowego.
+        // 3. Rozpakuj nową paczkę do katalogu tymczasowego.
         $extractDir = $this->tmpDir().'/extract-'.now()->format('Y-m-d-His');
         $this->extractSafely($zipPath, $extractDir);
 
         try {
-            // 3. Podmiana plików "na żywo", z pominięciem chronionych ścieżek.
+            // 4. Podmiana plików "na żywo", z pominięciem chronionych ścieżek.
             $this->copyInto($extractDir, $root, UpdatePaths::PROTECTED_PATHS);
 
-            // 4. Migracje z paczki (nowe zostaną wykonane, reszta pominięta).
+            // 5. Migracje z paczki (nowe zostaną wykonane, reszta pominięta).
             Artisan::call('migrate', ['--force' => true]);
 
-            // 5. Nowa wersja + czyszczenie cache configu/widoków.
+            // 6. Nowa wersja + czyszczenie cache configu/widoków.
             $this->version->set($manifest['version']);
             Artisan::call('config:clear');
             Artisan::call('view:clear');
 
-            // 6. Stan do ewentualnego rollbacku.
+            // 7. Stan do ewentualnego rollbacku.
             $this->writeState([
                 'from_version' => $fromVersion,
                 'to_version' => $manifest['version'],

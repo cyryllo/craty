@@ -21,8 +21,14 @@ class BackupService
         return config('backup.backup.destination.disks')[0];
     }
 
-    /** Uruchamia pełny backup (baza + storage/app/public, plus .env jeśli włączone). */
-    public function run(): void
+    /**
+     * Uruchamia pełny backup (baza + storage/app/public, plus .env jeśli
+     * włączone). Zwraca kod wyjścia komendy — `0` sukces, cokolwiek innego
+     * porażka — żeby wołający (np. `UpdateService::apply()`, patrz TODO.md
+     * "Moduł Aktualizacje") mógł sam zdecydować, czy przerwać dalsze
+     * działanie zamiast kontynuować bez świeżego backupu.
+     */
+    public function run(): int
     {
         if (AppSetting::current()->backup_include_env) {
             config([
@@ -33,7 +39,7 @@ class BackupService
             ]);
         }
 
-        Artisan::call('backup:run', ['--disable-notifications' => true]);
+        return Artisan::call('backup:run', ['--disable-notifications' => true]);
     }
 
     /** Usuwa kopie starsze niż retencja ustawiona przez admina (Ustawienia → Kopie zapasowe). */

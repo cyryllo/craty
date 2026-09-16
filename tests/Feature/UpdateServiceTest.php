@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Exceptions\UpdatePackageException;
+use App\Services\BackupService;
 use App\Services\UpdateService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -99,6 +100,7 @@ class UpdateServiceTest extends TestCase
 
     public function test_apply_updates_code_and_protects_env_and_user_data(): void
     {
+        $this->mockSuccessfulBackup();
         $zip = $this->buildPackageZip(['version' => '1.1.0'], [
             'app/placeholder.php' => "<?php\n// nowy kod\n",
             '.env' => 'ATTEMPT-TO-OVERWRITE-ENV',
@@ -122,6 +124,7 @@ class UpdateServiceTest extends TestCase
 
     public function test_apply_rejects_zip_slip_path_traversal(): void
     {
+        $this->mockSuccessfulBackup();
         $zip = tempnam(sys_get_temp_dir(), 'craty-pkg-').'.zip';
         $archive = new ZipArchive();
         $archive->open($zip, ZipArchive::CREATE);
@@ -136,8 +139,36 @@ class UpdateServiceTest extends TestCase
         $updates->apply($zip, $manifest);
     }
 
+    /**
+     * "Automatyczny backup przed aktualizacją" (TODO.md "Drobne rzeczy
+     * zauważone przy budowie") to twardy wymóg, nie opcja — nieudany backup
+     * musi przerwać całą aktualizację, zanim cokolwiek na dysku się zmieni,
+     * zamiast po cichu kontynuować bez siatki bezpieczeństwa dla bazy.
+     */
+    public function test_apply_aborts_before_touching_anything_when_the_automatic_backup_fails(): void
+    {
+        $this->mock(BackupService::class, fn ($mock) => $mock->shouldReceive('run')->once()->andReturn(1));
+        $zip = $this->buildPackageZip(['version' => '1.1.0'], [
+            'app/placeholder.php' => "<?php\n// nowy kod\n",
+        ]);
+
+        $updates = app(UpdateService::class);
+        $manifest = $updates->validatePackage($zip);
+
+        $this->expectException(UpdatePackageException::class);
+
+        try {
+            $updates->apply($zip, $manifest);
+        } finally {
+            $this->assertSame('1.0.0', $updates->currentVersion());
+            $this->assertStringContainsString('stary kod', file_get_contents($this->appRoot.'/app/placeholder.php'));
+            $this->assertFalse($updates->canRollback());
+        }
+    }
+
     public function test_rollback_restores_the_previous_code_and_version(): void
     {
+        $this->mockSuccessfulBackup();
         $zip = $this->buildPackageZip(['version' => '1.1.0'], [
             'app/placeholder.php' => "<?php\n// nowy kod\n",
         ]);
@@ -158,6 +189,18 @@ class UpdateServiceTest extends TestCase
     {
         $this->expectException(UpdatePackageException::class);
         app(UpdateService::class)->rollback();
+    }
+
+    /**
+     * `apply()` teraz woła prawdziwy `BackupService::run()` jako pierwszy
+     * krok — bez tej podmiany testy próbowałyby zrzucić prawdziwą bazę
+     * testową (sqlite ":memory:", której dumper spatie nie potrafi otworzyć
+     * jak zwykłego pliku) zamiast operować na `$this->appRoot`, tak jak
+     * reszta tego testu.
+     */
+    private function mockSuccessfulBackup(): void
+    {
+        $this->mock(BackupService::class, fn ($mock) => $mock->shouldReceive('run')->once()->andReturn(0));
     }
 
     /** @param  array<string, mixed>  $manifest */
