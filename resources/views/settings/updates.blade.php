@@ -48,7 +48,7 @@
             </div>
 
             <div class="bg-amber-50 border border-amber-200 text-amber-900 text-sm rounded-md p-4 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-300">
-                {{ __('This overwrites the application code and cannot be undone from here. This does not back up the database and does not undo migrations — we recommend creating a database backup yourself (Settings → Backups, or an export from your hosting panel) before applying an update, especially if it adds migrations.') }}
+                {{ __('This overwrites the application code and cannot be undone from here. Remember to back up your files and database before applying an update.') }}
             </div>
 
             <div class="flex justify-end">

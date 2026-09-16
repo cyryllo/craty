@@ -32,7 +32,6 @@ class UpdatePaths
         'composer',
         'test',
         'storage/app/public',
-        'storage/app/backups',
         'storage/app/updates',
         // Wyjście samego release:build — bez tego każde kolejne wydanie
         // pakowałoby ze sobą wszystkie poprzednie .zip-y z tego katalogu

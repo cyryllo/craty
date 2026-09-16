@@ -38,15 +38,6 @@ return [
             'report' => false,
         ],
 
-        // Kopie zapasowe (moduł Backup) — celowo osobny dysk, nigdy publiczny:
-        // zawierają pełny dump bazy danych, nie mogą wylądować pod URL-em
-        // tak jak dysk "public".
-        'backups' => [
-            'driver' => 'local',
-            'root' => storage_path('app/backups'),
-            'throw' => false,
-            'report' => false,
-        ],
 
         'public' => [
             'driver' => 'local',

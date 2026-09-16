@@ -355,3 +355,17 @@ pójdzie źle, powrót do poprzedniej wersji to dziś ręczne wgranie
 poprzedniej paczki.
 
 208/208 testów zielone.
+
+## 2026-09-16 — Usunięto cały moduł Backup
+
+Usunięta cała funkcja robienia kopii zapasowych z poziomu appki: strona
+Ustawienia → Kopie zapasowe, `BackupController`, `BackupService`,
+zaplanowane codzienne zadania w `routes/console.php`, zależność
+`spatie/laravel-backup` (razem z `spatie/db-dumper`) z `composer.json`.
+Powód: podejście przez `spatie/laravel-backup` zawsze uruchamia prawdziwy
+`mysqldump` jako osobny proces systemowy, co okazało się niekompatybilne z
+częścią tanich/współdzielonych hostingów (patrz poprzednie wpisy o
+`proc_open`) — planowane jest rozwiązanie napisane od zera w czystym PHP,
+inspirowane osobnym projektem, zamiast łatania tego podejścia dalej.
+
+199/199 testów zielone.

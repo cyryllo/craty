@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AppSettingController;
-use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
@@ -103,16 +102,6 @@ Route::middleware('auth')->group(function () {
         Route::get('ustawienia/poczta', [MailSettingController::class, 'edit'])->name('settings.mail.edit');
         Route::post('ustawienia/poczta', [MailSettingController::class, 'update'])->name('settings.mail.update');
         Route::post('ustawienia/poczta/test', [MailSettingController::class, 'test'])->name('settings.mail.test');
-
-        Route::get('ustawienia/kopie-zapasowe', [BackupController::class, 'index'])->name('settings.backup.index');
-        Route::post('ustawienia/kopie-zapasowe', [BackupController::class, 'run'])->name('settings.backup.run');
-        Route::post('ustawienia/kopie-zapasowe/ustawienia', [BackupController::class, 'updateSettings'])->name('settings.backup.settings');
-        // {filename} może zawierać "/" (spatie trzyma zipy w podkatalogu z nazwą appki) —
-        // stąd where(.*) zamiast domyślnego ograniczenia segmentu trasy.
-        Route::get('ustawienia/kopie-zapasowe/{filename}', [BackupController::class, 'download'])
-            ->where('filename', '.*')->name('settings.backup.download');
-        Route::delete('ustawienia/kopie-zapasowe/{filename}', [BackupController::class, 'destroy'])
-            ->where('filename', '.*')->name('settings.backup.destroy');
 
         Route::get('ustawienia/aktualizacje', [UpdateController::class, 'index'])->name('settings.updates.index');
         // password.confirm: ponowne podanie hasła tuż przed jedną z najbardziej

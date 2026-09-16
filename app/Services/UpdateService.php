@@ -127,19 +127,9 @@ class UpdateService
 
         $this->ensureDirectory($this->workDir());
 
-        // Świadomie BRAK automatycznego backupu tutaj — była to wcześniej
-        // twarda blokada (nieudany backup przerywał całą aktualizację), ale
-        // realny przypadek pokazał, że na części hostingów backup bazy
-        // strukturalnie nie może się udać (np. `proc_open` zablokowane przez
-        // hosting — spatie/laravel-backup zawsze woła prawdziwy `mysqldump`
-        // przez `Symfony\Process`, więc żaden retry tego nie naprawi) — taki
-        // admin był trwale zablokowany, bez możliwości wgrania NAWET
-        // poprawki naprawiającej samą diagnostykę backupu, bo aktualizacja
-        // przez panel to właśnie ten sam zablokowany mechanizm. Zamiast
-        // twardego wymogu: rekomendacja ręcznego backupu w UI (patrz
-        // settings/updates.blade.php) — admin decyduje sam, backup bazy
-        // przez Ustawienia → Kopie zapasowe (jeśli działa) albo eksport z
-        // panelu hostingu, PRZED kliknięciem "Zastosuj aktualizację".
+        // Świadomie BRAK backupu tutaj — appka nie ma już własnego modułu
+        // Backup (usunięty, patrz TODO.md/CHANGELOG.md). Rekomendacja
+        // zrobienia kopii samemu jest tylko w UI (settings/updates.blade.php).
 
         // 1. Rozpakuj nową paczkę do katalogu tymczasowego.
         $extractDir = $this->tmpDir().'/extract-'.now()->format('Y-m-d-His');

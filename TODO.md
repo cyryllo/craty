@@ -54,8 +54,10 @@ jeszcze decyzji biznesowej)**
 6. ~~**Moduł Backup** (pełna specyfikacja niżej) — ma wartość sam w sobie
    (bezpieczeństwo danych) już dziś, a przy okazji jest twardym wymogiem
    kroku 3 modułu Aktualizacje w fazie 2, więc musi powstać wcześniej.~~
-   **Zrobione** (`spatie/laravel-backup`, `BackupService`, harmonogram w
-   `routes/console.php`, 8 testów).
+   **Zrobione, potem usunięte** (`spatie/laravel-backup`, `BackupService`,
+   harmonogram w `routes/console.php`, 8 testów — usunięte całkowicie
+   2026-09-16, patrz "Moduł „Backup"" niżej po pełne uzasadnienie i plan na
+   przyszłość: rozwiązanie od zera w czystym PHP).
 
 **Faza 1.5 — punkt pośredni, samodzielny (nie blokuje ani nie jest
 blokowany przez Instalator/Aktualizacje z fazy 2)**
@@ -381,23 +383,39 @@ samowystarczalna (patrz niżej).
 
 </details>
 
-## Moduł „Backup” — **Zrobione** (Faza 1)
+## Moduł „Backup” — **Zrobione, potem usunięte** (Faza 1)
 
 Zbudowane wg specyfikacji niżej, z dwoma odstępstwami odnotowanymi na
 przyszłość:
 - **Retencja jest dniowa, nie ilościowa** — `spatie/laravel-backup`'owa
   `DefaultStrategy` domyślnie liczy w dniach ("trzymaj pełne kopie z
   ostatnich N dni"), nie w sztukach ("trzymaj ostatnie N kopii"), więc UI
-  (`Ustawienia → Kopie zapasowe`) opisuje to uczciwie jako dni, żeby nie
+  (`Ustawienia → Kopie zapasowe`) opisywało to uczciwie jako dni, żeby nie
   wprowadzać w błąd.
 - **Obraz Dockera wymagał doinstalowania `mariadb-client`** (dostarcza
   `mysqldump`), bo `spatie/laravel-backup` woła tę binarkę do zrzutu bazy —
-  bez tego backup 500-ował z `DumpFailed`. Patrz `Dockerfile`.
+  bez tego backup 500-ował z `DumpFailed`. Zostaje w `Dockerfile` (patrz
+  CLAUDE.md "No Backup module"), choć nic już go nie używa.
 
-Harmonogram (`routes/console.php`) woła `BackupService::run()`/`cleanup()`
+Harmonogram (`routes/console.php`) wołał `BackupService::run()`/`cleanup()`
 przez `Schedule::call()`, a nie `backup:run`/`backup:clean` bezpośrednio —
-dzięki temu zaplanowane uruchomienia respektują ustawienia admina (retencja,
-dołączanie `.env`), tak samo jak ręczne uruchomienie z panelu.
+dzięki temu zaplanowane uruchomienia respektowały ustawienia admina
+(retencja, dołączanie `.env`), tak samo jak ręczne uruchomienie z panelu.
+
+**Usunięte całkowicie** (2026-09-16): `BackupController`, `BackupService`,
+widok `settings/backup.blade.php`, harmonogram w `routes/console.php`,
+zależność `spatie/laravel-backup` (i `spatie/db-dumper`) z `composer.json`,
+dysk `backups` z `config/filesystems.php`. Powód: podejście oparte o
+shellowanie prawdziwego `mysqldump` przez `Symfony\Process` okazało się
+strukturalnie niekompatybilne z częścią hostingów (`proc_open` zablokowane
+— patrz "Moduł Aktualizacje" wyżej, dokładnie ten sam realny przypadek),
+a plan na przyszłość to rozwiązanie napisane od zera w czystym PHP
+(inspirowane osobnym projektem użytkownika), nie łatanie podejścia spatie.
+Kolumny `backup_retention_days`/`backup_include_env` w `app_settings`
+zostają w bazie (usunięte tylko z modelu `AppSetting`) — nie warto ich teraz
+kasować migracją, skoro nowy projekt może chcieć podobnej koncepcji
+retencji. 199/199 testów zielone (usunięto `BackupManagementTest`, 9
+testów).
 
 <details>
 <summary>Oryginalna specyfikacja (dla kontekstu)</summary>

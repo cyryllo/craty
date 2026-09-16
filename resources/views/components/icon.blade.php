@@ -18,15 +18,6 @@
         </svg>
         @break
 
-    @case('backup')
-        {{-- taca z pobieraniem: Kopie zapasowe --}}
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" {{ $attributes }}>
-            <path d="M10 3v9"/>
-            <path d="M6.5 8.5 10 12l3.5-3.5"/>
-            <path d="M3.5 13.5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2"/>
-        </svg>
-        @break
-
     @case('language')
         {{-- globus: wybór języka --}}
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" {{ $attributes }}>
