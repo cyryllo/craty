@@ -1,9 +1,4 @@
-# TODO / mapa drogowa
-
-Co jeszcze zostało z pierwotnej [koncepcji](https://claude.ai/code/artifact/1c7498de-ff94-4f0a-a338-0bee7e681bb8),
-plus drobne rzeczy zauważone po drodze. Nic z tego nie jest w toku — to lista
-do wybierania, nie backlog sprintu. Pełne treści/specyfikacje są w sekcjach
-niżej — ta lista tylko ustala kolejność i tłumaczy dlaczego.
+# TODO
 
 ## Kolejność prac (od czego zacząć, żeby nie robić niczego dwa razy)
 
