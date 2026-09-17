@@ -1,6 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">{{ __('Updates') }}</h2>
+        <div class="space-y-1">
+            @include('settings._back-link')
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">{{ __('Updates') }}</h2>
+        </div>
     </x-slot>
 
     <div class="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">

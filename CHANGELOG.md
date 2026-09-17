@@ -13,6 +13,8 @@ opis funkcji — [README.md](README.md).
   → Moduły (pierwszy z planowanych kolejnych modułów opcjonalnych).
 - Dodano Ustawienia → Powiadomienia: włącznik samodzielnego resetu hasła
   oraz e-mailowe podsumowanie przeterminowanych wypożyczeń.
+- Dodano szybki link powrotu do Ustawień na wszystkich podstronach
+  dostępnych z tego rozdzielnika.
 
 ## 2026-09-16
 

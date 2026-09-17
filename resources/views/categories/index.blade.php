@@ -1,8 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">{{ __('Categories') }}</h2>
-            <a href="{{ route('categories.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">+ {{ __('New category') }}</a>
+        <div class="flex items-start justify-between gap-4">
+            <div class="space-y-1">
+                @include('settings._back-link')
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">{{ __('Categories') }}</h2>
+            </div>
+            <a href="{{ route('categories.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700 shrink-0">+ {{ __('New category') }}</a>
         </div>
     </x-slot>
 
