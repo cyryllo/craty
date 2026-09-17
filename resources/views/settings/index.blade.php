@@ -38,14 +38,6 @@
             <div>
                 <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 dark:text-gray-400">{{ __('Advanced settings') }}</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <a href="{{ route('users.index') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition flex gap-4 items-start dark:bg-gray-800">
-                        <x-icon name="users" class="w-8 h-8 text-indigo-500 shrink-0 dark:text-indigo-400" />
-                        <div>
-                            <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Users') }}</h3>
-                            <p class="text-sm text-gray-500 mt-1 dark:text-gray-400">{{ __('Accounts, roles, access to the panel.') }}</p>
-                        </div>
-                    </a>
-
                     <a href="{{ route('settings.app.edit') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition flex gap-4 items-start dark:bg-gray-800">
                         <x-icon name="branding" class="w-8 h-8 text-indigo-500 shrink-0 dark:text-indigo-400" />
                         <div>
@@ -54,11 +46,35 @@
                         </div>
                     </a>
 
+                    <a href="{{ route('users.index') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition flex gap-4 items-start dark:bg-gray-800">
+                        <x-icon name="users" class="w-8 h-8 text-indigo-500 shrink-0 dark:text-indigo-400" />
+                        <div>
+                            <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Users') }}</h3>
+                            <p class="text-sm text-gray-500 mt-1 dark:text-gray-400">{{ __('Accounts, roles, access to the panel.') }}</p>
+                        </div>
+                    </a>
+
                     <a href="{{ route('settings.mail.edit') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition flex gap-4 items-start dark:bg-gray-800">
                         <x-icon name="mail" class="w-8 h-8 text-indigo-500 shrink-0 dark:text-indigo-400" />
                         <div>
                             <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Mail') }}</h3>
                             <p class="text-sm text-gray-500 mt-1 dark:text-gray-400">{{ __('SMTP settings used to send email from the app.') }}</p>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('settings.notifications.edit') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition flex gap-4 items-start dark:bg-gray-800">
+                        <x-icon name="bell" class="w-8 h-8 text-indigo-500 shrink-0 dark:text-indigo-400" />
+                        <div>
+                            <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Notifications') }}</h3>
+                            <p class="text-sm text-gray-500 mt-1 dark:text-gray-400">{{ __('Password reset and overdue-loan email notifications.') }}</p>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('settings.modules.edit') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition flex gap-4 items-start dark:bg-gray-800">
+                        <x-icon name="settings" class="w-8 h-8 text-indigo-500 shrink-0 dark:text-indigo-400" />
+                        <div>
+                            <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Modules') }}</h3>
+                            <p class="text-sm text-gray-500 mt-1 dark:text-gray-400">{{ __('Turn optional parts of the app on or off.') }}</p>
                         </div>
                     </a>
 

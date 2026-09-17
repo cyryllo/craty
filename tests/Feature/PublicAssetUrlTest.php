@@ -37,7 +37,7 @@ class PublicAssetUrlTest extends TestCase
         $photo = $item->photos()->create(['path' => 'items/1/a.jpg', 'is_primary' => true, 'sort_order' => 0]);
         $item->saleListings()->create(['platform' => 'olx', 'title' => 'Wiertarka']);
 
-        $csv = $this->actingAs($magazynier)->get('/sprzedaz/eksport.csv')->streamedContent();
+        $csv = $this->actingAs($magazynier)->get('/sales/eksport.csv')->streamedContent();
 
         $this->assertStringContainsString('http://localhost/storage/'.$photo->path, $csv);
     }

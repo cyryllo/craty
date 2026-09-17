@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AppSetting;
 use App\Models\Category;
 use App\Models\SaleListing;
+use App\Support\Modules;
 use Illuminate\Http\Request;
 
 /**
@@ -18,7 +19,10 @@ class MarketplaceController extends Controller
     {
         $setting = AppSetting::current();
 
-        abort_unless($setting->public_marketplace_enabled, 404);
+        // Wyłączenie modułu Sprzedaż chowa też pchli targ, niezależnie od
+        // jego własnego przełącznika — inaczej pokazywałby zamrożone oferty,
+        // których nie dałoby się już obsłużyć (patrz App\Support\Modules).
+        abort_unless($setting->public_marketplace_enabled && Modules::isEnabled('sales'), 404);
 
         // Ten sam wzorzec co ItemController::index() dla /items, ale osobny
         // klucz sesji — wybór gościa na tej stronie nie ma nadpisywać

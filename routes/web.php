@@ -9,6 +9,8 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MailSettingController;
 use App\Http\Controllers\MarketplaceController;
+use App\Http\Controllers\ModuleSettingController;
+use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SaleListingController;
 use App\Http\Controllers\ScanController;
@@ -63,14 +65,19 @@ Route::middleware('auth')->group(function () {
         Route::post('items/{item}/loans', [LoanController::class, 'store'])->name('items.loans.store');
         Route::post('loans/{loan}/return', [LoanController::class, 'returnLoan'])->name('loans.return');
 
-        Route::get('sprzedaz', [SaleListingController::class, 'index'])->name('sale-listings.index');
-        Route::post('sprzedaz/{listing}/wystawiono', [SaleListingController::class, 'markListed'])->name('sale-listings.mark-listed');
-        Route::get('sprzedaz/wystawione', [SaleListingController::class, 'exported'])->name('sale-listings.exported');
-        Route::post('sprzedaz/wystawione/{listing}/sprzedano', [SaleListingController::class, 'markSold'])->name('sale-listings.mark-sold');
-        Route::post('sprzedaz/wystawione/{listing}/wycofaj', [SaleListingController::class, 'withdraw'])->name('sale-listings.withdraw');
-        Route::get('items/{item}/sale-listing/create', [SaleListingController::class, 'create'])->name('items.sale-listing.create');
-        Route::post('items/{item}/sale-listing', [SaleListingController::class, 'store'])->name('items.sale-listing.store');
-        Route::get('sprzedaz/eksport.csv', [SaleListingController::class, 'exportCsv'])->name('sale-listings.export');
+        // Moduł "Sprzedaż" (App\Support\Modules) — wyłączenie w Ustawieniach →
+        // Moduły chowa tę grupę tras za 404, niezależnie od roli. `module:sales`
+        // jest DOŁOŻONY na istniejący `role:admin,magazynier`, nie zamiast niego.
+        Route::middleware('module:sales')->group(function () {
+            Route::get('sales', [SaleListingController::class, 'index'])->name('sale-listings.index');
+            Route::post('sales/{listing}/wystawiono', [SaleListingController::class, 'markListed'])->name('sale-listings.mark-listed');
+            Route::get('sales/wystawione', [SaleListingController::class, 'exported'])->name('sale-listings.exported');
+            Route::post('sales/wystawione/{listing}/sprzedano', [SaleListingController::class, 'markSold'])->name('sale-listings.mark-sold');
+            Route::post('sales/wystawione/{listing}/wycofaj', [SaleListingController::class, 'withdraw'])->name('sale-listings.withdraw');
+            Route::get('items/{item}/sale-listing/create', [SaleListingController::class, 'create'])->name('items.sale-listing.create');
+            Route::post('items/{item}/sale-listing', [SaleListingController::class, 'store'])->name('items.sale-listing.store');
+            Route::get('sales/eksport.csv', [SaleListingController::class, 'exportCsv'])->name('sale-listings.export');
+        });
 
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('warehouses', WarehouseController::class)->except('show');
@@ -98,6 +105,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', UserController::class)->except('show');
         Route::get('ustawienia/aplikacja', [AppSettingController::class, 'edit'])->name('settings.app.edit');
         Route::post('ustawienia/aplikacja', [AppSettingController::class, 'update'])->name('settings.app.update');
+
+        Route::get('ustawienia/moduly', [ModuleSettingController::class, 'edit'])->name('settings.modules.edit');
+        Route::post('ustawienia/moduly', [ModuleSettingController::class, 'update'])->name('settings.modules.update');
+
+        Route::get('ustawienia/powiadomienia', [NotificationSettingController::class, 'edit'])->name('settings.notifications.edit');
+        Route::post('ustawienia/powiadomienia', [NotificationSettingController::class, 'update'])->name('settings.notifications.update');
 
         Route::get('ustawienia/poczta', [MailSettingController::class, 'edit'])->name('settings.mail.edit');
         Route::post('ustawienia/poczta', [MailSettingController::class, 'update'])->name('settings.mail.update');

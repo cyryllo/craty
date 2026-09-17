@@ -133,6 +133,7 @@
                     @endif
                 </div>
 
+                @if (\App\Support\Modules::isEnabled('sales'))
                 <div class="bg-white rounded-lg shadow p-5 space-y-3 dark:bg-gray-800">
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Sale') }}</h3>
                     @forelse ($item->saleListings as $listing)
@@ -171,6 +172,7 @@
                         </a>
                     @endif
                 </div>
+                @endif
 
                 <form method="POST" action="{{ route('items.destroy', $item) }}" onsubmit="return confirm('{{ __('Remove this item from inventory?') }}');">
                     @csrf @method('DELETE')

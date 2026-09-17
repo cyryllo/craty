@@ -7,6 +7,12 @@ opis funkcji — [README.md](README.md).
 
 - Dodano wspólną stopkę (wersja aplikacji + link do repozytorium) na
   wszystkich stronach.
+- Przebudowano pulpit — kafelki liczb kierują teraz do odpowiednich list,
+  "Ostatnio dodane" pokazuje też osobno przedmioty dodane szybko z telefonu.
+- Sprzedaż stała się modułem, który można włączyć/wyłączyć w Ustawieniach
+  → Moduły (pierwszy z planowanych kolejnych modułów opcjonalnych).
+- Dodano Ustawienia → Powiadomienia: włącznik samodzielnego resetu hasła
+  oraz e-mailowe podsumowanie przeterminowanych wypożyczeń.
 
 ## 2026-09-16
 

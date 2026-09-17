@@ -22,7 +22,10 @@ class DashboardController extends Controller
                 ->whereNull('returned_at')
                 ->whereDate('due_at', '<', now())
                 ->get(),
-            'recentItems' => Item::with('category', 'storageLocation.warehouse')->latest()->take(8)->get(),
+            // Nazwa jedyne, co pokazuje widok (patrz dashboard.blade.php) — bez
+            // eager-loadów category/storageLocation, których już nie wyświetla.
+            'recentItems' => Item::latest()->take(8)->get(),
+            'needsCompletionItems' => Item::where('needs_completion', true)->latest()->take(8)->get(),
         ]);
     }
 }

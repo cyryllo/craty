@@ -26,7 +26,7 @@
                        @class(['flex items-center justify-center w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('items.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('items.*')])>
                         <x-icon name="items" class="w-5 h-5" />
                     </a>
-                    @if (auth()->user()->isMagazynier())
+                    @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('sales'))
                         <a href="{{ route('sale-listings.index') }}" title="{{ __('Sale') }}"
                            @class(['flex items-center justify-center w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('sale-listings.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('sale-listings.*')])>
                             <x-icon name="sale" class="w-5 h-5" />
@@ -44,7 +44,7 @@
                         <x-icon name="items" class="w-4 h-4 me-1.5" />
                         {{ __('Items') }}
                     </x-nav-link>
-                    @if (auth()->user()->isMagazynier())
+                    @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('sales'))
                         <x-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
                             <x-icon name="sale" class="w-4 h-4 me-1.5" />
                             {{ __('Sale') }}
@@ -132,7 +132,7 @@
                     {{ __('Items') }}
                 </span>
             </x-responsive-nav-link>
-            @if (auth()->user()->isMagazynier())
+            @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('sales'))
                 <x-responsive-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
                     <span class="inline-flex items-center gap-2">
                         <x-icon name="sale" class="w-4 h-4" />

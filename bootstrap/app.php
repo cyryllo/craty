@@ -25,6 +25,8 @@ return tap(Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
             'install.guard' => \App\Http\Middleware\EnsureNotInstalled::class,
+            'module' => \App\Http\Middleware\EnsureModuleEnabled::class,
+            'password-reset.enabled' => \App\Http\Middleware\EnsurePasswordResetEnabled::class,
         ]);
         $middleware->web(append: [
             \App\Http\Middleware\RedirectToInstallerIfNotInstalled::class,

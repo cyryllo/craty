@@ -47,11 +47,11 @@ class SaleListingWorkflowTest extends TestCase
         ]);
 
         // Zaraz po przygotowaniu: widoczna na "Przygotowane", nie na "Wystawione".
-        $this->actingAs($magazynier)->get('/sprzedaz')->assertSee('Wiertarka - okazja');
-        $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertDontSee('Wiertarka - okazja');
+        $this->actingAs($magazynier)->get('/sales')->assertSee('Wiertarka - okazja');
+        $this->actingAs($magazynier)->get('/sales/wystawione')->assertDontSee('Wiertarka - okazja');
 
         // Eksport CSV automatycznie przenosi ofertę do "Wystawione" i zmienia status przedmiotu.
-        $this->actingAs($magazynier)->get('/sprzedaz/eksport.csv')->assertOk();
+        $this->actingAs($magazynier)->get('/sales/eksport.csv')->assertOk();
 
         $listing->refresh();
         $item->refresh();
@@ -59,8 +59,8 @@ class SaleListingWorkflowTest extends TestCase
         $this->assertNotNull($listing->exported_at);
         $this->assertSame('do_sprzedazy', $item->status);
 
-        $this->actingAs($magazynier)->get('/sprzedaz')->assertDontSee('Wiertarka - okazja');
-        $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertSee('Wiertarka - okazja');
+        $this->actingAs($magazynier)->get('/sales')->assertDontSee('Wiertarka - okazja');
+        $this->actingAs($magazynier)->get('/sales/wystawione')->assertSee('Wiertarka - okazja');
 
         // Oznaczenie jako sprzedane usuwa ją z "Wystawione".
         $this->actingAs($magazynier)
@@ -69,7 +69,7 @@ class SaleListingWorkflowTest extends TestCase
 
         $this->assertSame('sprzedana', $listing->refresh()->status);
         $this->assertSame('sprzedany', $item->refresh()->status);
-        $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertDontSee('Wiertarka - okazja');
+        $this->actingAs($magazynier)->get('/sales/wystawione')->assertDontSee('Wiertarka - okazja');
     }
 
     public function test_withdrawing_a_listing_removes_it_from_wystawione_and_frees_the_item(): void
@@ -88,7 +88,7 @@ class SaleListingWorkflowTest extends TestCase
 
         $this->assertSame('wycofana', $listing->refresh()->status);
         $this->assertSame('dostepny', $item->refresh()->status);
-        $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertDontSee('Wiertarka - okazja');
+        $this->actingAs($magazynier)->get('/sales/wystawione')->assertDontSee('Wiertarka - okazja');
     }
 
     public function test_marking_a_single_prepared_listing_as_listed_moves_it_to_wystawione(): void
@@ -109,8 +109,8 @@ class SaleListingWorkflowTest extends TestCase
         $this->assertNotNull($listing->exported_at);
         $this->assertSame('do_sprzedazy', $item->refresh()->status);
 
-        $this->actingAs($magazynier)->get('/sprzedaz')->assertDontSee('Wiertarka - okazja');
-        $this->actingAs($magazynier)->get('/sprzedaz/wystawione')->assertSee('Wiertarka - okazja');
+        $this->actingAs($magazynier)->get('/sales')->assertDontSee('Wiertarka - okazja');
+        $this->actingAs($magazynier)->get('/sales/wystawione')->assertSee('Wiertarka - okazja');
     }
 
     public function test_prepared_tab_has_a_direct_list_for_sale_button_per_row(): void

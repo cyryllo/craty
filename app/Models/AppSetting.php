@@ -18,6 +18,8 @@ class AppSetting extends Model
         'mail_host', 'mail_port', 'mail_encryption', 'mail_username', 'mail_password',
         'mail_from_address', 'mail_from_name',
         'public_marketplace_enabled', 'public_contact_email', 'public_contact_phone',
+        'module_sales_enabled',
+        'password_reset_enabled', 'loan_due_notifications_enabled',
     ];
 
     protected $casts = [
@@ -25,6 +27,9 @@ class AppSetting extends Model
         // reszta AppSetting to jawne, nieszyfrowane dane (nazwa, logo...).
         'mail_password' => 'encrypted',
         'public_marketplace_enabled' => 'boolean',
+        'module_sales_enabled' => 'boolean',
+        'password_reset_enabled' => 'boolean',
+        'loan_due_notifications_enabled' => 'boolean',
     ];
 
     // Tak jak w User (rola/active) — bez tego świeży, jeszcze niezapisany
@@ -32,6 +37,9 @@ class AppSetting extends Model
     // wartości domyślnej z migracji, dopóki ktoś raz nie zapisałby ustawień.
     protected $attributes = [
         'public_marketplace_enabled' => false,
+        'module_sales_enabled' => true,
+        'password_reset_enabled' => true,
+        'loan_due_notifications_enabled' => false,
     ];
 
     public const LOCALES = [

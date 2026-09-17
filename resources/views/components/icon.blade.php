@@ -148,4 +148,12 @@
             <path d="M16.5 12.8A6.8 6.8 0 0 1 7.2 3.5a7 7 0 1 0 9.3 9.3Z"/>
         </svg>
         @break
+
+    @case('bell')
+        {{-- dzwonek: Powiadomienia --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" {{ $attributes }}>
+            <path d="M5 8a5 5 0 0 1 10 0c0 3.2 1 4.5 1.5 5H3.5C4 12.5 5 11.2 5 8Z"/>
+            <path d="M8.3 16a1.8 1.8 0 0 0 3.4 0"/>
+        </svg>
+        @break
 @endswitch
