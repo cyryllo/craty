@@ -102,6 +102,8 @@ zwykłym HTTP w produkcji. Zadbaj o certyfikat, zanim ktoś się zdziwi, że
 
 ## Dokumentacja
 
+- [INSTRUKCJA.md](INSTRUKCJA.md) — instrukcja użytkownika (główne funkcje,
+  struktura magazynowa)
 - [CHANGELOG.md](CHANGELOG.md) — historia zmian
 
 ## Licencja
