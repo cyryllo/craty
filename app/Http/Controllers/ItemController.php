@@ -113,6 +113,29 @@ class ItemController extends Controller
         return redirect()->route('items.show', $item)->with('status', __('Changes saved.'));
     }
 
+    /**
+     * Ponowne wygenerowanie numeru ewidencyjnego i kodu QR na podstawie
+     * aktualnej kategorii/lokalizacji — przydaje się, gdy przedmiot dodano
+     * bez ich uzupełnienia (numer dostaje wtedy segmenty GEN/BRAK, patrz
+     * InventoryNumberGenerator) i uzupełniono je dopiero po fakcie. Stary
+     * plik QR (nazwany po starym numerze ewidencyjnym) jest usuwany, żeby
+     * nie zostawiać osieroconych plików w app-storage/app/public/qr.
+     */
+    public function regenerateQr(Item $item, InventoryNumberGenerator $numbers, QrCodeGenerator $qr)
+    {
+        $oldQrPath = $item->qr_path;
+
+        $item->inventory_no = $numbers->generate($item->category, $item->storageLocation);
+        $item->qr_path = $qr->generateForItem($item);
+        $item->saveQuietly(); // numer/QR nie są śledzone w historii (patrz ItemObserver)
+
+        if ($oldQrPath && $oldQrPath !== $item->qr_path) {
+            Storage::disk('public')->delete($oldQrPath);
+        }
+
+        return back()->with('status', __('Inventory number and QR code regenerated.'));
+    }
+
     public function destroy(Item $item)
     {
         foreach ($item->photos as $photo) {

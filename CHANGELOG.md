@@ -3,6 +3,14 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-09-22
+
+- Dodano możliwość ponownego wygenerowania numeru ewidencyjnego i kodu QR
+  na karcie przedmiotu (przydaje się, gdy przedmiot dodano bez kategorii/
+  lokalizacji) — z potwierdzeniem, bo unieważnia już wydrukowaną etykietę.
+- Rozszerzono skanowanie kamerą o dodatkowe formaty kodów kreskowych
+  (Code 39, Code 93, Codabar, ITF), obok dotychczasowych EAN/UPC/Code128.
+
 ## 2026-09-17
 
 - Dodano wspólną stopkę (wersja aplikacji + link do repozytorium) na

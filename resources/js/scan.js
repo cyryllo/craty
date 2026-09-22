@@ -90,6 +90,13 @@ document.addEventListener('DOMContentLoaded', () => {
             BarcodeFormat.UPC_A,
             BarcodeFormat.UPC_E,
             BarcodeFormat.CODE_128,
+            // Zwykłe kody kreskowe 1D spotykane na etykietach producenta/SN
+            // poza EAN/UPC/Code128 — np. Code 39 to częsty wybór na
+            // naklejkach z numerem seryjnym sprzętu.
+            BarcodeFormat.CODE_39,
+            BarcodeFormat.CODE_93,
+            BarcodeFormat.CODABAR,
+            BarcodeFormat.ITF,
         ]);
         const reader = new BrowserMultiFormatReader(hints);
 

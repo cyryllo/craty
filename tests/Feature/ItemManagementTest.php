@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Item;
+use App\Models\StorageLocation;
 use App\Models\User;
+use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -70,6 +72,40 @@ class ItemManagementTest extends TestCase
         ])->assertRedirect();
 
         $this->assertSame('Wiertarka udarowa', $item->fresh()->name);
+    }
+
+    /**
+     * Przedmiot dodany bez kategorii/lokalizacji dostaje numer z segmentami
+     * GEN/BRAK (InventoryNumberGenerator) — jeśli je uzupełni się dopiero
+     * później, numer/QR same się nie przeliczają (ItemController::update()
+     * tego nie robi). Przycisk "Odśwież kod QR" na karcie przedmiotu ma to
+     * naprawiać na żądanie, usuwając też stary, osierocony plik QR.
+     */
+    public function test_magazynier_can_regenerate_inventory_number_and_qr_for_an_item(): void
+    {
+        Storage::fake('public');
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $category = Category::create(['name' => 'Narzędzia', 'code' => 'NAR']);
+        $warehouse = Warehouse::create(['name' => 'Magazyn 1', 'code' => 'M1']);
+        $location = StorageLocation::create(['warehouse_id' => $warehouse->id, 'rack' => 3, 'shelf' => 2, 'bin' => 1]);
+
+        $item = Item::create([
+            'inventory_no' => 'GEN-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'nowy', 'status' => 'dostepny',
+            'qr_path' => 'qr/GEN-BRAK-2026-00001.svg',
+        ]);
+        Storage::disk('public')->put($item->qr_path, 'fake-qr');
+
+        // Kategoria/lokalizacja uzupełnione dopiero po fakcie — symulujemy to
+        // bezpośrednio, bo update() i tak nie przelicza numeru/QR.
+        $item->forceFill(['category_id' => $category->id, 'storage_location_id' => $location->id])->saveQuietly();
+
+        $response = $this->actingAs($magazynier)->post(route('items.regenerate-qr', $item));
+
+        $response->assertRedirect();
+        $item->refresh();
+        $this->assertStringStartsWith('NAR-M1R3P2K1-', $item->inventory_no);
+        Storage::disk('public')->assertMissing('qr/GEN-BRAK-2026-00001.svg');
+        Storage::disk('public')->assertExists($item->qr_path);
     }
 
     public function test_items_can_be_found_by_serial_number_or_ean(): void
