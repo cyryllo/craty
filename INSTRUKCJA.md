@@ -106,17 +106,19 @@ Powiadomienia).
 Można wyłączyć w Ustawienia → Moduły, jeśli nie sprzedajecie sprzętu.
 
 Ścieżka: z karty przedmiotu "Przygotuj ofertę sprzedaży" → zakładka
-"Przygotowane" (Sprzedaż) → eksport do CSV (zawiera gotowe tytuły/opisy do
-wklejenia na OLX albo wgrania w narzędziu typu BaseLinker — OLX nie
-udostępnia publicznego API do masowego wystawiania dla zwykłych kont) →
-oferta trafia do zakładki "Wystawione", gdzie oznaczasz ją jako "sprzedane"
-albo "wycofaj".
+"Przygotowane" (Sprzedaż) → eksport do CSV (opcja wyeksportowania swoich
+przedmiotów przeznaczonych do sprzedaży — gotowe tytuły i opisy, do
+dalszego wykorzystania jak Ci wygodnie) → oferta trafia do zakładki
+"Wystawione", gdzie oznaczasz ją jako "sprzedane" albo "wycofaj".
 
 **Pchli targ** — opcjonalna publiczna strona (bez logowania) pokazująca
-wystawione oferty, do włączenia w Ustawienia → Ustawienia aplikacji. Dwa
-niezależne przełączniki muszą być włączone naraz: moduł Sprzedaży i sam
-"Pchli targ" — jeśli wyłączysz moduł Sprzedaży, publiczna strona znika
-automatycznie, nawet gdy jej własny przełącznik zostaje włączony.
+wystawione oferty, do włączenia w Ustawienia → Ustawienia aplikacji. Link
+do niej możesz wysłać znajomym, żeby pokazać, co aktualnie sprzedajesz —
+to zwykła lista rzeczy z opisami i zdjęciami, bez koszyka i bez typowego
+sklepu (kontakt tylko przez podany e-mail/telefon). Dwa niezależne
+przełączniki muszą być włączone naraz: moduł Sprzedaży i sam "Pchli targ"
+— jeśli wyłączysz moduł Sprzedaży, publiczna strona znika automatycznie,
+nawet gdy jej własny przełącznik zostaje włączony.
 
 ## Skanowanie kamerą i aplikacja mobilna (PWA)
 
