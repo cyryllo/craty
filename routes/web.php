@@ -12,6 +12,7 @@ use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\ModuleSettingController;
 use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SaleListingController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\SettingsController;
@@ -61,6 +62,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('items/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
         Route::post('items/{item}/regenerate-qr', [ItemController::class, 'regenerateQr'])->name('items.regenerate-qr');
         Route::delete('items/{item}/photos/{photo}', [ItemController::class, 'destroyPhoto'])->name('items.photos.destroy');
+        Route::patch('items/{item}/photos/{photo}/move', [ItemController::class, 'movePhoto'])->name('items.photos.move');
         Route::delete('items/{item}/attachments/{attachment}', [ItemController::class, 'destroyAttachment'])->name('items.attachments.destroy');
 
         Route::post('items/{item}/loans', [LoanController::class, 'store'])->name('items.loans.store');
@@ -82,6 +84,7 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('warehouses', WarehouseController::class)->except('show');
+        Route::resource('rooms', RoomController::class)->except('show');
         Route::resource('storage-locations', StorageLocationController::class)->except('show');
 
         // "Szybkie dodawanie" po nietrafionym skanie kodu kreskowego — mutuje

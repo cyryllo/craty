@@ -16,6 +16,7 @@
                     <tr>
                         <th class="text-left px-4 py-3">{{ __('Code') }}</th>
                         <th class="text-left px-4 py-3">{{ __('Warehouse') }}</th>
+                        <th class="text-left px-4 py-3">{{ __('Room') }}</th>
                         <th class="text-left px-4 py-3">{{ __('Rack / Shelf / Bin') }}</th>
                         <th class="text-left px-4 py-3">{{ __('Items') }}</th>
                         <th class="px-4 py-3"></th>
@@ -26,6 +27,7 @@
                         <tr>
                             <td class="px-4 py-3 font-mono text-gray-900 dark:text-gray-100">{{ $location->code }}</td>
                             <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $location->warehouse->name }}</td>
+                            <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $location->room?->name ?? '—' }}</td>
                             <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ implode(' / ', array_filter([$location->rack, $location->shelf, $location->bin])) ?: '—' }}</td>
                             <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $location->items_count }}</td>
                             <td class="px-4 py-3 text-right space-x-3">

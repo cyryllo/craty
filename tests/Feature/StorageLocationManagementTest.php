@@ -24,7 +24,12 @@ class StorageLocationManagementTest extends TestCase
             'shelf' => '2',
         ]);
 
+        // Komunikat ma wskazywać istniejącą lokalizację (po kodzie) i tłumaczyć,
+        // że jedna lokalizacja i tak może trzymać kilka przedmiotów naraz —
+        // realne zgłoszenie użytkownika, który nie wiedział o tym i próbował
+        // założyć duplikat zamiast wybrać istniejącą na formularzu przedmiotu.
         $response->assertSessionHasErrors('combination');
+        $this->assertStringContainsString('M1-R3-P2', session('errors')->first('combination'));
         $this->assertSame(1, StorageLocation::count());
     }
 

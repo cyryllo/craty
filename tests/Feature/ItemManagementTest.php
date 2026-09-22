@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Item;
+use App\Models\ItemPhoto;
 use App\Models\StorageLocation;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -125,6 +126,65 @@ class ItemManagementTest extends TestCase
 
         $byEan = $this->actingAs($magazynier)->get('/items?q=5901234123457');
         $byEan->assertSee('Wkrętarka')->assertDontSee('Inny przedmiot');
+    }
+
+    /**
+     * "Przesuń wcześniej/później" na karcie edycji przedmiotu — zamienia
+     * sort_order z sąsiadem, a okładką (is_primary) zawsze zostaje zdjęcie
+     * na pierwszej pozycji, niezależnie które to było przed przesunięciem.
+     */
+    public function test_magazynier_can_reorder_photos_and_the_first_one_becomes_the_cover(): void
+    {
+        Storage::fake('public');
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'nowy', 'status' => 'dostepny',
+        ]);
+        $first = $item->photos()->create(['path' => 'items/1/a.jpg', 'is_primary' => true, 'sort_order' => 0]);
+        $second = $item->photos()->create(['path' => 'items/1/b.jpg', 'is_primary' => false, 'sort_order' => 1]);
+        $third = $item->photos()->create(['path' => 'items/1/c.jpg', 'is_primary' => false, 'sort_order' => 2]);
+
+        // Przesuwamy trzecie zdjęcie "wcześniej" — powinno zamienić się
+        // miejscami z drugim, ale nie ruszyć pierwszego (nadal okładka).
+        $response = $this->actingAs($magazynier)->patch(route('items.photos.move', [$item, $third]), ['direction' => 'earlier']);
+        // Kotwica #item-photos zamiast gołego back() — inaczej każde
+        // kliknięcie strzałki przewija stronę z powrotem na sam początek.
+        $this->assertStringEndsWith('#item-photos', $response->headers->get('Location'));
+        $this->assertTrue($third->fresh()->sort_order < $second->fresh()->sort_order);
+        $this->assertTrue($first->fresh()->is_primary);
+
+        // Przesuwamy pierwsze zdjęcie "później" — traci pozycję lidera,
+        // więc to, co teraz jest pierwsze w kolejności, przejmuje okładkę.
+        $this->actingAs($magazynier)->patch(route('items.photos.move', [$item, $first]), ['direction' => 'later']);
+        $this->assertFalse($first->fresh()->is_primary);
+        $newFirst = $item->photos()->first();
+        $this->assertTrue($newFirst->is_primary);
+        $this->assertNotSame($first->id, $newFirst->id);
+
+        // Przesunięcie skrajnego zdjęcia w kierunku, w którym nie ma sąsiada, to no-op.
+        // ItemPhoto::query() wprost, bo relacja photos() ma wbudowane orderBy('sort_order')
+        // ASC — dopisanie do niej orderByDesc() na tej samej kolumnie by się z nim zderzyło.
+        $edge = ItemPhoto::where('item_id', $item->id)->orderByDesc('sort_order')->first();
+        $before = $edge->sort_order;
+        $this->actingAs($magazynier)->patch(route('items.photos.move', [$item, $edge]), ['direction' => 'later']);
+        $this->assertSame($before, $edge->fresh()->sort_order);
+    }
+
+    public function test_edit_form_renders_reorder_controls_for_non_edge_photos_only(): void
+    {
+        Storage::fake('public');
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka', 'condition' => 'nowy', 'status' => 'dostepny',
+        ]);
+        $item->photos()->create(['path' => 'items/1/a.jpg', 'is_primary' => true, 'sort_order' => 0]);
+        $item->photos()->create(['path' => 'items/1/b.jpg', 'is_primary' => false, 'sort_order' => 1]);
+
+        $response = $this->actingAs($magazynier)->get(route('items.edit', $item));
+
+        $response->assertOk()->assertSee(__('Cover'));
+        $this->assertSame(1, substr_count($response->getContent(), 'name="direction" value="earlier"'));
+        $this->assertSame(1, substr_count($response->getContent(), 'name="direction" value="later"'));
     }
 
     public function test_magazynier_can_remove_a_single_photo_and_another_one_becomes_primary(): void

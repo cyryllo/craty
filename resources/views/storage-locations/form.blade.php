@@ -19,6 +19,21 @@
                 <x-input-error :messages="$errors->get('warehouse_id')" class="mt-1" />
             </div>
             <div>
+                <x-input-label for="room_id" :value="__('Room (optional)')" />
+                <select id="room_id" name="room_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600">
+                    <option value="">— {{ __('none') }} —</option>
+                    @foreach ($rooms->groupBy('warehouse_id') as $warehouseRooms)
+                        <optgroup label="{{ $warehouseRooms->first()->warehouse->name }}">
+                            @foreach ($warehouseRooms as $room)
+                                <option value="{{ $room->id }}" @selected(old('room_id', $location->room_id) == $room->id)>{{ $room->name }} ({{ $room->code }})</option>
+                            @endforeach
+                        </optgroup>
+                    @endforeach
+                </select>
+                <x-input-error :messages="$errors->get('room_id')" class="mt-1" />
+            </div>
+            <div>
+                <p class="text-xs text-gray-400 mb-2 dark:text-gray-500">{{ __('Leave rack/shelf/bin blank for a location that just represents the whole warehouse (or room), with no further breakdown.') }}</p>
                 <div class="grid grid-cols-3 gap-3">
                     <div>
                         <x-input-label for="rack" :value="__('Rack')" />

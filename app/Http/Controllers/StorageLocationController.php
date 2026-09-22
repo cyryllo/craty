@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Room;
 use App\Models\StorageLocation;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ class StorageLocationController extends Controller
     public function index()
     {
         return view('storage-locations.index', [
-            'locations' => StorageLocation::with('warehouse')->withCount('items')->get(),
+            'locations' => StorageLocation::with(['warehouse', 'room'])->withCount('items')->get(),
         ]);
     }
 
@@ -21,6 +22,7 @@ class StorageLocationController extends Controller
         return view('storage-locations.form', [
             'location' => new StorageLocation,
             'warehouses' => Warehouse::orderBy('name')->get(),
+            'rooms' => Room::with('warehouse')->orderBy('warehouse_id')->orderBy('name')->get(),
         ]);
     }
 
@@ -36,6 +38,7 @@ class StorageLocationController extends Controller
         return view('storage-locations.form', [
             'location' => $storageLocation,
             'warehouses' => Warehouse::orderBy('name')->get(),
+            'rooms' => Room::with('warehouse')->orderBy('warehouse_id')->orderBy('name')->get(),
         ]);
     }
 
@@ -61,11 +64,22 @@ class StorageLocationController extends Controller
     {
         $data = $request->validate([
             'warehouse_id' => ['required', 'exists:warehouses,id'],
+            'room_id' => ['nullable', 'exists:rooms,id'],
             'rack' => ['nullable', 'string', 'max:32'],
             'shelf' => ['nullable', 'string', 'max:32'],
             'bin' => ['nullable', 'string', 'max:32'],
             'note' => ['nullable', 'string', 'max:255'],
         ]);
+
+        // Pomieszczenie jest własnością konkretnego magazynu (rooms.warehouse_id)
+        // — nie da się go wybrać z <select>a poza swoim magazynem (patrz
+        // storage-locations/form.blade.php, optgroup per magazyn), ale ktoś
+        // mógłby to obejść, więc sprawdzamy to samo jeszcze raz po stronie serwera.
+        if (! empty($data['room_id']) && ! Room::where('id', $data['room_id'])->where('warehouse_id', $data['warehouse_id'])->exists()) {
+            throw ValidationException::withMessages([
+                'room_id' => [__('The selected room does not belong to the chosen warehouse.')],
+            ]);
+        }
 
         // storage_locations.code (regał/półka/pojemnik w obrębie magazynu) jest
         // unikalny w bazie, ale nie jest polem formularza — sam się buduje w
@@ -74,13 +88,19 @@ class StorageLocationController extends Controller
         $candidate = new StorageLocation($data);
         $code = $candidate->buildCode();
 
-        $duplicateExists = StorageLocation::where('code', $code)
+        $duplicate = StorageLocation::where('code', $code)
             ->when($storageLocation, fn ($query) => $query->whereKeyNot($storageLocation))
-            ->exists();
+            ->first();
 
-        if ($duplicateExists) {
+        if ($duplicate) {
+            // Nie tylko "już istnieje" — dopisujemy kod istniejącej lokalizacji i
+            // przypominamy, że jedna lokalizacja i tak może trzymać wiele
+            // przedmiotów naraz, żeby nie zachęcać do zakładania duplikatu
+            // zamiast po prostu wybrania istniejącej na formularzu przedmiotu
+            // (realne zgłoszenie użytkownika — trafił na ten błąd, bo nie
+            // wiedział, że jeden pojemnik obsługuje kilka przedmiotów).
             throw ValidationException::withMessages([
-                'combination' => [__('A location with this rack/shelf/bin combination already exists in this warehouse.')],
+                'combination' => [__('A location with this rack/shelf/bin combination already exists in this warehouse (code: :code). One location can already hold several items — pick the existing one on the item form instead of creating a new one.', ['code' => $duplicate->code])],
             ]);
         }
 

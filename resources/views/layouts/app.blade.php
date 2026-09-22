@@ -37,14 +37,20 @@
                 $breezeStatusFlags = ['profile-updated', 'password-updated', 'locale-updated', 'verification-link-sent'];
             @endphp
             @if (session('status') && ! in_array(session('status'), $breezeStatusFlags, true))
-                <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+                {{-- x-data/x-init znika samo po 10s — ten sam wzorzec, co Breeze'owe
+                     "Saved." w profile/partials/update-profile-information-form.blade.php,
+                     tylko z dłuższym czasem (to pełny baner, nie krótki napis obok przycisku).
+                     mb-4 (obok mt-4) celowo, żeby baner nie stykał się bezpośrednio z nagłówkiem
+                     podstrony poniżej — bez tego wyglądało to jak jedno na drugim. --}}
+                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 10000)"
+                     class="max-w-7xl mx-auto mt-4 mb-4 px-4 sm:px-6 lg:px-8">
                     <div class="rounded-md bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300 dark:bg-emerald-950 dark:border-emerald-800">
                         {{ session('status') }}
                     </div>
                 </div>
             @endif
             @if (session('error'))
-                <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto mt-4 mb-4 px-4 sm:px-6 lg:px-8">
                     <div class="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800 whitespace-pre-line dark:bg-red-950 dark:border-red-800 dark:text-red-300">
                         {{ session('error') }}
                     </div>

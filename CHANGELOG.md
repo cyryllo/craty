@@ -10,6 +10,22 @@ opis funkcji — [README.md](README.md).
   lokalizacji) — z potwierdzeniem, bo unieważnia już wydrukowaną etykietę.
 - Rozszerzono skanowanie kamerą o dodatkowe formaty kodów kreskowych
   (Code 39, Code 93, Codabar, ITF), obok dotychczasowych EAN/UPC/Code128.
+- Dodano zmianę kolejności zdjęć przy edycji przedmiotu (strzałkami) —
+  pierwsze zdjęcie jest zawsze okładką.
+- Poprawiono baner powiadomień o zapisie/zmianach — nie nachodzi już na
+  nagłówek podstrony i znika sam po 10 sekundach.
+- Magazyn dostaje teraz automatycznie "bazową" lokalizację (bez regału/
+  półki/pojemnika), więc da się go wybrać na formularzu przedmiotu bez
+  konieczności najpierw ręcznie definiować szczegółową lokalizację.
+- Dodano pomieszczenia (Ustawienia → Pomieszczenia) jako opcjonalny poziom
+  między magazynem a regałem/półką/pojemnikiem — przydaje się, gdy magazyn
+  ma więcej niż jedno pomieszczenie. Tak jak magazyn, pomieszczenie od razu
+  dostaje własną "bazową" lokalizację, więc jest wybieralne na formularzu
+  przedmiotu bez rozpisywania regału/półki/pojemnika.
+- Doprecyzowano komunikat o zduplikowanej lokalizacji (regał/półka/
+  pojemnik) — teraz podaje kod już istniejącej lokalizacji i przypomina,
+  że jedna lokalizacja i tak może trzymać kilka przedmiotów naraz, więc
+  wystarczy wybrać ją na formularzu przedmiotu zamiast zakładać duplikat.
 
 ## 2026-09-17
 

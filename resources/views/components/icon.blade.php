@@ -114,6 +114,14 @@
         </svg>
         @break
 
+    @case('room')
+        {{-- otwarte drzwi: Pomieszczenia --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" {{ $attributes }}>
+            <path d="M4 2.5 13 2.5 17 4V16L13 17.5 4 17.5Z"/>
+            <circle cx="10.8" cy="10" r="0.9" fill="currentColor" stroke="none"/>
+        </svg>
+        @break
+
     @case('location')
         {{-- pinezka mapy: Lokalizacje --}}
         <svg viewBox="0 0 20 20" fill="currentColor" {{ $attributes }}>

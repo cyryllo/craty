@@ -30,7 +30,7 @@ class ItemController extends Controller
         }
 
         $items = Item::query()
-            ->with(['category', 'storageLocation.warehouse', 'primaryPhoto'])
+            ->with(['category', 'storageLocation.warehouse', 'storageLocation.room', 'primaryPhoto'])
             ->when($request->filled('q'), fn ($q) => $q->where(function ($q) use ($request) {
                 $term = '%'.$request->string('q').'%';
                 $q->where('name', 'like', $term)
@@ -57,7 +57,7 @@ class ItemController extends Controller
         return view('items.form', [
             'item' => new Item,
             'categories' => Category::orderBy('name')->get(),
-            'locations' => StorageLocation::with('warehouse')->get(),
+            'locations' => StorageLocation::with(['warehouse', 'room'])->get(),
         ]);
     }
 
@@ -82,7 +82,7 @@ class ItemController extends Controller
 
     public function show(Item $item)
     {
-        $item->load(['category', 'storageLocation.warehouse', 'photos', 'attachments', 'histories.user', 'currentLoan.borrower', 'saleListings', 'activeSaleListing', 'draftSaleListing']);
+        $item->load(['category', 'storageLocation.warehouse', 'storageLocation.room', 'photos', 'attachments', 'histories.user', 'currentLoan.borrower', 'saleListings', 'activeSaleListing', 'draftSaleListing']);
 
         return view('items.show', ['item' => $item]);
     }
@@ -92,7 +92,7 @@ class ItemController extends Controller
         return view('items.form', [
             'item' => $item,
             'categories' => Category::orderBy('name')->get(),
-            'locations' => StorageLocation::with('warehouse')->get(),
+            'locations' => StorageLocation::with(['warehouse', 'room'])->get(),
         ]);
     }
 
@@ -221,6 +221,40 @@ class ItemController extends Controller
         }
 
         return back()->with('status', __('Photo removed.'));
+    }
+
+    /**
+     * Przesuwa zdjęcie o jedną pozycję wcześniej/później (zamiana sort_order
+     * z sąsiadem w tym kierunku) — brak sąsiada w danym kierunku to po
+     * prostu no-op, nie błąd. Zdjęcie na pierwszej pozycji zawsze staje się
+     * okładką (is_primary), tak samo jak po usunięciu okładki w destroyPhoto().
+     */
+    public function movePhoto(Request $request, Item $item, ItemPhoto $photo)
+    {
+        abort_unless($photo->item_id === $item->id, 404);
+
+        $direction = $request->validate([
+            'direction' => ['required', Rule::in(['earlier', 'later'])],
+        ])['direction'];
+
+        $neighbor = $direction === 'earlier'
+            ? ItemPhoto::where('item_id', $item->id)->where('sort_order', '<', $photo->sort_order)->orderByDesc('sort_order')->first()
+            : ItemPhoto::where('item_id', $item->id)->where('sort_order', '>', $photo->sort_order)->orderBy('sort_order')->first();
+
+        if ($neighbor) {
+            [$photo->sort_order, $neighbor->sort_order] = [$neighbor->sort_order, $photo->sort_order];
+            $photo->save();
+            $neighbor->save();
+
+            ItemPhoto::where('item_id', $item->id)->update(['is_primary' => false]);
+            $item->photos()->first()?->update(['is_primary' => true]);
+        }
+
+        // Zwykłe back() wraca na sam początek strony (przeładowanie nawiguje
+        // od nowa) — przy przesuwaniu wielu zdjęć pod rząd to uciążliwe, więc
+        // doklejamy kotwicę sekcji zdjęć (items/form.blade.php, #item-photos),
+        // żeby przeglądarka od razu przewinęła z powrotem w to miejsce.
+        return redirect(url()->previous().'#item-photos')->with('status', __('Photo order updated.'));
     }
 
     public function destroyAttachment(Item $item, ItemAttachment $attachment)

@@ -105,16 +105,38 @@
         </form>
 
         @if ($item->exists && $item->photos->isNotEmpty())
-            <div class="bg-white rounded-lg shadow p-6 mt-6 dark:bg-gray-800">
-                <h3 class="text-sm font-medium text-gray-700 mb-3 dark:text-gray-300">{{ __('Photos') }}</h3>
+            <div id="item-photos" class="bg-white rounded-lg shadow p-6 mt-6 dark:bg-gray-800">
+                <h3 class="text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">{{ __('Photos') }}</h3>
+                <p class="text-xs text-gray-400 mb-3 dark:text-gray-500">{{ __('The first photo is used as the cover — use the arrows to reorder.') }}</p>
                 <div class="flex flex-wrap gap-3">
                     @foreach ($item->photos as $photo)
-                        <div class="relative group">
+                        <div class="relative group w-20 h-20">
                             <img src="{{ $photo->url() }}" class="w-20 h-20 object-cover rounded-md border {{ $photo->is_primary ? 'ring-2 ring-indigo-500' : '' }}">
+
+                            @if ($photo->is_primary)
+                                <span class="absolute bottom-1 start-1 px-1 rounded bg-indigo-600 text-white text-[10px] leading-tight">{{ __('Cover') }}</span>
+                            @endif
+
                             <form method="POST" action="{{ route('items.photos.destroy', [$item, $photo]) }}" onsubmit="return confirm('{{ __('Remove this photo?') }}');" class="absolute -top-2 -end-2">
                                 @csrf @method('DELETE')
                                 <button type="submit" title="{{ __('Remove photo') }}" class="w-5 h-5 flex items-center justify-center rounded-full bg-red-600 text-white text-xs leading-none shadow hover:bg-red-700">×</button>
                             </form>
+
+                            @unless ($loop->first)
+                                <form method="POST" action="{{ route('items.photos.move', [$item, $photo]) }}" class="absolute top-1/2 -start-2 -translate-y-1/2">
+                                    @csrf @method('PATCH')
+                                    <input type="hidden" name="direction" value="earlier">
+                                    <button type="submit" title="{{ __('Move earlier') }}" class="w-5 h-5 flex items-center justify-center rounded-full bg-white border border-gray-300 text-gray-600 text-xs leading-none shadow hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">‹</button>
+                                </form>
+                            @endunless
+
+                            @unless ($loop->last)
+                                <form method="POST" action="{{ route('items.photos.move', [$item, $photo]) }}" class="absolute top-1/2 -end-2 -translate-y-1/2">
+                                    @csrf @method('PATCH')
+                                    <input type="hidden" name="direction" value="later">
+                                    <button type="submit" title="{{ __('Move later') }}" class="w-5 h-5 flex items-center justify-center rounded-full bg-white border border-gray-300 text-gray-600 text-xs leading-none shadow hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">›</button>
+                                </form>
+                            @endunless
                         </div>
                     @endforeach
                 </div>

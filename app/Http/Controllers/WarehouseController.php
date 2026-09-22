@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
+use App\Models\StorageLocation;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 
@@ -21,7 +23,14 @@ class WarehouseController extends Controller
 
     public function store(Request $request)
     {
-        Warehouse::create($this->validated($request));
+        $warehouse = Warehouse::create($this->validated($request));
+
+        // Nie każdy chce od razu rozpisywać regały/półki/pojemniki — bez tego
+        // magazynu w ogóle nie dało się wybrać na formularzu przedmiotu
+        // (patrz migracja add_base_location_for_warehouses_without_one).
+        // Ta "bazowa" lokalizacja (bez rack/shelf/bin) daje wybór "cały
+        // magazyn", a StorageLocation::label() ją odpowiednio opisuje.
+        StorageLocation::create(['warehouse_id' => $warehouse->id]);
 
         return redirect()->route('warehouses.index')->with('status', __('Warehouse added.'));
     }
@@ -40,11 +49,17 @@ class WarehouseController extends Controller
 
     public function destroy(Warehouse $warehouse)
     {
-        if ($warehouse->storageLocations()->exists()) {
-            return back()->with('error', __('This warehouse cannot be deleted because it has locations defined.'));
+        // Nie samo "czy magazyn ma jakąś lokalizację" — od store() każdy
+        // magazyn zawsze ma co najmniej bazową (patrz wyżej), więc ten
+        // warunek nigdy by nie przepuścił żadnego usunięcia. Liczy się,
+        // czy w którejkolwiek z jego lokalizacji faktycznie są przedmioty.
+        $hasItems = Item::whereIn('storage_location_id', $warehouse->storageLocations()->pluck('id'))->exists();
+
+        if ($hasItems) {
+            return back()->with('error', __('This warehouse cannot be deleted because it has items in it.'));
         }
 
-        $warehouse->delete();
+        $warehouse->delete(); // lokalizacje kaskadowo (storage_locations.warehouse_id->cascadeOnDelete())
 
         return redirect()->route('warehouses.index')->with('status', __('Warehouse deleted.'));
     }
