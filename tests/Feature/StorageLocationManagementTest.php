@@ -12,6 +12,14 @@ class StorageLocationManagementTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** Pomieszczenia/lokalizacje żyją w module "Rozszerzony magazyn" — domyślnie wyłączonym. */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \App\Models\AppSetting::current()->fill(['module_locations_enabled' => true])->save();
+    }
+
     public function test_duplicate_rack_shelf_bin_combination_in_the_same_warehouse_is_rejected_with_validation(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);

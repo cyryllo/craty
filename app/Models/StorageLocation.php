@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Modules;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -61,10 +62,20 @@ class StorageLocation extends Model
      * dopisku wyglądałaby na liście identycznie jak zwykła, konkretna
      * lokalizacja (kod pokrywa się wtedy z kodem magazynu).
      */
+    /** "Bazowa" lokalizacja = cały magazyn, bez pomieszczenia i regału/półki/pojemnika. */
+    public function isBase(): bool
+    {
+        return ! $this->room_id && ! $this->rack && ! $this->shelf && ! $this->bin;
+    }
+
     public function label(): string
     {
-        if (! $this->room_id && ! $this->rack && ! $this->shelf && ! $this->bin) {
-            return $this->warehouse->name.' — '.__('whole warehouse, no specific spot');
+        if ($this->isBase()) {
+            // Bez modułu "Rozszerzony magazyn" nie ma innych lokalizacji do
+            // odróżnienia, więc wystarczy sama nazwa magazynu.
+            return Modules::isEnabled('locations')
+                ? $this->warehouse->name.' — '.__('whole warehouse, no specific spot')
+                : $this->warehouse->name;
         }
 
         return $this->warehouse->name.' — '.$this->code;

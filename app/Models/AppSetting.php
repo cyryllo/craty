@@ -18,7 +18,7 @@ class AppSetting extends Model
         'mail_host', 'mail_port', 'mail_encryption', 'mail_username', 'mail_password',
         'mail_from_address', 'mail_from_name',
         'public_marketplace_enabled', 'public_contact_email', 'public_contact_phone',
-        'module_sales_enabled',
+        'module_sales_enabled', 'module_locations_enabled',
         'password_reset_enabled', 'loan_due_notifications_enabled',
     ];
 
@@ -28,6 +28,7 @@ class AppSetting extends Model
         'mail_password' => 'encrypted',
         'public_marketplace_enabled' => 'boolean',
         'module_sales_enabled' => 'boolean',
+        'module_locations_enabled' => 'boolean',
         'password_reset_enabled' => 'boolean',
         'loan_due_notifications_enabled' => 'boolean',
     ];
@@ -38,6 +39,7 @@ class AppSetting extends Model
     protected $attributes = [
         'public_marketplace_enabled' => false,
         'module_sales_enabled' => true,
+        'module_locations_enabled' => false,
         'password_reset_enabled' => true,
         'loan_due_notifications_enabled' => false,
     ];

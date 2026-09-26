@@ -42,7 +42,7 @@
                 </div>
 
                 <div>
-                    <x-input-label for="storage_location_id" :value="__('Location')" />
+                    <x-input-label for="storage_location_id" :value="\App\Support\Modules::isEnabled('locations') ? __('Location') : __('Warehouse')" />
                     <select id="storage_location_id" name="storage_location_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600">
                         <option value="">— {{ __('none') }} —</option>
                         @foreach ($locations as $location)

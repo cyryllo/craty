@@ -87,8 +87,10 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('warehouses', WarehouseController::class)->except('show');
-        Route::resource('rooms', RoomController::class)->except('show');
-        Route::resource('storage-locations', StorageLocationController::class)->except('show');
+        Route::middleware('module:locations')->group(function () {
+            Route::resource('rooms', RoomController::class)->except('show');
+            Route::resource('storage-locations', StorageLocationController::class)->except('show');
+        });
 
         // "Szybkie dodawanie" po nietrafionym skanie kodu kreskowego — mutuje
         // stan magazynu, więc te dwie trasy zostają w grupie admin/magazynier,

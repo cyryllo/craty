@@ -14,6 +14,14 @@ class RoomManagementTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** Pomieszczenia/lokalizacje żyją w module "Rozszerzony magazyn" — domyślnie wyłączonym. */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \App\Models\AppSetting::current()->fill(['module_locations_enabled' => true])->save();
+    }
+
     /**
      * Tak samo jak magazyn dostaje bazową lokalizację przy tworzeniu
      * (WarehouseController::store()), pomieszczenie ma być wybieralne od

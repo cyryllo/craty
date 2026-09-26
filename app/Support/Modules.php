@@ -30,6 +30,12 @@ class Modules
             'label' => 'Sale',
             'description' => 'Sale listings, the "Sale" section, and the public flea market page.',
         ],
+        // Bez modułu przedmiot wybiera sam magazyn (jego "bazową" lokalizację);
+        // dane już zapisane w pomieszczeniach/lokalizacjach są tylko ukrywane, nie kasowane.
+        'locations' => [
+            'label' => 'Extended warehouse',
+            'description' => 'Rooms and detailed locations (rack, shelf, bin) inside warehouses. When off, items are assigned just to a warehouse.',
+        ],
     ];
 
     public static function isEnabled(string $key): bool

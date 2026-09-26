@@ -1,4 +1,5 @@
 <x-app-layout>
+    @php($locationsModule = \App\Support\Modules::isEnabled('locations'))
     <x-slot name="header">
         <div class="flex items-start justify-between gap-4">
             <div class="space-y-1">
@@ -17,7 +18,9 @@
                         <th class="text-left px-4 py-3">{{ __('Warehouse name') }}</th>
                         <th class="text-left px-4 py-3">{{ __('Code') }}</th>
                         <th class="text-left px-4 py-3">{{ __('Address') }}</th>
-                        <th class="text-left px-4 py-3">{{ __('Locations') }}</th>
+                        @if ($locationsModule)
+                            <th class="text-left px-4 py-3">{{ __('Locations') }}</th>
+                        @endif
                         <th class="px-4 py-3"></th>
                     </tr>
                 </thead>
@@ -27,7 +30,9 @@
                             <td class="px-4 py-3 text-gray-900 dark:text-gray-100">{{ $warehouse->name }}</td>
                             <td class="px-4 py-3 font-mono text-gray-500 dark:text-gray-400">{{ $warehouse->code }}</td>
                             <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $warehouse->address ?? '—' }}</td>
-                            <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $warehouse->storage_locations_count }}</td>
+                            @if ($locationsModule)
+                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $warehouse->storage_locations_count }}</td>
+                            @endif
                             <td class="px-4 py-3 text-right space-x-3">
                                 <a href="{{ route('warehouses.edit', $warehouse) }}" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('edit') }}</a>
                                 <form method="POST" action="{{ route('warehouses.destroy', $warehouse) }}" class="inline" onsubmit="return confirm('{{ __('Delete this warehouse?') }}');">

@@ -12,6 +12,7 @@ use App\Models\StorageLocation;
 use App\Services\InventoryNumberGenerator;
 use App\Services\QrCodeGenerator;
 use App\Support\ItemLabelTemplates;
+use App\Support\Modules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -57,7 +58,7 @@ class ItemController extends Controller
         return view('items.form', [
             'item' => new Item,
             'categories' => Category::orderBy('name')->get(),
-            'locations' => StorageLocation::with(['warehouse', 'room'])->get(),
+            'locations' => $this->locationOptions(),
         ]);
     }
 
@@ -92,7 +93,7 @@ class ItemController extends Controller
         return view('items.form', [
             'item' => $item,
             'categories' => Category::orderBy('name')->get(),
-            'locations' => StorageLocation::with(['warehouse', 'room'])->get(),
+            'locations' => $this->locationOptions($item),
         ]);
     }
 
@@ -292,5 +293,26 @@ class ItemController extends Controller
                 'label' => $labels[$index] ?? $file->getClientOriginalName(),
             ]);
         }
+    }
+
+    /**
+     * Opcje pola "Lokalizacja"/"Magazyn" na formularzu przedmiotu. Przy
+     * wyłączonym module "Rozszerzony magazyn" tylko bazowe lokalizacje
+     * (= same magazyny) — plus bieżąca lokalizacja edytowanego przedmiotu,
+     * jeśli jest szczegółowa (zapisana, zanim moduł wyłączono), żeby zwykły
+     * zapis formularza jej po cichu nie zgubił.
+     */
+    private function locationOptions(?Item $item = null)
+    {
+        $locations = StorageLocation::with(['warehouse', 'room'])->get();
+
+        if (Modules::isEnabled('locations')) {
+            return $locations;
+        }
+
+        return $locations
+            ->filter(fn (StorageLocation $l) => $l->isBase() || $l->id === $item?->storage_location_id)
+            ->sortBy(fn (StorageLocation $l) => $l->warehouse->name)
+            ->values();
     }
 }
