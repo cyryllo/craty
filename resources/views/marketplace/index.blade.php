@@ -111,6 +111,9 @@
                                             <span class="font-semibold text-gray-900 whitespace-nowrap dark:text-gray-100">{{ number_format((float) $listing->price, 2, ',', ' ') }} zł</span>
                                         </div>
                                         <p class="text-sm text-gray-600 mt-1 whitespace-pre-line dark:text-gray-400">{{ $listing->description }}</p>
+                                        @if ($listing->external_url)
+                                            <div class="mt-2">@include('marketplace._external-link')</div>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
@@ -147,6 +150,9 @@
                                         </div>
                                         <span class="font-semibold text-gray-900 mt-1 dark:text-gray-100">{{ number_format((float) $listing->price, 2, ',', ' ') }} zł</span>
                                         <p class="text-sm text-gray-600 mt-2 flex-1 whitespace-pre-line dark:text-gray-400">{{ $listing->description }}</p>
+                                        @if ($listing->external_url)
+                                            <div class="mt-3">@include('marketplace._external-link')</div>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach

@@ -57,6 +57,25 @@ class SaleListingController extends Controller
         return back()->with('status', __('Listing marked as listed.'));
     }
 
+    /**
+     * Dopisanie/zmiana/usunięcie linku do oferty na OLX/Allegro już po jej
+     * utworzeniu — z popupu podglądu na "Przygotowane" i "Wystawione". Link
+     * zwykle istnieje dopiero po faktycznym wystawieniu ogłoszenia, więc
+     * samo pole w formularzu tworzenia oferty by nie wystarczyło.
+     */
+    public function updateLink(Request $request, SaleListing $listing)
+    {
+        abort_unless($this->isEditable($listing), 404);
+
+        $data = $request->validate([
+            'external_url' => ['nullable', 'url:http,https', 'max:2048'],
+        ]);
+
+        $listing->update($data);
+
+        return back()->with('status', $data['external_url'] ? __('Listing link saved.') : __('Listing link removed.'));
+    }
+
     /** Oznacza wystawioną ofertę jako sprzedaną — kończy jej cykl życia. */
     public function markSold(SaleListing $listing)
     {
@@ -94,17 +113,36 @@ class SaleListingController extends Controller
 
     public function store(Request $request, Item $item)
     {
-        $data = $request->validate([
-            'platform' => ['required', 'in:olx,allegro,inne'],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'price' => ['nullable', 'numeric', 'min:0'],
-        ]);
+        $data = $request->validate($this->rules());
 
         $item->saleListings()->create($data);
         $item->update(['status' => 'do_sprzedazy']);
 
         return redirect()->route('sale-listings.index')->with('status', __('Sale listing prepared.'));
+    }
+
+    /**
+     * Edycja istniejącej oferty (przygotowanej albo wystawionej) — ten sam
+     * formularz co create(), ale z zapisanymi wartościami zamiast
+     * podpowiedzi. Wcześniej "edytuj treść" prowadziło do create(), co
+     * gubiło zapisaną platformę/treść i przy zapisie tworzyło drugą ofertę.
+     */
+    public function edit(SaleListing $listing)
+    {
+        abort_unless($this->isEditable($listing), 404);
+
+        return view('items.sale-listing', ['item' => $listing->item, 'listing' => $listing]);
+    }
+
+    public function update(Request $request, SaleListing $listing)
+    {
+        abort_unless($this->isEditable($listing), 404);
+
+        $listing->update($request->validate($this->rules()));
+
+        return redirect()
+            ->route($listing->status === 'szkic' ? 'sale-listings.index' : 'sale-listings.exported')
+            ->with('status', __('Sale listing updated.'));
     }
 
     /** Krok A z koncepcji: uniwersalny eksport CSV wszystkich przygotowanych ofert (zakładka Sprzedaż). */
@@ -156,6 +194,24 @@ class SaleListingController extends Controller
             'oferty-sprzedazy-'.now()->format('Y-m-d').'.csv',
             ['Content-Type' => 'text/csv; charset=UTF-8'],
         );
+    }
+
+    /** Sprzedane i wycofane oferty to ślepe zaułki — zostają w bazie tylko dla historii. */
+    private function isEditable(SaleListing $listing): bool
+    {
+        return in_array($listing->status, ['szkic', 'wyeksportowana'], true);
+    }
+
+    /** @return array<string, array<int, string>> */
+    private function rules(): array
+    {
+        return [
+            'platform' => ['required', 'in:'.implode(',', array_keys(SaleListing::PLATFORMS))],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'price' => ['nullable', 'numeric', 'min:0'],
+            'external_url' => ['nullable', 'url:http,https', 'max:2048'],
+        ];
     }
 
     /**

@@ -73,6 +73,9 @@ Route::middleware('auth')->group(function () {
         // jest DOŁOŻONY na istniejący `role:admin,magazynier`, nie zamiast niego.
         Route::middleware('module:sales')->group(function () {
             Route::get('sales', [SaleListingController::class, 'index'])->name('sale-listings.index');
+            Route::get('sales/{listing}/edit', [SaleListingController::class, 'edit'])->name('sale-listings.edit');
+            Route::put('sales/{listing}', [SaleListingController::class, 'update'])->name('sale-listings.update');
+            Route::patch('sales/{listing}/link', [SaleListingController::class, 'updateLink'])->name('sale-listings.update-link');
             Route::post('sales/{listing}/wystawiono', [SaleListingController::class, 'markListed'])->name('sale-listings.mark-listed');
             Route::get('sales/wystawione', [SaleListingController::class, 'exported'])->name('sale-listings.exported');
             Route::post('sales/wystawione/{listing}/sprzedano', [SaleListingController::class, 'markSold'])->name('sale-listings.mark-sold');

@@ -15,6 +15,8 @@
                 'description' => $l->description ?? '',
                 'price' => $l->price ? number_format((float) $l->price, 2, ',', ' ').' zł' : '',
                 'platform' => strtoupper($l->platform),
+                'externalUrl' => $l->external_url ?? '',
+                'linkUrl' => route('sale-listings.update-link', $l),
                 'photos' => $l->item->photos->map(fn ($p) => $p->url())->values()->all(),
             ])),
             copied: null,
@@ -35,6 +37,8 @@
 
         @include('sale-listings._tabs', ['active' => 'exported'])
 
+        <x-input-error :messages="$errors->get('external_url')" class="mb-4" />
+
         <div class="bg-white rounded-lg shadow overflow-x-auto dark:bg-gray-800">
             <table class="min-w-full text-sm">
                 <thead class="bg-gray-50 text-gray-500 text-xs uppercase dark:bg-gray-900 dark:text-gray-400">
@@ -53,11 +57,12 @@
                                 <a href="{{ route('items.show', $listing->item) }}" @click.stop class="text-gray-900 hover:underline dark:text-gray-100">{{ $listing->item->name }}</a>
                                 <div class="text-xs font-mono text-gray-400 dark:text-gray-500">{{ $listing->item->inventory_no }}</div>
                             </td>
-                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $listing->title }}</td>
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $listing->title }}@include('sale-listings._link-icon')</td>
                             <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $listing->price ? number_format((float) $listing->price, 2, ',', ' ').' zł' : '—' }}</td>
                             <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $listing->exported_at?->format('d.m.Y H:i') }}</td>
                             <td class="px-4 py-3 text-right whitespace-nowrap">
-                                <form method="POST" action="{{ route('sale-listings.mark-sold', $listing) }}" @click.stop onsubmit="return confirm('{{ __('Mark as sold?') }}');" class="inline">
+                                <a href="{{ route('sale-listings.edit', $listing) }}" @click.stop class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('edit') }}</a>
+                                <form method="POST" action="{{ route('sale-listings.mark-sold', $listing) }}" @click.stop onsubmit="return confirm('{{ __('Mark as sold?') }}');" class="inline ms-3">
                                     @csrf
                                     <button class="text-emerald-700 hover:underline dark:text-emerald-400">{{ __('mark as sold') }}</button>
                                 </form>
@@ -137,6 +142,8 @@
                                 </template>
                             </div>
                         </div>
+
+                        @include('sale-listings._link-form')
 
                         <div class="flex items-center justify-end pt-2 border-t border-gray-100 dark:border-gray-700">
                             <button type="button" @click="open = false" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Close') }}</button>

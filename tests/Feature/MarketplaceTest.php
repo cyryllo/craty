@@ -115,6 +115,31 @@ class MarketplaceTest extends TestCase
         $this->assertSame('items/1/actual-cover.jpg', $ordered->first()->path);
     }
 
+    public function test_marketplace_shows_external_listing_button_only_when_link_was_given(): void
+    {
+        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
+        $withLink = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka z linkiem', 'wyeksportowana');
+        $withLink->update(['external_url' => 'https://www.olx.pl/d/oferta/wiertarka-CID99-ID123.html']);
+        $this->createListing('NAR-BRAK-2026-00002', 'Szlifierka bez linku', 'wyeksportowana');
+
+        foreach (['grid', 'list'] as $view) {
+            $response = $this->get(route('marketplace.index', ['view' => $view]));
+
+            $response->assertOk()
+                ->assertSee('https://www.olx.pl/d/oferta/wiertarka-CID99-ID123.html', false)
+                ->assertSee(__('View on :platform', ['platform' => 'OLX']));
+            $this->assertSame(1, substr_count($response->getContent(), 'rel="noopener noreferrer nofollow"'));
+        }
+    }
+
+    public function test_external_platform_name_is_detected_from_the_link_host(): void
+    {
+        $this->assertSame('Allegro', (new SaleListing(['external_url' => 'https://allegro.pl/oferta/123']))->externalPlatformName());
+        $this->assertSame('OLX', (new SaleListing(['external_url' => 'https://m.olx.pl/d/oferta/x']))->externalPlatformName());
+        $this->assertNull((new SaleListing(['external_url' => 'https://example.com/x']))->externalPlatformName());
+        $this->assertNull((new SaleListing)->externalPlatformName());
+    }
+
     /** @param  array<int, string>  $filenames */
     private function createListingWithPhotos(array $filenames): SaleListing
     {
