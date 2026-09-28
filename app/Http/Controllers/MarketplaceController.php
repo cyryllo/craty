@@ -17,12 +17,7 @@ class MarketplaceController extends Controller
 {
     public function index(Request $request)
     {
-        $setting = AppSetting::current();
-
-        // Wyłączenie modułu Sprzedaż chowa też pchli targ, niezależnie od
-        // jego własnego przełącznika — inaczej pokazywałby zamrożone oferty,
-        // których nie dałoby się już obsłużyć (patrz App\Support\Modules).
-        abort_unless($setting->public_marketplace_enabled && Modules::isEnabled('sales'), 404);
+        $setting = $this->enabledSetting();
 
         // Ten sam wzorzec co ItemController::index() dla /items, ale osobny
         // klucz sesji — wybór gościa na tej stronie nie ma nadpisywać
@@ -53,9 +48,8 @@ class MarketplaceController extends Controller
 
         $listings = (clone $activeListings)
             ->when($categoryId, fn ($q) => $q->whereHas('item', fn ($q) => $q->where('category_id', $categoryId)))
-            // Wcześniej tylko primaryPhoto — dorzucamy całą galerię (patrz
-            // TODO.md "Drobne rzeczy zauważone przy budowie", pasek
-            // miniaturek zamiast pełnej podstrony/lightboxa).
+            // Całe photos (nie tylko primaryPhoto) — lista pokazuje okładkę
+            // i licznik zdjęć; pełna galeria jest na stronie oferty (show()).
             ->with('item.photos', 'item.category')
             ->latest('exported_at')
             ->paginate(24)
@@ -71,5 +65,46 @@ class MarketplaceController extends Controller
             'contactPhone' => $setting->public_contact_phone,
             'appName' => $setting->effectiveName(),
         ]);
+    }
+
+    /**
+     * Strona pojedynczej oferty — pełny opis i cała galeria zdjęć. Tylko
+     * oferty aktualnie wystawione; sprzedana/wycofana/szkic to 404, tak
+     * samo jak na liście (nie zdradzamy, że taka oferta w ogóle istniała).
+     */
+    public function show(SaleListing $listing)
+    {
+        $setting = $this->enabledSetting();
+
+        abort_unless($listing->status === 'wyeksportowana', 404);
+
+        $listing->load('item.photos', 'item.category');
+
+        // "Wróć" zachowuje filtr kategorii/stronę listy, jeśli gość przyszedł
+        // z listy — w każdym innym przypadku (link z zewnątrz) po prostu lista.
+        $previous = url()->previous();
+        $backUrl = parse_url($previous, PHP_URL_PATH) === parse_url(route('marketplace.index'), PHP_URL_PATH)
+            ? $previous
+            : route('marketplace.index');
+
+        return view('marketplace.show', [
+            'listing' => $listing,
+            'backUrl' => $backUrl,
+            'contactEmail' => $setting->public_contact_email,
+            'contactPhone' => $setting->public_contact_phone,
+            'appName' => $setting->effectiveName(),
+        ]);
+    }
+
+    private function enabledSetting(): AppSetting
+    {
+        $setting = AppSetting::current();
+
+        // Wyłączenie modułu Sprzedaż chowa też pchli targ, niezależnie od
+        // jego własnego przełącznika — inaczej pokazywałby zamrożone oferty,
+        // których nie dałoby się już obsłużyć (patrz App\Support\Modules).
+        abort_unless($setting->public_marketplace_enabled && Modules::isEnabled('sales'), 404);
+
+        return $setting;
     }
 }

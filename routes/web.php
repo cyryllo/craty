@@ -30,6 +30,7 @@ Route::get('/', function () {
 // Świadomie poza grupą "auth" niżej; kontroler sam odpowiada 404, gdy admin
 // nie włączył tej strony w Ustawienia → Ustawienia aplikacji.
 Route::get('flea-market', [MarketplaceController::class, 'index'])->name('marketplace.index');
+Route::get('flea-market/{listing}', [MarketplaceController::class, 'show'])->name('marketplace.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

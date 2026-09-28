@@ -29,7 +29,11 @@
             </div>
             <div>
                 <x-input-label for="description" :value="__('Description')" />
-                <textarea id="description" name="description" rows="6" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600">{{ old('description', $listing->description) }}</textarea>
+                {{-- Tylko rośnie razem z treścią (także od razu przy edycji długiego opisu) — nigdy nie cofa rozmiaru, który ktoś ustawił ręcznie uchwytem w rogu. --}}
+                <textarea id="description" name="description" rows="8"
+                          x-data="{ fit() { if ($el.scrollHeight > $el.clientHeight) $el.style.height = ($el.scrollHeight + 2) + 'px'; } }"
+                          x-init="$nextTick(() => fit())" @input="fit()"
+                          class="mt-1 block w-full min-h-[10rem] resize-y rounded-md border-gray-300 dark:border-gray-600">{{ old('description', $listing->description) }}</textarea>
             </div>
             <div>
                 <x-input-label for="price" :value="__('Price (zł)')" />

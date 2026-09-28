@@ -1,4 +1,4 @@
-{{-- Przycisk do tej samej oferty na OLX/Allegro — tylko gdy link podano przy tworzeniu oferty. --}}
+{{-- Przycisk do tej samej oferty na OLX/Allegro — tylko na stronie oferty (lista ma zamiast niego "Więcej informacji"), i tylko gdy link podano. --}}
 @if ($listing->external_url)
     @php $platformName = $listing->externalPlatformName(); @endphp
     <a href="{{ $listing->external_url }}" target="_blank" rel="noopener noreferrer nofollow"

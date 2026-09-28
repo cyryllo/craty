@@ -68,37 +68,24 @@ class MarketplaceTest extends TestCase
     }
 
     /**
-     * Wcześniej pchli targ pokazywał tylko `item->primaryPhoto` — jedno
-     * zdjęcie, nawet gdy przedmiot ma ich kilka (patrz TODO.md "Drobne
-     * rzeczy zauważone przy budowie"). Sprawdzamy obie strony przełącznika
-     * widoku, bo mają dwa niezależne bloki markupu w tym samym widoku.
+     * Lista pokazuje tylko okładkę (is_primary) i licznik zdjęć — całą
+     * galerię ma strona oferty (patrz test_product_page_shows_...). Obie
+     * strony przełącznika widoku, bo to dwa niezależne bloki markupu.
      */
-    public function test_marketplace_grid_view_shows_every_photo_not_just_the_primary_one(): void
+    public function test_marketplace_list_shows_the_cover_photo_and_photo_count_in_both_views(): void
     {
         Storage::fake('public');
         AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
         $listing = $this->createListingWithPhotos(['main-cover.jpg', 'second-photo.jpg', 'third-photo.jpg']);
 
-        $response = $this->get(route('marketplace.index', ['view' => 'grid']));
-
-        $response->assertOk()
-            ->assertSee($listing->title)
-            ->assertSee('main-cover.jpg')
-            ->assertSee('second-photo.jpg')
-            ->assertSee('third-photo.jpg');
-    }
-
-    public function test_marketplace_list_view_shows_every_photo_not_just_the_primary_one(): void
-    {
-        Storage::fake('public');
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
-        $listing = $this->createListingWithPhotos(['main-cover.jpg', 'second-photo.jpg']);
-
-        $response = $this->get(route('marketplace.index', ['view' => 'list']));
-
-        $response->assertOk()
-            ->assertSee('main-cover.jpg')
-            ->assertSee('second-photo.jpg');
+        foreach (['grid', 'list'] as $view) {
+            $this->get(route('marketplace.index', ['view' => $view]))
+                ->assertOk()
+                ->assertSee($listing->title)
+                ->assertSee('main-cover.jpg')
+                ->assertDontSee('second-photo.jpg')
+                ->assertSee('📷 3');
+        }
     }
 
     /** Item::photosForGallery() musi dawać okładkę (is_primary) na pierwszym miejscu, niezależnie od sort_order. */
@@ -115,21 +102,25 @@ class MarketplaceTest extends TestCase
         $this->assertSame('items/1/actual-cover.jpg', $ordered->first()->path);
     }
 
-    public function test_marketplace_shows_external_listing_button_only_when_link_was_given(): void
+    /** Na liście zamiast przycisku OLX/Allegro jest "Więcej informacji" — link zewnętrzny dopiero na stronie oferty. */
+    public function test_external_listing_button_is_shown_only_on_the_product_page_when_link_was_given(): void
     {
         AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
         $withLink = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka z linkiem', 'wyeksportowana');
         $withLink->update(['external_url' => 'https://www.olx.pl/d/oferta/wiertarka-CID99-ID123.html']);
-        $this->createListing('NAR-BRAK-2026-00002', 'Szlifierka bez linku', 'wyeksportowana');
+        $withoutLink = $this->createListing('NAR-BRAK-2026-00002', 'Szlifierka bez linku', 'wyeksportowana');
 
         foreach (['grid', 'list'] as $view) {
-            $response = $this->get(route('marketplace.index', ['view' => $view]));
-
-            $response->assertOk()
-                ->assertSee('https://www.olx.pl/d/oferta/wiertarka-CID99-ID123.html', false)
-                ->assertSee(__('View on :platform', ['platform' => 'OLX']));
-            $this->assertSame(1, substr_count($response->getContent(), 'rel="noopener noreferrer nofollow"'));
+            $response = $this->get(route('marketplace.index', ['view' => $view]))->assertOk();
+            $response->assertDontSee('olx.pl', false)->assertSee(__('More information'));
+            $this->assertSame(2, substr_count($response->getContent(), __('More information')));
         }
+
+        $this->get(route('marketplace.show', $withLink))
+            ->assertSee('https://www.olx.pl/d/oferta/wiertarka-CID99-ID123.html', false)
+            ->assertSee(__('View on :platform', ['platform' => 'OLX']));
+        $this->get(route('marketplace.show', $withoutLink))
+            ->assertDontSee('rel="noopener noreferrer nofollow"', false);
     }
 
     public function test_external_platform_name_is_detected_from_the_link_host(): void
@@ -138,6 +129,69 @@ class MarketplaceTest extends TestCase
         $this->assertSame('OLX', (new SaleListing(['external_url' => 'https://m.olx.pl/d/oferta/x']))->externalPlatformName());
         $this->assertNull((new SaleListing(['external_url' => 'https://example.com/x']))->externalPlatformName());
         $this->assertNull((new SaleListing)->externalPlatformName());
+    }
+
+    public function test_description_is_shown_only_on_the_product_page_not_on_the_list(): void
+    {
+        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
+        $listing = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka', 'wyeksportowana');
+
+        foreach (['grid', 'list'] as $view) {
+            $this->get(route('marketplace.index', ['view' => $view]))
+                ->assertSee('Wiertarka')
+                ->assertSee($listing->item->conditionLabel())
+                ->assertDontSee('Opis testowy');
+        }
+
+        $this->get(route('marketplace.show', $listing))->assertSee('Opis testowy');
+    }
+
+    public function test_listing_on_the_list_links_to_its_own_product_page(): void
+    {
+        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
+        $listing = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka', 'wyeksportowana');
+
+        foreach (['grid', 'list'] as $view) {
+            $this->get(route('marketplace.index', ['view' => $view]))
+                ->assertOk()
+                ->assertSee(route('marketplace.show', $listing), false);
+        }
+    }
+
+    public function test_product_page_shows_full_description_every_photo_and_contact(): void
+    {
+        Storage::fake('public');
+        AppSetting::current()->fill([
+            'public_marketplace_enabled' => true,
+            'public_contact_email' => 'kontakt@example.com',
+        ])->save();
+        $listing = $this->createListingWithPhotos(['main-cover.jpg', 'second-photo.jpg', 'third-photo.jpg']);
+        $listing->update(['description' => "Linia pierwsza\nLinia druga", 'external_url' => 'https://allegro.pl/oferta/1']);
+
+        $this->get(route('marketplace.show', $listing))
+            ->assertOk()
+            ->assertSee($listing->title)
+            ->assertSee('Linia druga')
+            ->assertSee('main-cover.jpg')
+            ->assertSee('second-photo.jpg')
+            ->assertSee('third-photo.jpg')
+            ->assertSee('https://allegro.pl/oferta/1', false)
+            ->assertSee('mailto:kontakt@example.com?subject=', false);
+    }
+
+    public function test_product_page_is_not_found_for_listings_not_currently_listed_or_when_disabled(): void
+    {
+        $listed = $this->createListing('NAR-BRAK-2026-00001', 'Wystawiona', 'wyeksportowana');
+        $sold = $this->createListing('NAR-BRAK-2026-00002', 'Sprzedana', 'sprzedana');
+        $draft = $this->createListing('NAR-BRAK-2026-00003', 'Szkic', 'szkic');
+
+        $this->get(route('marketplace.show', $listed))->assertNotFound();
+
+        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
+
+        $this->get(route('marketplace.show', $listed))->assertOk();
+        $this->get(route('marketplace.show', $sold))->assertNotFound();
+        $this->get(route('marketplace.show', $draft))->assertNotFound();
     }
 
     /** @param  array<int, string>  $filenames */
