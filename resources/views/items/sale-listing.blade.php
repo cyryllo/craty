@@ -40,7 +40,7 @@
                 <x-text-input id="price" name="price" type="number" step="0.01" min="0" class="mt-1 block w-full" value="{{ old('price', $listing->price) }}" />
             </div>
             <div>
-                <x-input-label for="external_url" :value="__('Link to the listing on OLX / Allegro (optional)')" />
+                <x-input-label for="external_url" :value="__('Link to the listing on OLX / Allegro / Vinted (optional)')" />
                 <x-text-input id="external_url" name="external_url" type="url" placeholder="https://" class="mt-1 block w-full" value="{{ old('external_url', $listing->external_url) }}" />
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('If provided, the public flea market shows a button leading to this listing.') }}</p>
                 <x-input-error :messages="$errors->get('external_url')" class="mt-2" />

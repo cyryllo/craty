@@ -127,6 +127,7 @@ class MarketplaceTest extends TestCase
     {
         $this->assertSame('Allegro', (new SaleListing(['external_url' => 'https://allegro.pl/oferta/123']))->externalPlatformName());
         $this->assertSame('OLX', (new SaleListing(['external_url' => 'https://m.olx.pl/d/oferta/x']))->externalPlatformName());
+        $this->assertSame('Vinted', (new SaleListing(['external_url' => 'https://www.vinted.pl/items/123-kurtka']))->externalPlatformName());
         $this->assertNull((new SaleListing(['external_url' => 'https://example.com/x']))->externalPlatformName());
         $this->assertNull((new SaleListing)->externalPlatformName());
     }

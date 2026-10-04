@@ -50,7 +50,7 @@
                         <div class="bg-white rounded-lg shadow divide-y divide-gray-100 dark:bg-gray-800 dark:divide-gray-700">
                             @foreach ($listings as $listing)
                                 @php $photos = $listing->item?->photosForGallery() ?? collect(); @endphp
-                                {{-- Cały wiersz klikalny ("stretched link" na tytule), przycisk OLX/Allegro nad nim przez relative z-10. --}}
+                                {{-- Cały wiersz klikalny ("stretched link" na tytule), przycisk OLX/Allegro/Vinted nad nim przez relative z-10. --}}
                                 <div class="p-4 flex gap-4 items-start relative hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                     <div class="w-20 h-20 rounded-md bg-gray-100 overflow-hidden shrink-0 relative dark:bg-gray-700">
                                         @if ($photos->isNotEmpty())

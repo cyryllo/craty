@@ -29,6 +29,7 @@ class SaleListing extends Model
     public const PLATFORMS = [
         'olx' => 'OLX',
         'allegro' => 'Allegro',
+        'vinted' => 'Vinted',
         'inne' => 'Other',
     ];
 
@@ -50,6 +51,7 @@ class SaleListing extends Model
             $host === '' => null,
             str_contains($host, 'olx.') => 'OLX',
             str_contains($host, 'allegro.') => 'Allegro',
+            str_contains($host, 'vinted.') => 'Vinted',
             default => null,
         };
     }

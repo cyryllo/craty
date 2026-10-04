@@ -145,6 +145,23 @@ class SaleListingWorkflowTest extends TestCase
         $this->assertSame(1, $item->saleListings()->count());
     }
 
+    public function test_listing_can_be_saved_with_vinted_platform(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        $item = Item::create([
+            'inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Kurtka', 'condition' => 'uzywany', 'status' => 'dostepny',
+        ]);
+
+        $this->actingAs($magazynier)->get(route('items.sale-listing.create', $item))
+            ->assertSee('<option value="vinted"', false);
+
+        $this->actingAs($magazynier)->post(route('items.sale-listing.store', $item), [
+            'platform' => 'vinted', 'title' => 'Kurtka',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame('vinted', $item->saleListings()->first()->platform);
+    }
+
     public function test_sold_listing_cannot_be_edited(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);

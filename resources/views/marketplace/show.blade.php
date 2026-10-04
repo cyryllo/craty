@@ -7,38 +7,19 @@
             ← {{ __('Back to all listings') }}
         </a>
 
-        <div class="bg-white rounded-lg shadow overflow-hidden lg:grid lg:grid-cols-2 dark:bg-gray-800">
-            {{-- Galeria: duże zdjęcie + miniatury, strzałki gdy zdjęć jest więcej; klik w duże zdjęcie otwiera oryginał. --}}
-            <div class="bg-gray-100 dark:bg-gray-900" x-data="{ active: 0, count: {{ $photos->count() }} }"
-                 @keydown.left.window="active = (active - 1 + count) % count" @keydown.right.window="active = (active + 1) % count">
-                <div class="aspect-square relative">
-                    @forelse ($photos as $i => $photo)
-                        <a x-show="active === {{ $i }}" @if ($i > 0) x-cloak @endif href="{{ $photo->url() }}" target="_blank" rel="noopener">
-                            <img src="{{ $photo->url() }}" alt="{{ $listing->title }}" class="w-full h-full object-contain">
-                        </a>
-                    @empty
-                        <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm dark:text-gray-500">{{ __('No photos') }}</div>
-                    @endforelse
-
-                    @if ($photos->count() > 1)
-                        <button type="button" @click="active = (active - 1 + count) % count" aria-label="{{ __('Previous photo') }}"
-                                class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 text-white hover:bg-black/70">‹</button>
-                        <button type="button" @click="active = (active + 1) % count" aria-label="{{ __('Next photo') }}"
-                                class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 text-white hover:bg-black/70">›</button>
-                        <span class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded" x-text="(active + 1) + ' / ' + count"></span>
-                    @endif
-                </div>
-
-                @if ($photos->count() > 1)
-                    <div class="flex gap-2 p-3 overflow-x-auto">
-                        @foreach ($photos as $i => $photo)
-                            <button type="button" @click="active = {{ $i }}"
-                                    class="w-16 h-16 rounded overflow-hidden shrink-0 border-2"
-                                    :class="active === {{ $i }} ? 'border-indigo-500' : 'border-transparent opacity-70 hover:opacity-100'">
-                                <img src="{{ $photo->url() }}" alt="" class="w-full h-full object-cover">
-                            </button>
+        <div class="bg-white rounded-lg shadow overflow-hidden lg:grid lg:grid-cols-2 lg:items-start dark:bg-gray-800">
+            {{-- Galeria jak na stronie przedmiotu w panelu: siatka kwadratowych, przyciętych miniatur; klik otwiera nieprzycięty oryginał. --}}
+            <div class="p-4">
+                @if ($photos->isNotEmpty())
+                    <div class="grid grid-cols-3 gap-2">
+                        @foreach ($photos as $photo)
+                            <a href="{{ $photo->url() }}" target="_blank" rel="noopener" class="block">
+                                <img src="{{ $photo->url() }}" alt="{{ $listing->title }}" class="aspect-square object-cover rounded-md w-full hover:opacity-90">
+                            </a>
                         @endforeach
                     </div>
+                @else
+                    <div class="aspect-[4/3] rounded-md bg-gray-100 flex items-center justify-center text-gray-400 text-sm dark:bg-gray-900 dark:text-gray-500">{{ __('No photos') }}</div>
                 @endif
             </div>
 

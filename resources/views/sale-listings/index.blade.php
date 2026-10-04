@@ -87,7 +87,7 @@
             </table>
         </div>
 
-        {{-- Popup z podglądem oferty i przyciskami kopiowania — do szybkiego ręcznego wystawienia na OLX/Allegro bez pobierania CSV. --}}
+        {{-- Popup z podglądem oferty i przyciskami kopiowania — do szybkiego ręcznego wystawienia na OLX/Allegro/Vinted bez pobierania CSV. --}}
         <div x-show="open" x-cloak class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" @click.self="open = false" @keydown.escape.window="open = false">
             <div class="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto dark:bg-gray-800">
                 <template x-if="listing">

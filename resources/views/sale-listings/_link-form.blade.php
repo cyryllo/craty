@@ -1,9 +1,9 @@
-{{-- Edycja linku do oferty na OLX/Allegro w popupie podglądu — wspólne dla "Przygotowane" i "Wystawione". Puste pole usuwa link. --}}
+{{-- Edycja linku do oferty na OLX/Allegro/Vinted w popupie podglądu — wspólne dla "Przygotowane" i "Wystawione". Puste pole usuwa link. --}}
 <form :action="listing.linkUrl" method="POST" class="pt-4 border-t border-gray-100 dark:border-gray-700">
     @csrf
     @method('PATCH')
     <div class="flex items-center justify-between">
-        <x-input-label for="external_url" :value="__('Link to the listing on OLX / Allegro (optional)')" />
+        <x-input-label for="external_url" :value="__('Link to the listing on OLX / Allegro / Vinted (optional)')" />
         <a x-show="listing.externalUrl" x-cloak :href="listing.externalUrl" target="_blank" rel="noopener noreferrer" class="text-xs text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Open') }} ↗</a>
     </div>
     <div class="mt-1 flex gap-2">
