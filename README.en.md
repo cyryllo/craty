@@ -9,6 +9,8 @@ loans, change history, and CSV export of sale listings (OLX). Also includes
 a public "flea market" page for listed items, a web-based installer, and a
 self-update module via the admin panel.
 
+![Craty — item list in grid view](app.png)
+
 It also installs as a PWA on your phone/tablet and scans QR and barcodes
 (EAN/UPC) straight from the browser's camera — a miss suggests quickly
 adding the item instead of a dead end.

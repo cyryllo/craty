@@ -9,6 +9,8 @@ wartość, stan), wypożyczenia, historia zmian i eksport ofert sprzedażowych
 do CSV (OLX). Do tego publiczna strona „pchli targ” dla wystawionych ofert,
 webowy instalator i moduł samo-aktualizacji przez panel administratora.
 
+![Craty — lista przedmiotów w widoku kafelków](app.png)
+
 Do tego appka instaluje się jako PWA na telefonie/tablecie i skanuje kody QR
 oraz kreskowe (EAN/UPC) wprost kamerą przeglądarki — nietrafiony skan
 proponuje szybkie dodanie nowego przedmiotu.
