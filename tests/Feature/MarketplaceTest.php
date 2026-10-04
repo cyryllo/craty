@@ -147,6 +147,18 @@ class MarketplaceTest extends TestCase
         $this->get(route('marketplace.show', $listing))->assertSee('Opis testowy');
     }
 
+    /** Regresja: pionowe zdjęcie rozpychało kafelek, bo w kolumnie flex aspect-video to tylko "preferowana" proporcja. */
+    public function test_grid_cover_photo_is_absolutely_positioned_inside_a_clipping_frame(): void
+    {
+        Storage::fake('public');
+        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
+        $this->createListingWithPhotos(['main-cover.jpg']);
+
+        $this->get(route('marketplace.index', ['view' => 'grid']))
+            ->assertSee('aspect-video bg-gray-100 relative overflow-hidden', false)
+            ->assertSee('class="absolute inset-0 w-full h-full object-cover"', false);
+    }
+
     public function test_listing_on_the_list_links_to_its_own_product_page(): void
     {
         AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();

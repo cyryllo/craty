@@ -140,8 +140,9 @@
                 @forelse ($items as $item)
                     <div class="relative">
                         <input type="checkbox" name="items[]" value="{{ $item->id }}" class="item-checkbox absolute top-2 left-2 z-10 w-4 h-4 rounded shadow">
-                        <a href="{{ route('items.show', $item) }}" class="bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden flex flex-col dark:bg-gray-800">
-                        <div class="aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden dark:bg-gray-700">
+                        {{-- h-full: karta wypełnia całą komórkę siatki, więc wszystkie kafelki w rzędzie mają równą wysokość (dolna linia przez mt-auto). --}}
+                        <a href="{{ route('items.show', $item) }}" class="h-full bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden flex flex-col dark:bg-gray-800">
+                        <div class="aspect-[4/3] shrink-0 bg-gray-100 flex items-center justify-center overflow-hidden dark:bg-gray-700">
                             @if ($item->primaryPhoto->first())
                                 <img src="{{ $item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
                             @else

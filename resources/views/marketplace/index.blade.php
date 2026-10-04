@@ -80,9 +80,11 @@
                             @foreach ($listings as $listing)
                                 @php $photos = $listing->item?->photosForGallery() ?? collect(); @endphp
                                 <div class="bg-white rounded-lg shadow overflow-hidden flex flex-col relative hover:shadow-md transition dark:bg-gray-800">
-                                    <div class="aspect-video bg-gray-100 relative dark:bg-gray-700">
+                                    {{-- Zdjęcie absolute + overflow-hidden, nie zwykłe w-full h-full: w kolumnie flex samo aspect-video jest
+                                         tylko "preferowaną" proporcją i wysokie (pionowe) zdjęcie rozpychało ramkę zamiast się przyciąć. --}}
+                                    <div class="aspect-video bg-gray-100 relative overflow-hidden shrink-0 dark:bg-gray-700">
                                         @if ($photos->isNotEmpty())
-                                            <img src="{{ $photos->first()->url() }}" alt="" class="w-full h-full object-cover">
+                                            <img src="{{ $photos->first()->url() }}" alt="" class="absolute inset-0 w-full h-full object-cover">
                                         @endif
                                         @include('marketplace._photo-count')
                                     </div>
