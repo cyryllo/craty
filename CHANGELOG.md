@@ -3,6 +3,27 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-10-04
+
+- Dodano opcjonalny link do oferty na OLX / Allegro / Vinted — przy
+  tworzeniu oferty albo później z okienka podglądu na zakładkach
+  "Przygotowane"/"Wystawione"; na pchlim targu pokazuje się jako przycisk.
+- Dodano Vinted jako platformę sprzedaży obok OLX i Allegro.
+- Poprawiono "edytuj" przy ofertach sprzedaży — edytuje istniejącą ofertę
+  (łącznie z platformą) zamiast tworzyć nową; dostępne na obu zakładkach.
+- Dodano odnośnik do pchlego targu przy zakładkach Sprzedaży, gdy pchli
+  targ jest włączony.
+- Dodano moduł "Rozszerzony magazyn" (Ustawienia → Moduły) — pomieszczenia
+  i szczegółowe lokalizacje można ukryć; dane nie są kasowane.
+- Dodano stronę pojedynczej oferty na pchlim targu (wszystkie zdjęcia,
+  pełny opis, przycisk OLX/Allegro/Vinted, kontakt); lista pokazuje już
+  tylko zdjęcie, nazwę, cenę i stan oraz przycisk "Więcej informacji".
+- Poprawiono pionowe zdjęcia na pchlim targu — są przycinane i nie
+  rozpychają już kafelków.
+- Wyrównano wysokość kafelków w siatce przedmiotów.
+- Pole opisu oferty sprzedaży rośnie razem z treścią i da się je
+  rozciągać w dół.
+
 ## 2026-09-22
 
 - Dodano możliwość ponownego wygenerowania numeru ewidencyjnego i kodu QR

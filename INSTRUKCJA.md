@@ -31,6 +31,18 @@ magazyn, bez podziału na regały/półki. Jeśli to Ci wystarcza (mały warszta
 jeden magazyn, nie chce się Wam rozpisywać każdego regału) — nic więcej nie
 trzeba robić.
 
+**Pomieszczenia i Lokalizacje to moduł „Rozszerzony magazyn”**, który
+Administrator włącza w Ustawienia → Moduły. Gdy jest wyłączony, w
+Ustawieniach nie ma kafelków „Pomieszczenia” i „Lokalizacje”, a na
+formularzu przedmiotu pole nazywa się po prostu „Magazyn” i wybierasz w
+nim sam magazyn — to wystarcza większości małych warsztatów. Na nowej
+instalacji moduł jest domyślnie wyłączony; jeśli korzystaliście już z
+pomieszczeń lub regałów/półek, po aktualizacji jest włączony sam, więc nic
+Wam nie zniknie. Wyłączenie modułu niczego nie kasuje — przedmiot, który
+już leży na konkretnym regale, zachowuje tę lokalizację (widać ją na jego
+karcie i zostaje przy edycji), a po ponownym włączeniu modułu wszystko
+wraca tak, jak było. Opis poniżej dotyczy sytuacji z włączonym modułem.
+
 **Pomieszczenie** (Ustawienia → Pomieszczenia) to *opcjonalny* poziom
 między magazynem a regałem — przydatny, gdy jeden magazyn ma więcej niż
 jedno pomieszczenie/halę (np. "Hala produkcyjna" i "Magazyn narzędzi" w tym
@@ -108,17 +120,39 @@ Można wyłączyć w Ustawienia → Moduły, jeśli nie sprzedajecie sprzętu.
 Ścieżka: z karty przedmiotu "Przygotuj ofertę sprzedaży" → zakładka
 "Przygotowane" (Sprzedaż) → eksport do CSV (opcja wyeksportowania swoich
 przedmiotów przeznaczonych do sprzedaży — gotowe tytuły i opisy, do
-dalszego wykorzystania jak Ci wygodnie) → oferta trafia do zakładki
-"Wystawione", gdzie oznaczasz ją jako "sprzedane" albo "wycofaj".
+dalszego wykorzystania jak Ci wygodnie) albo ręczne "wystaw" przy
+pojedynczej ofercie → oferta trafia do zakładki "Wystawione", gdzie
+oznaczasz ją jako "sprzedane" albo "wycofaj".
+
+**Formularz oferty**: platforma (OLX, Allegro, Vinted albo "Inne"), tytuł,
+opis (pole rośnie razem z tekstem, można je też rozciągnąć w dół
+uchwytem w rogu), cena i opcjonalny **link do tej samej oferty na OLX /
+Allegro / Vinted**. Zapisaną ofertę poprawiasz przyciskiem "edytuj" — na
+obu zakładkach, "Przygotowane" i "Wystawione" — łącznie ze zmianą
+platformy.
+
+**Link do oferty zwykle powstaje dopiero po jej wystawieniu**, więc można
+go dopisać albo zmienić także później: kliknij wiersz oferty na zakładce
+"Przygotowane" lub "Wystawione", a w okienku podglądu na dole jest pole na
+link. Oferty, które mają link, mają w tabeli ikonkę 🔗.
 
 **Pchli targ** — opcjonalna publiczna strona (bez logowania) pokazująca
 wystawione oferty, do włączenia w Ustawienia → Ustawienia aplikacji. Link
 do niej możesz wysłać znajomym, żeby pokazać, co aktualnie sprzedajesz —
-to zwykła lista rzeczy z opisami i zdjęciami, bez koszyka i bez typowego
-sklepu (kontakt tylko przez podany e-mail/telefon). Dwa niezależne
-przełączniki muszą być włączone naraz: moduł Sprzedaży i sam "Pchli targ"
-— jeśli wyłączysz moduł Sprzedaży, publiczna strona znika automatycznie,
-nawet gdy jej własny przełącznik zostaje włączony.
+bez koszyka i bez typowego sklepu (kontakt tylko przez podany e-mail/
+telefon). Gdy jest włączony, obok zakładek Sprzedaży pojawia się
+odnośnik "🛒 Pchli targ", który otwiera go w nowej karcie.
+
+Na liście pchlego targu każda oferta to tylko zdjęcie (z liczbą zdjęć,
+jeśli jest ich więcej), nazwa, cena i stan techniczny, plus przycisk
+"Więcej informacji". Po kliknięciu otwiera się **strona oferty** z
+wszystkimi zdjęciami (kliknięcie otwiera pełny rozmiar), pełnym opisem,
+przyciskiem "Zobacz na OLX / Allegro / Vinted" (jeśli podano link) i
+kontaktem — e-mail otwiera się od razu z tytułem oferty w temacie.
+
+Dwa niezależne przełączniki muszą być włączone naraz: moduł Sprzedaży i
+sam "Pchli targ" — jeśli wyłączysz moduł Sprzedaży, publiczna strona
+znika automatycznie, nawet gdy jej własny przełącznik zostaje włączony.
 
 ## Skanowanie kamerą i aplikacja mobilna (PWA)
 
@@ -139,7 +173,8 @@ Rozdzielnik Ustawień (link w prawym górnym rogu) grupuje wszystko w jednym
 miejscu:
 
 - **Kategorie / Magazyny / Pomieszczenia / Lokalizacje** — struktura
-  magazynowa, opisana wyżej.
+  magazynowa, opisana wyżej (Pomieszczenia i Lokalizacje tylko z
+  włączonym modułem „Rozszerzony magazyn”).
 - **Ustawienia aplikacji** *(tylko Administrator)* — nazwa i logo appki,
   domyślny język (PL/EN), dane kontaktowe i przełącznik Pchlego targu.
 - **Użytkownicy** *(tylko Administrator)* — konta, role, aktywacja/
@@ -149,7 +184,7 @@ miejscu:
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego
   resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń.
 - **Moduły** *(tylko Administrator)* — włącz/wyłącz opcjonalne części
-  appki (dziś: Sprzedaż).
+  appki (dziś: Sprzedaż i Rozszerzony magazyn).
 - **Aktualizacje** *(tylko Administrator)* — samodzielna aktualizacja
   appki przez wgranie paczki `.zip`, bez SSH/Composera. Zawsze rób kopię
   plików i bazy danych przed wgraniem nowej wersji.
