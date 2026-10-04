@@ -26,7 +26,7 @@
             <div class="p-6 space-y-4">
                 <div>
                     @if ($listing->item?->category)
-                        <a href="{{ route('marketplace.index', ['category_id' => $listing->item->category_id]) }}"
+                        <a href="{{ route('marketplace.index', ['category_id' => $listing->item->category_id], false) }}"
                            class="text-xs font-semibold uppercase tracking-wide text-indigo-600 hover:underline dark:text-indigo-400">{{ $listing->item->category->name }}</a>
                     @endif
                     <h1 class="text-2xl font-semibold text-gray-900 mt-1 dark:text-gray-100">{{ $listing->title }}</h1>

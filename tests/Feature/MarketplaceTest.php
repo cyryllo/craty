@@ -159,6 +159,21 @@ class MarketplaceTest extends TestCase
             ->assertSee('class="absolute inset-0 w-full h-full object-cover"', false);
     }
 
+    public function test_category_links_are_clean_urls_without_a_dangling_question_mark(): void
+    {
+        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
+        $tools = Category::create(['name' => 'Narzędzia', 'code' => 'NAR']);
+        $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka', 'wyeksportowana', $tools->id);
+
+        $this->get(route('marketplace.index', ['category_id' => $tools->id, 'page' => 1]))
+            ->assertOk()
+            ->assertSee('href="/flea-market"', false)
+            ->assertSee('href="/flea-market?category_id='.$tools->id.'"', false)
+            ->assertDontSee('flea-market?"', false)
+            // Względne, nie z http:// — za serwerem pośredniczącym z HTTPS pełny adres dawał 502.
+            ->assertDontSee('href="http://localhost/flea-market', false);
+    }
+
     public function test_listing_on_the_list_links_to_its_own_product_page(): void
     {
         AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
@@ -167,7 +182,7 @@ class MarketplaceTest extends TestCase
         foreach (['grid', 'list'] as $view) {
             $this->get(route('marketplace.index', ['view' => $view]))
                 ->assertOk()
-                ->assertSee(route('marketplace.show', $listing), false);
+                ->assertSee('href="'.route('marketplace.show', $listing, false).'"', false);
         }
     }
 

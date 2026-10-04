@@ -58,7 +58,7 @@
                         <span class="block text-xs text-gray-500 dark:text-gray-400">
                             {{ __('Shows a public, login-free page listing items marked for sale, with no purchasing — visitors are asked to email you.') }}
                             @if ($setting->public_marketplace_enabled)
-                                <a href="{{ route('marketplace.index') }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('View the public page') }}</a>
+                                <a href="{{ route('marketplace.index', [], false) }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('View the public page') }}</a>
                             @endif
                         </span>
                     </label>

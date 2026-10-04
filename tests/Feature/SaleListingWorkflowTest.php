@@ -179,12 +179,12 @@ class SaleListingWorkflowTest extends TestCase
         $magazynier = User::factory()->create(['role' => 'magazynier']);
 
         $this->actingAs($magazynier)->get(route('sale-listings.index'))
-            ->assertDontSee(route('marketplace.index'), false);
+            ->assertDontSee('href="/flea-market"', false);
 
         \App\Models\AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
 
-        $this->actingAs($magazynier)->get(route('sale-listings.index'))->assertSee(route('marketplace.index'), false);
-        $this->actingAs($magazynier)->get(route('sale-listings.exported'))->assertSee(route('marketplace.index'), false);
+        $this->actingAs($magazynier)->get(route('sale-listings.index'))->assertSee('href="/flea-market"', false);
+        $this->actingAs($magazynier)->get(route('sale-listings.exported'))->assertSee('href="/flea-market"', false);
     }
 
     public function test_listing_moves_from_prepared_to_wystawione_after_export_then_to_sold(): void
