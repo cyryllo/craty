@@ -40,7 +40,10 @@ class ItemController extends Controller
                     ->orWhere('ean', 'like', $term);
             }))
             ->when($request->filled('category_id'), fn ($q) => $q->where('category_id', $request->integer('category_id')))
-            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
+            // Bez filtra statusu (i przy każdym innym niż "sprzedany") lista
+            // pokazuje tylko to, co jest w magazynie — sprzedane tylko po
+            // jawnym wybraniu filtra "Sprzedany".
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')), fn ($q) => $q->inStock())
             ->latest()
             ->paginate(24)
             ->withQueryString();

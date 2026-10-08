@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -117,6 +118,17 @@ class Item extends Model
     public function draftSaleListing()
     {
         return $this->hasOne(SaleListing::class)->where('status', 'szkic')->latestOfMany();
+    }
+
+    /**
+     * Przedmioty faktycznie w magazynie — bez sprzedanych. Sprzedany
+     * przedmiot zostaje w bazie (historia, oferta sprzedaży), ale znika z
+     * listy przedmiotów i statystyk pulpitu; widać go tylko po wybraniu
+     * filtra statusu "Sprzedany" na /items.
+     */
+    public function scopeInStock(Builder $query): Builder
+    {
+        return $query->where('status', '!=', 'sprzedany');
     }
 
     public function statusLabel(): string

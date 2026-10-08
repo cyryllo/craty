@@ -39,7 +39,7 @@
             <div class="min-w-[160px]">
                 <label class="block text-xs font-medium text-gray-500 mb-1 dark:text-gray-400">{{ __('Status') }}</label>
                 <select name="status" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
-                    <option value="">{{ __('all') }}</option>
+                    <option value="">{{ __('all (without sold)') }}</option>
                     @foreach (\App\Models\Item::STATUSES as $value => $label)
                         <option value="{{ $value }}" @selected(($filters['status'] ?? null) == $value)>{{ __($label) }}</option>
                     @endforeach

@@ -15,8 +15,9 @@ class DashboardController extends Controller
             ->pluck('total', 'status');
 
         return view('dashboard', [
-            'totalItems' => Item::count(),
-            'totalValue' => Item::sum('value'),
+            // Liczba i wartość tylko tego, co jest w magazynie — sprzedane nie.
+            'totalItems' => Item::inStock()->count(),
+            'totalValue' => Item::inStock()->sum('value'),
             'statusCounts' => $statusCounts,
             'overdueLoans' => Loan::with('item', 'borrower')
                 ->whereNull('returned_at')
@@ -24,8 +25,8 @@ class DashboardController extends Controller
                 ->get(),
             // Nazwa jedyne, co pokazuje widok (patrz dashboard.blade.php) — bez
             // eager-loadów category/storageLocation, których już nie wyświetla.
-            'recentItems' => Item::latest()->take(8)->get(),
-            'needsCompletionItems' => Item::where('needs_completion', true)->latest()->take(8)->get(),
+            'recentItems' => Item::inStock()->latest()->take(8)->get(),
+            'needsCompletionItems' => Item::inStock()->where('needs_completion', true)->latest()->take(8)->get(),
         ]);
     }
 }

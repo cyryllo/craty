@@ -187,6 +187,32 @@ class SaleListingWorkflowTest extends TestCase
         $this->actingAs($magazynier)->get(route('sale-listings.exported'))->assertSee('href="/flea-market"', false);
     }
 
+    public function test_sold_items_disappear_from_the_items_list_and_dashboard_unless_filtered_by_sold(): void
+    {
+        $magazynier = User::factory()->create(['role' => 'magazynier']);
+        Item::create(['inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka w magazynie', 'condition' => 'uzywany', 'status' => 'dostepny', 'value' => 100]);
+        Item::create(['inventory_no' => 'NAR-BRAK-2026-00002', 'name' => 'Sprzedana szlifierka', 'condition' => 'uzywany', 'status' => 'sprzedany', 'value' => 900]);
+
+        foreach (['grid', 'list'] as $view) {
+            $this->actingAs($magazynier)->get(route('items.index', ['view' => $view]))
+                ->assertSee('Wiertarka w magazynie')
+                ->assertDontSee('Sprzedana szlifierka');
+        }
+
+        // Wyszukiwanie też nie wyciąga sprzedanych bez filtra.
+        $this->actingAs($magazynier)->get(route('items.index', ['q' => 'szlifierka']))
+            ->assertDontSee('Sprzedana szlifierka');
+
+        $this->actingAs($magazynier)->get(route('items.index', ['status' => 'sprzedany']))
+            ->assertSee('Sprzedana szlifierka')
+            ->assertDontSee('Wiertarka w magazynie');
+
+        $this->actingAs($magazynier)->get(route('dashboard'))
+            ->assertViewHas('totalItems', 1)
+            ->assertViewHas('totalValue', fn ($v) => (float) $v === 100.0)
+            ->assertDontSee('Sprzedana szlifierka');
+    }
+
     public function test_listing_moves_from_prepared_to_wystawione_after_export_then_to_sold(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);
