@@ -3,6 +3,16 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-10-09
+
+- Sprzedane i wycofane przedmioty znikają z listy przedmiotów (także z
+  wyszukiwania) i ze statystyk Panelu — widać je tylko po wybraniu filtra
+  statusu "Sprzedany"/"Wycofany"; dane zostają w bazie.
+- Poprawiono linki kategorii na pchlim targu — "Wszystkie" nie zostawia już
+  pustego "?" w adresie, a kliknięcie kategorii nie kończy się błędem 502
+  na hostingu z HTTPS przed serwerem.
+- Dodano zrzut ekranu aplikacji do README.
+
 ## 2026-10-04
 
 - Dodano opcjonalny link do oferty na OLX / Allegro / Vinted — przy

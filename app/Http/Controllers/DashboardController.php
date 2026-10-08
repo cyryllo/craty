@@ -15,7 +15,7 @@ class DashboardController extends Controller
             ->pluck('total', 'status');
 
         return view('dashboard', [
-            // Liczba i wartość tylko tego, co jest w magazynie — sprzedane nie.
+            // Liczba i wartość tylko tego, co jest w magazynie — bez sprzedanych/wycofanych.
             'totalItems' => Item::inStock()->count(),
             'totalValue' => Item::inStock()->sum('value'),
             'statusCounts' => $statusCounts,

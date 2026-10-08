@@ -120,15 +120,18 @@ class Item extends Model
         return $this->hasOne(SaleListing::class)->where('status', 'szkic')->latestOfMany();
     }
 
+    /** Statusy oznaczające, że przedmiotu fizycznie nie ma już w magazynie. */
+    public const OUT_OF_STOCK_STATUSES = ['sprzedany', 'wycofany'];
+
     /**
-     * Przedmioty faktycznie w magazynie — bez sprzedanych. Sprzedany
-     * przedmiot zostaje w bazie (historia, oferta sprzedaży), ale znika z
-     * listy przedmiotów i statystyk pulpitu; widać go tylko po wybraniu
-     * filtra statusu "Sprzedany" na /items.
+     * Przedmioty faktycznie w magazynie — bez sprzedanych i wycofanych.
+     * Taki przedmiot zostaje w bazie (historia, oferta sprzedaży), ale znika
+     * z listy przedmiotów i statystyk pulpitu; widać go tylko po wybraniu
+     * filtra statusu "Sprzedany"/"Wycofany" na /items.
      */
     public function scopeInStock(Builder $query): Builder
     {
-        return $query->where('status', '!=', 'sprzedany');
+        return $query->whereNotIn('status', self::OUT_OF_STOCK_STATUSES);
     }
 
     public function statusLabel(): string

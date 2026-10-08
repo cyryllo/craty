@@ -96,6 +96,14 @@ liście przedmiotów i karcie przedmiotu. Kolejność da się zmieniać
 strzałkami na formularzu edycji — przesunięcie innego zdjęcia na pierwsze
 miejsce automatycznie robi z niego nową okładkę.
 
+**Sprzedane i wycofane przedmioty znikają z magazynu.** Gdy przedmiot
+dostanie status "Sprzedany" albo "Wycofany", przestaje być widoczny na
+liście przedmiotów (także w wyszukiwaniu) i nie liczy się do liczby ani
+wartości przedmiotów na Panelu — domyślna opcja filtra statusu to
+"wszystkie (w magazynie)". Żeby je zobaczyć, wybierz w filtrze statusu
+"Sprzedany" albo "Wycofany". Nic nie jest kasowane: przedmiot zostaje w
+bazie razem z historią, a jego karta (i kod QR z naklejki) dalej działa.
+
 **Historia zmian**: każda edycja kluczowych pól (nazwa, wartość, stan,
 status, kategoria, lokalizacja) zapisuje się w historii widocznej na karcie
 przedmiotu, razem z tym, kto i kiedy ją zrobił.

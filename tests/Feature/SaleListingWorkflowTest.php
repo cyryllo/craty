@@ -187,16 +187,18 @@ class SaleListingWorkflowTest extends TestCase
         $this->actingAs($magazynier)->get(route('sale-listings.exported'))->assertSee('href="/flea-market"', false);
     }
 
-    public function test_sold_items_disappear_from_the_items_list_and_dashboard_unless_filtered_by_sold(): void
+    public function test_sold_and_retired_items_disappear_from_the_items_list_and_dashboard_unless_filtered(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);
         Item::create(['inventory_no' => 'NAR-BRAK-2026-00001', 'name' => 'Wiertarka w magazynie', 'condition' => 'uzywany', 'status' => 'dostepny', 'value' => 100]);
         Item::create(['inventory_no' => 'NAR-BRAK-2026-00002', 'name' => 'Sprzedana szlifierka', 'condition' => 'uzywany', 'status' => 'sprzedany', 'value' => 900]);
+        Item::create(['inventory_no' => 'NAR-BRAK-2026-00003', 'name' => 'Wycofana pilarka', 'condition' => 'uszkodzony', 'status' => 'wycofany', 'value' => 500]);
 
         foreach (['grid', 'list'] as $view) {
             $this->actingAs($magazynier)->get(route('items.index', ['view' => $view]))
                 ->assertSee('Wiertarka w magazynie')
-                ->assertDontSee('Sprzedana szlifierka');
+                ->assertDontSee('Sprzedana szlifierka')
+                ->assertDontSee('Wycofana pilarka');
         }
 
         // Wyszukiwanie też nie wyciąga sprzedanych bez filtra.
@@ -205,7 +207,12 @@ class SaleListingWorkflowTest extends TestCase
 
         $this->actingAs($magazynier)->get(route('items.index', ['status' => 'sprzedany']))
             ->assertSee('Sprzedana szlifierka')
-            ->assertDontSee('Wiertarka w magazynie');
+            ->assertDontSee('Wiertarka w magazynie')
+            ->assertDontSee('Wycofana pilarka');
+
+        $this->actingAs($magazynier)->get(route('items.index', ['status' => 'wycofany']))
+            ->assertSee('Wycofana pilarka')
+            ->assertDontSee('Sprzedana szlifierka');
 
         $this->actingAs($magazynier)->get(route('dashboard'))
             ->assertViewHas('totalItems', 1)
