@@ -124,6 +124,26 @@ of the box in dev) — browsers won't grant camera access over plain HTTP in
 production. Sort out a certificate before someone wonders why "the scanner
 doesn't work".
 
+## How to help
+
+Craty is a young project developed in spare time, and **I'm looking for
+people who'll actually use it**. You don't need to code to help:
+
+- **Use it and tell me what breaks.** Every bug reported through the
+  [bug report form](https://github.com/cyryllo/craty/issues/new?template=bug_report.yml)
+  gets it closer to a stable release. A screenshot and the version number
+  (shown in the footer) help a lot.
+- **Share an idea.** Missing something in your day-to-day decluttering?
+  Describe it in the
+  [feature request form](https://github.com/cyryllo/craty/issues/new?template=feature_request.yml),
+  ideally with a real-life example.
+- **Spread the word.** A GitHub star and recommending Craty to people from
+  your workshop, hackerspace or maker group really helps.
+- **Do you code?** Pull requests are welcome. For bigger changes, please
+  open an issue first so we can agree on the direction.
+
+Issues can be written in Polish or English.
+
 ## Plans
 
 Craty keeps growing, mainly through **optional modules** you can switch on

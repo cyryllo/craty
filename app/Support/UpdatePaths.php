@@ -18,6 +18,7 @@ class UpdatePaths
      */
     public const PACKAGE_EXCLUDES = [
         '.git',
+        '.github',
         '.env',
         '.env.testing',
         '.gitignore',

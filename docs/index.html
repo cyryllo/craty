@@ -164,6 +164,17 @@ h3 { font-size: 19px; font-weight: 700; }
 .reqs { margin-top: 28px; font-size: 15px; color: var(--muted); }
 .reqs code { background: var(--accent-soft); color: var(--accent-strong); padding: 1px 6px; border-radius: 5px; font-size: 14px; }
 
+/* ---------- pomoc ---------- */
+.help { counter-reset: none; }
+.step-link {
+    display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 26px; color: var(--ink); text-decoration: none; transition: border-color .15s ease, transform .15s ease;
+}
+.step-link:hover { color: var(--ink); border-color: var(--accent); transform: translateY(-2px); }
+.step-link p { color: var(--muted); margin: 8px 0 14px; font-size: 16px; }
+.step-link .more { color: var(--accent); font-weight: 600; font-size: 15px; }
+@media (prefers-reduced-motion: reduce) { .step-link { transition: none; } }
+
 /* ---------- cta + stopka ---------- */
 .cta { text-align: center; }
 .cta .lead { margin: 16px auto 28px; }
@@ -203,6 +214,7 @@ footer p { margin: 0; max-width: 620px; }
             <a href="#dla-kogo">Dla kogo</a>
             <a href="#funkcje">Co potrafi</a>
             <a href="#start">Jak zacząć</a>
+            <a href="#pomoc">Jak pomóc</a>
             <a class="btn btn-primary" href="https://github.com/cyryllo/craty">GitHub</a>
         </nav>
     </div>
@@ -326,6 +338,32 @@ footer p { margin: 0; max-width: 620px; }
             <div class="step"><h3>Przejdź kreator</h3><p>Otwórz adres strony w przeglądarce. Kreator sprawdzi serwer, połączy bazę, założy konto administratora i opcjonalnie wgra dane przykładowe.</p></div>
         </div>
         <p class="reqs">Wymagania: <code>PHP 8.3+</code> <code>MySQL 8+ / MariaDB 10.3+</code> <code>Apache z mod_rewrite</code> <code>HTTPS</code> (do skanowania aparatem). Szczegóły i wersja z Dockerem dla programistów: <a href="https://github.com/cyryllo/craty#readme">README na GitHubie</a>.</p>
+    </div>
+</section>
+
+<section class="section" id="pomoc" style="padding-top:0">
+    <div class="wrap">
+        <span class="eyebrow">Szukam testerów</span>
+        <h2>Używaj, zgłaszaj, podpowiadaj.</h2>
+        <p class="lead" style="margin-top:16px">Craty to młody projekt rozwijany po godzinach. Najbardziej pomagają mu ludzie, którzy go używają na co dzień i mówią, co działa, a co nie. Nie trzeba umieć programować.</p>
+        <div class="steps help">
+            <a class="step-link" href="https://github.com/cyryllo/craty/issues/new?template=bug_report.yml">
+                <h3>🐞 Znalazłeś błąd?</h3>
+                <p>Opisz go w krótkim formularzu. Zrzut ekranu i numer wersji ze stopki bardzo pomagają.</p>
+                <span class="more">Zgłoś błąd →</span>
+            </a>
+            <a class="step-link" href="https://github.com/cyryllo/craty/issues/new?template=feature_request.yml">
+                <h3>💡 Masz pomysł?</h3>
+                <p>Czegoś brakuje w porządkowaniu Twoich gratów? Opisz to na przykładzie z życia, każdy dobry pomysł rozważę.</p>
+                <span class="more">Zaproponuj funkcję →</span>
+            </a>
+            <a class="step-link" href="https://github.com/cyryllo/craty">
+                <h3>⭐ Powiedz innym</h3>
+                <p>Gwiazdka na GitHubie i polecenie znajomym z warsztatu, hackerspace'u czy grupy majsterkowiczów.</p>
+                <span class="more">Przejdź do GitHuba →</span>
+            </a>
+        </div>
+        <p class="reqs">Zgłaszać można po polsku albo po angielsku. Programujesz? Pull requesty są mile widziane, przy większej zmianie najpierw opisz ją w zgłoszeniu.</p>
     </div>
 </section>
 

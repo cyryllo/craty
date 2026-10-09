@@ -1,0 +1,68 @@
+name: "🐞 Zgłoś błąd / Report a bug"
+description: "Coś nie działa tak, jak powinno. / Something doesn't work as it should."
+title: "[Błąd] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Dzięki, że zgłaszasz błąd! Im dokładniej go opiszesz, tym szybciej da się go naprawić.
+        Thanks for reporting! The more precise the description, the faster it gets fixed. English is fine too.
+  - type: textarea
+    id: what
+    attributes:
+      label: "Co się stało? / What happened?"
+      description: "Opisz błąd. Zrzut ekranu bardzo pomaga (możesz go wkleić tutaj). / Describe the bug. A screenshot helps a lot (you can paste it here)."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Jak to powtórzyć? / How to reproduce?"
+      description: "Kroki, które prowadzą do błędu. / Steps that lead to the bug."
+      placeholder: |
+        1. Wchodzę w Przedmioty / Go to Items
+        2. Klikam… / Click…
+        3. Widzę… / See…
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Czego się spodziewałeś? / What did you expect?"
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: "Wersja Craty / Craty version"
+      description: "Widać ją w stopce każdej strony, np. „Craty v1.2.1”. / Shown in the footer of every page, e.g. \"Craty v1.2.1\"."
+      placeholder: "v1.2.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: "Gdzie działa Craty? / Where does Craty run?"
+      options:
+        - "Hosting współdzielony / Shared hosting"
+        - "Własny serwer lub VPS / Own server or VPS"
+        - "Docker"
+        - "Inne / Other"
+    validations:
+      required: false
+  - type: input
+    id: browser
+    attributes:
+      label: "Przeglądarka i urządzenie / Browser and device"
+      placeholder: "np. Chrome na Androidzie, Firefox na Windows / e.g. Chrome on Android"
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Log błędów (opcjonalnie) / Error log (optional)"
+      description: "Ostatnie wpisy z app-storage/logs/laravel.log z chwili błędu. Usuń z nich hasła i dane osobowe. / Last entries from app-storage/logs/laravel.log. Remove passwords and personal data."
+      render: text
+    validations:
+      required: false

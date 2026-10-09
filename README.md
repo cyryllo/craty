@@ -120,6 +120,26 @@ niczego dodatkowego na dev) — przeglądarki nie dają dostępu do kamery na
 zwykłym HTTP w produkcji. Zadbaj o certyfikat, zanim ktoś się zdziwi, że
 „skaner nie działa”.
 
+## Jak pomóc
+
+Craty to młody projekt rozwijany po godzinach i **szukam osób, które będą
+go używać**. Nie trzeba umieć programować, żeby pomóc:
+
+- **Używaj i mów, co nie działa.** Każdy błąd zgłoszony przez
+  [formularz zgłoszenia błędu](https://github.com/cyryllo/craty/issues/new?template=bug_report.yml)
+  przybliża stabilną wersję. Zrzut ekranu i numer wersji (widać go w
+  stopce) bardzo pomagają.
+- **Podziel się pomysłem.** Brakuje Ci czegoś w codziennym porządkowaniu
+  gratów? Opisz to w
+  [formularzu propozycji](https://github.com/cyryllo/craty/issues/new?template=feature_request.yml),
+  najlepiej na przykładzie z życia.
+- **Powiedz innym.** Gwiazdka na GitHubie i polecenie Craty znajomym z
+  warsztatu, hackerspace'u czy grupy majsterkowiczów naprawdę pomagają.
+- **Programujesz?** Pull requesty są mile widziane. Przy większej zmianie
+  najlepiej najpierw opisz ją w zgłoszeniu, żebyśmy ustalili kierunek.
+
+Zgłaszać można po polsku albo po angielsku.
+
 ## Plany na przyszłość
 
 Craty rozwija się dalej, głównie przez **moduły rozszerzające**, które

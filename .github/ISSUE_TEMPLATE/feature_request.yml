@@ -1,0 +1,45 @@
+name: "💡 Zaproponuj funkcję / Suggest a feature"
+description: "Masz pomysł albo potrzebę, której Craty dziś nie spełnia? / Have an idea or a need Craty doesn't cover today?"
+title: "[Pomysł] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Każdy dobry pomysł zostanie rozważony! Jedno założenie: Craty jest programem magazynowym i nie stanie się sklepem internetowym (bez koszyka, zamówień i płatności).
+        Every good idea will be considered! One rule: Craty is an inventory app and won't become an online shop (no cart, orders or payments). English is fine too.
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Jaki problem to rozwiąże? / What problem would it solve?"
+      description: "Opisz sytuację z życia: czego brakuje, co jest niewygodne. / Describe a real situation: what's missing or awkward."
+      placeholder: "Np. „Mam w garażu kilkanaście kartonów i chciałbym…” / e.g. \"I have a dozen boxes in my garage and I'd like to…\""
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: "Jak to sobie wyobrażasz? / How do you imagine it?"
+      description: "Nie musi być dopracowane, wystarczy ogólny pomysł. / Doesn't need to be polished, a rough idea is enough."
+    validations:
+      required: false
+  - type: textarea
+    id: today
+    attributes:
+      label: "Jak radzisz sobie z tym dziś? / How do you handle it today?"
+      description: "Arkusz, kartka, inny program, pamięć… / A spreadsheet, a notebook, another app, memory…"
+    validations:
+      required: false
+  - type: dropdown
+    id: who
+    attributes:
+      label: "Gdzie używasz Craty? / Where do you use Craty?"
+      multiple: true
+      options:
+        - "Dom, garaż, piwnica / Home, garage, basement"
+        - "Warsztat lub pracownia / Workshop"
+        - "Mały magazyn lub firma / Small warehouse or business"
+        - "Hackerspace, stowarzyszenie, klub / Hackerspace, association, club"
+        - "Jeszcze nie używam / Not using it yet"
+    validations:
+      required: false
