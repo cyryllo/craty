@@ -93,15 +93,17 @@
                     </dl>
                 @endif
 
-                @if ($listing->description)
-                    <p class="text-gray-700 whitespace-pre-line dark:text-gray-300">{{ $listing->description }}</p>
-                @endif
-
+                {{-- Jak kupić (link do ogłoszenia + kontakt) od razu pod stanem technicznym, a dopiero
+                     potem pełny opis — żeby przy długim opisie nie trzeba było przewijać do kontaktu. --}}
                 @if ($listing->external_url)
                     <div>@include('marketplace._external-link')</div>
                 @endif
 
                 @include('marketplace._contact')
+
+                @if ($listing->description)
+                    <p class="text-gray-700 whitespace-pre-line dark:text-gray-300">{{ $listing->description }}</p>
+                @endif
             </div>
         </div>
     </div>

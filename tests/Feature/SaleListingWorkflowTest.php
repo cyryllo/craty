@@ -115,7 +115,7 @@ class SaleListingWorkflowTest extends TestCase
             ->assertNotFound();
     }
 
-    public function test_existing_listing_can_be_edited_including_platform_without_creating_a_duplicate(): void
+    public function test_existing_listing_can_be_edited_without_creating_a_duplicate(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);
         $item = Item::create([
@@ -131,7 +131,6 @@ class SaleListingWorkflowTest extends TestCase
         $this->actingAs($magazynier)->get(route('sale-listings.edit', $listed))
             ->assertOk()
             ->assertSee('Stary tytuł')
-            ->assertSee('<option value="allegro" selected', false)
             ->assertDontSee('<x-', false);
 
         $this->actingAs($magazynier)->put(route('sale-listings.update', $listed), [
@@ -139,13 +138,14 @@ class SaleListingWorkflowTest extends TestCase
         ])->assertRedirect(route('sale-listings.exported'));
 
         $listed->refresh();
-        $this->assertSame('olx', $listed->platform);
+        $this->assertSame('OLX', $listed->externalPlatformName());
         $this->assertSame('Nowy tytuł', $listed->title);
         $this->assertSame('wyeksportowana', $listed->status);
         $this->assertSame(1, $item->saleListings()->count());
     }
 
-    public function test_listing_can_be_saved_with_vinted_platform(): void
+    /** Formularz oferty nie ma już pola "platforma": serwis wynika z linku do ogłoszenia. */
+    public function test_listing_form_has_no_platform_field_and_the_portal_comes_from_the_link(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);
         $item = Item::create([
@@ -153,13 +153,15 @@ class SaleListingWorkflowTest extends TestCase
         ]);
 
         $this->actingAs($magazynier)->get(route('items.sale-listing.create', $item))
-            ->assertSee('<option value="vinted"', false);
+            ->assertDontSee('name="platform"', false);
 
         $this->actingAs($magazynier)->post(route('items.sale-listing.store', $item), [
-            'platform' => 'vinted', 'title' => 'Kurtka',
+            'title' => 'Kurtka', 'external_url' => 'https://www.vinted.pl/items/123-kurtka',
         ])->assertSessionHasNoErrors();
 
-        $this->assertSame('vinted', $item->saleListings()->first()->platform);
+        $listing = $item->saleListings()->first();
+        $this->assertSame('Vinted', $listing->externalPlatformName());
+        $this->actingAs($magazynier)->get(route('sale-listings.index'))->assertSee('Vinted');
     }
 
     public function test_sold_listing_cannot_be_edited(): void

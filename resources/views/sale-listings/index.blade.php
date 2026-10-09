@@ -21,7 +21,6 @@
                 'title' => $l->title,
                 'description' => $l->description ?? '',
                 'price' => $l->price ? number_format((float) $l->price, 2, ',', ' ').' zł' : '',
-                'platform' => strtoupper($l->platform),
                 'markListedUrl' => route('sale-listings.mark-listed', $l),
                 'externalUrl' => $l->external_url ?? '',
                 'linkUrl' => route('sale-listings.update-link', $l),
@@ -67,7 +66,7 @@
                             </td>
                             <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $listing->title }}@include('sale-listings._link-icon')</td>
                             <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $listing->price ? number_format((float) $listing->price, 2, ',', ' ').' zł' : '—' }}</td>
-                            <td class="px-4 py-3 text-gray-500 uppercase text-xs dark:text-gray-400">{{ $listing->platform }}</td>
+                            <td class="px-4 py-3 text-gray-500 text-xs dark:text-gray-400">{{ $listing->externalPlatformName() ?? '—' }}</td>
                             <td class="px-4 py-3 text-right whitespace-nowrap">
                                 <a href="{{ route('sale-listings.edit', $listing) }}" @click.stop class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('edit') }}</a>
                                 <form method="POST" action="{{ route('sale-listings.mark-listed', $listing) }}" @click.stop onsubmit="return confirm('{{ __('Mark as listed?') }}');" class="inline ms-3">

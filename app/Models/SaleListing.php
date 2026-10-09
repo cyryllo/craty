@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SaleListing extends Model
 {
-    protected $fillable = ['item_id', 'platform', 'title', 'description', 'price', 'external_url', 'status', 'exported_at'];
+    protected $fillable = ['item_id', 'title', 'description', 'price', 'external_url', 'status', 'exported_at'];
 
     protected $casts = [
         'price' => 'decimal:2',
@@ -25,13 +25,6 @@ class SaleListing extends Model
         'wycofana' => 'Withdrawn',
     ];
 
-    /** Wartości to teksty źródłowe do __() — nazwy własne (OLX, Allegro) i tak się nie tłumaczą. */
-    public const PLATFORMS = [
-        'olx' => 'OLX',
-        'allegro' => 'Allegro',
-        'vinted' => 'Vinted',
-        'inne' => 'Other',
-    ];
 
     public function item(): BelongsTo
     {
@@ -39,16 +32,22 @@ class SaleListing extends Model
     }
 
     /**
-     * Nazwa platformy do etykiety przycisku na pchlim targu — rozpoznawana
-     * z domeny samego linku, nie z pola `platform` (ktoś mógł wybrać "OLX",
-     * a wkleić link do Allegro, albo odwrotnie).
+     * Nazwa serwisu rozpoznana z domeny linku do ogłoszenia, np. na przycisku
+     * "Zobacz na …" na pchlim targu, w tabelach Sprzedaży i w eksporcie CSV.
+     * Osobnego pola "platforma" w formularzu już nie ma (2026-10-09): link
+     * sam mówi, gdzie jest ogłoszenie. Null = brak linku albo nieznany
+     * serwis (ogólne "Zobacz ofertę").
      */
     public function externalPlatformName(): ?string
     {
+        if (blank($this->external_url)) {
+            return null;
+        }
+
         $host = strtolower((string) parse_url((string) $this->external_url, PHP_URL_HOST));
 
         return match (true) {
-            $host === '' => null,
+            str_contains($host, 'allegrolokalnie.') => 'Allegro Lokalnie',
             str_contains($host, 'olx.') => 'OLX',
             str_contains($host, 'allegro.') => 'Allegro',
             str_contains($host, 'vinted.') => 'Vinted',

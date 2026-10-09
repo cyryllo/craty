@@ -137,12 +137,13 @@ potraktował go jak formuły) albo ręczne "wystaw" przy
 pojedynczej ofercie → oferta trafia do zakładki "Wystawione", gdzie
 oznaczasz ją jako "sprzedane" albo "wycofaj".
 
-**Formularz oferty**: platforma (OLX, Allegro, Vinted albo "Inne"), tytuł,
-opis (pole rośnie razem z tekstem, można je też rozciągnąć w dół
-uchwytem w rogu), cena i opcjonalny **link do tej samej oferty na OLX /
-Allegro / Vinted**. Zapisaną ofertę poprawiasz przyciskiem "edytuj" — na
-obu zakładkach, "Przygotowane" i "Wystawione" — łącznie ze zmianą
-platformy.
+**Formularz oferty**: tytuł, opis (pole rośnie razem z tekstem, można je
+też rozciągnąć w dół uchwytem w rogu), cena i opcjonalny **link do tej
+samej oferty na OLX, Allegro, Allegro Lokalnie albo Vinted**. Serwis
+rozpoznawany jest z samego linku i pokazywany w tabeli ofert oraz na
+przycisku „Zobacz na …” na pchlim targu, więc nie trzeba go nigdzie
+osobno wybierać. Zapisaną ofertę poprawiasz przyciskiem "edytuj" na obu
+zakładkach, "Przygotowane" i "Wystawione".
 
 **Link do oferty zwykle powstaje dopiero po jej wystawieniu**, więc można
 go dopisać albo zmienić także później: kliknij wiersz oferty na zakładce

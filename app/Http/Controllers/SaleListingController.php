@@ -168,7 +168,7 @@ class SaleListingController extends Controller
                     $listing->price,
                     $item->category?->name,
                     $item->conditionLabel(),
-                    $listing->platform,
+                    $listing->externalPlatformName() ?? '',
                     // CSV ląduje poza appką (OLX, Excel), więc w przeciwieństwie
                     // do zwykłych <img src> w widokach potrzebuje pełnego,
                     // absolutnego URL-a — ItemPhoto::url() od teraz zwraca
@@ -206,7 +206,6 @@ class SaleListingController extends Controller
     private function rules(): array
     {
         return [
-            'platform' => ['required', 'in:'.implode(',', array_keys(SaleListing::PLATFORMS))],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'price' => ['nullable', 'numeric', 'min:0'],

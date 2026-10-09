@@ -14,7 +14,6 @@
                 'title' => $l->title,
                 'description' => $l->description ?? '',
                 'price' => $l->price ? number_format((float) $l->price, 2, ',', ' ').' zł' : '',
-                'platform' => strtoupper($l->platform),
                 'externalUrl' => $l->external_url ?? '',
                 'linkUrl' => route('sale-listings.update-link', $l),
                 'photos' => $l->item->photos->map(fn ($p) => $p->url())->values()->all(),

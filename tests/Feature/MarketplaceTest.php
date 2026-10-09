@@ -151,6 +151,9 @@ class MarketplaceTest extends TestCase
         $this->assertSame('Vinted', (new SaleListing(['external_url' => 'https://www.vinted.pl/items/123-kurtka']))->externalPlatformName());
         $this->assertNull((new SaleListing(['external_url' => 'https://example.com/x']))->externalPlatformName());
         $this->assertNull((new SaleListing)->externalPlatformName());
+        $this->assertSame('Allegro Lokalnie', (new SaleListing(['external_url' => 'https://allegrolokalnie.pl/oferta/wiertarka']))->externalPlatformName());
+        // Nierozpoznany adres (np. skrócony link): ogólny napis "Zobacz ofertę".
+        $this->assertNull((new SaleListing(['external_url' => 'https://bit.ly/abc']))->externalPlatformName());
     }
 
     public function test_description_is_shown_only_on_the_product_page_not_on_the_list(): void
@@ -245,6 +248,21 @@ class MarketplaceTest extends TestCase
             ->assertSee('role="dialog"', false)
             ->assertSee('@click.prevent="show(1)"', false)
             ->assertDontSee('target="_blank" rel="noopener" class="block"', false);
+    }
+
+    /** Na stronie oferty "jak kupić" (link + kontakt) jest od razu pod stanem technicznym, opis dopiero niżej. */
+    public function test_offer_page_shows_link_and_contact_right_after_the_condition_and_before_the_description(): void
+    {
+        AppSetting::current()->fill(['public_contact_email' => 'kontakt@example.com'])->save();
+        $listing = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka', 'wyeksportowana');
+        $listing->update(['external_url' => 'https://www.olx.pl/d/oferta/x.html', 'description' => 'Pełny opis oferty']);
+
+        $this->get(route('marketplace.show', $listing))->assertSeeInOrder([
+            $listing->item->conditionLabel(),
+            'https://www.olx.pl/d/oferta/x.html',
+            'kontakt@example.com',
+            'Pełny opis oferty',
+        ], false);
     }
 
     /** @param  array<int, string>  $filenames */

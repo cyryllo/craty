@@ -150,7 +150,7 @@
                     @forelse ($item->saleListings as $listing)
                         <div class="text-sm">
                             <p class="text-gray-800 dark:text-gray-200">{{ $listing->title }} — {{ $listing->price ? number_format((float) $listing->price, 2, ',', ' ').' zł' : __('no price') }}</p>
-                            <p class="text-gray-400 text-xs uppercase dark:text-gray-500">{{ $listing->platform }} · {{ $listing->statusLabel() }}</p>
+                            <p class="text-gray-400 text-xs uppercase dark:text-gray-500">@if ($listing->externalPlatformName()){{ $listing->externalPlatformName() }} · @endif{{ $listing->statusLabel() }}</p>
                         </div>
                     @empty
                         <p class="text-sm text-gray-400 dark:text-gray-500">{{ __('This item is not listed for sale yet.') }}</p>
