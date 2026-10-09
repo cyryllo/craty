@@ -120,6 +120,27 @@ niczego dodatkowego na dev) — przeglądarki nie dają dostępu do kamery na
 zwykłym HTTP w produkcji. Zadbaj o certyfikat, zanim ktoś się zdziwi, że
 „skaner nie działa”.
 
+## Plany na przyszłość
+
+Craty rozwija się dalej, głównie przez **moduły rozszerzające**, które
+będzie można włączyć w ustawieniach, gdy są potrzebne, i wyłączyć, gdy
+nie są. W planie są między innymi:
+
+- **Kontakty**: osoby i firmy, którym wypożyczasz rzeczy, oraz serwisy,
+  do których wysyłasz sprzęt do naprawy, z historią wypożyczeń przy
+  każdym kontakcie.
+- **Serwis**: naprawy, przeglądy okresowe i gwarancje, czyli pełniejsza
+  historia „co się działo z tym sprzętem”.
+- **Protokoły wypożyczenia i zwrotu** jako gotowe do druku dokumenty PDF.
+- **Materiały eksploatacyjne**: rzeczy liczone w sztukach, metrach czy
+  litrach, z ostrzeżeniem, gdy zaczyna ich brakować.
+
+Kolejność i szczegóły nie są jeszcze ustalone. **Masz pomysł albo
+potrzebę, której Craty dziś nie spełnia?** Opisz ją w
+[zgłoszeniach na GitHubie](https://github.com/cyryllo/craty/issues).
+Każdą fajną funkcję rozważę, o ile pasuje do założeń projektu (program
+magazynowy, nie sklep).
+
 ## Dokumentacja
 
 - [INSTRUKCJA.md](INSTRUKCJA.md) — instrukcja użytkownika (główne funkcje,

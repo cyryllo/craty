@@ -124,6 +124,26 @@ of the box in dev) — browsers won't grant camera access over plain HTTP in
 production. Sort out a certificate before someone wonders why "the scanner
 doesn't work".
 
+## Plans
+
+Craty keeps growing, mainly through **optional modules** you can switch on
+in the settings when you need them and off when you don't. Planned, among
+others:
+
+- **Contacts**: people and companies you lend things to, and repair shops
+  you send equipment to, with the loan history kept on each contact.
+- **Service**: repairs, periodic inspections and warranties, i.e. a fuller
+  "what happened to this piece of equipment" history.
+- **Loan and return protocols** as print-ready PDF documents.
+- **Consumables**: things counted in pieces, metres or litres, with a
+  warning when you're running low.
+
+Order and details aren't settled yet. **Have an idea or a need Craty
+doesn't cover today?** Describe it in the
+[GitHub issues](https://github.com/cyryllo/craty/issues). Every good idea
+will be considered, as long as it fits the project's scope (an inventory
+app, not a shop).
+
 ## Documentation
 
 - [CHANGELOG.md](CHANGELOG.md) — change history
