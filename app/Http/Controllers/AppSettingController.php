@@ -20,8 +20,9 @@ class AppSettingController extends Controller
             'name' => ['nullable', 'string', 'max:255'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'remove_logo' => ['nullable', 'boolean'],
-            // .ico nie przechodzi reguły "image", więc jawna lista; mały plik — to ikonka karty przeglądarki.
-            'favicon' => ['nullable', 'file', 'mimes:png,ico,svg,jpg,jpeg,webp,gif', 'max:512'],
+            // .ico nie przechodzi reguły "image", więc jawna lista; mały plik, to ikonka karty
+            // przeglądarki. Bez .svg: SVG może zawierać skrypt, a leży w publicznym /storage/.
+            'favicon' => ['nullable', 'file', 'mimes:png,ico,jpg,jpeg,webp,gif', 'max:512'],
             'remove_favicon' => ['nullable', 'boolean'],
             'locale' => ['nullable', 'string', Rule::in(array_keys(AppSetting::LOCALES))],
         ]);

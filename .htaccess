@@ -1,3 +1,8 @@
+# Bez listingu katalogów — poza blokiem <IfModule mod_negotiation.c> niżej, bo
+# na realnym hostingu tego modułu nie było i /storage/ pokazywał wszystkim
+# listę zdjęć wszystkich przedmiotów.
+Options -Indexes
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -45,5 +50,29 @@
 # poprawnego symlinku.
 <IfModule mod_rewrite.c>
     RewriteCond %{REQUEST_URI} ^/app-storage/
+    RewriteRule .* - [F,L]
+
+    # Ukryte pliki i katalogi (.git, .github, .env.backup...) oraz dokumentacja
+    # .md — paczka aktualizacji ich nie zawiera, ale instalacja przez
+    # `git clone` prosto na hosting wystawiłaby całą historię repozytorium.
+    # .well-known zostaje dostępne (certyfikaty Let's Encrypt).
+    RewriteCond %{REQUEST_URI} !^/\.well-known/
+    RewriteCond %{REQUEST_URI} (^|/)\. [OR]
+    RewriteCond %{REQUEST_URI} \.md$ [NC]
+    RewriteRule .* - [F,L]
+
+    # /storage/ (symlink do app-storage/app/public) udostępnia tylko to, czego
+    # appka faktycznie używa publicznie: zdjęcia i załączniki przedmiotów, kody
+    # QR, logo/favicon. Wszystko inne, co mogło tam trafić (np. stare katalogi
+    # app/, framework/, logs/ z dawnego układu, znalezione realnie na
+    # produkcji razem z migawkami kodu), jest niedostępne z zewnątrz.
+    RewriteCond %{REQUEST_URI} ^/storage/
+    RewriteCond %{REQUEST_URI} !^/storage/(items|qr|branding)/
+    RewriteRule .* - [F,L]
+
+    # Drugie zabezpieczenie: nawet gdyby w /storage/ znalazł się skrypt (np.
+    # wgrany jako załącznik), serwer go nie uruchomi ani nie poda jako strony.
+    RewriteCond %{REQUEST_URI} ^/storage/ [NC]
+    RewriteCond %{REQUEST_URI} \.(php[0-9]?|phtml|phar|pht|phps|cgi|pl|py|sh|html?|shtml|xhtml|js|mjs)$ [NC]
     RewriteRule .* - [F,L]
 </IfModule>

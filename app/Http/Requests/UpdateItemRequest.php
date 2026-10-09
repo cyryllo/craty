@@ -37,7 +37,9 @@ class UpdateItemRequest extends FormRequest
             'photos' => ['nullable', 'array'],
             'photos.*' => ['image', 'max:8192'],
             'attachments' => ['nullable', 'array'],
-            'attachments.*' => ['file', 'max:20480'],
+            // Lista dozwolonych typów, nie "dowolny plik": załączniki lądują w publicznym
+            // /storage/, więc np. wgrany .php mógłby zostać uruchomiony na serwerze.
+            'attachments.*' => ['file', 'max:20480', 'mimes:'.implode(',', \App\Models\ItemAttachment::ALLOWED_EXTENSIONS)],
             'attachment_labels' => ['nullable', 'array'],
             'attachment_labels.*' => ['nullable', 'string', 'max:255'],
         ];

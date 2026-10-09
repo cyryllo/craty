@@ -120,6 +120,27 @@ niczego dodatkowego na dev) — przeglądarki nie dają dostępu do kamery na
 zwykłym HTTP w produkcji. Zadbaj o certyfikat, zanim ktoś się zdziwi, że
 „skaner nie działa”.
 
+## Bezpieczeństwo
+
+Po każdej aktualizacji warto sprawdzić swoją instalację skryptem z
+repozytorium:
+
+```bash
+./security-check https://twoja-domena.pl
+```
+
+Skrypt wykonuje wyłącznie zapytania odczytu, bez logowania, więc można go
+bezpiecznie uruchamiać na produkcji. Sprawdza, czy nie da się pobrać plików
+z kodem lub hasłami, czy nie ma listingu katalogów, czy panel wymaga
+logowania, czy strona błędu nie zdradza szczegółów, oraz nagłówki,
+ciasteczka i przekierowanie na HTTPS. Uprawnienia do każdej strony
+aplikacji i typowe ataki (wgrywanie skryptów, wstrzykiwanie kodu)
+sprawdzają automatyczne testy w `tests/Feature/Security/`.
+
+Znalazłeś lukę bezpieczeństwa? Zgłoś ją prywatnie przez
+[GitHub Security Advisories](https://github.com/cyryllo/craty/security/advisories/new),
+a nie w publicznym zgłoszeniu.
+
 ## Jak pomóc
 
 Craty to młody projekt rozwijany po godzinach i **szukam osób, które będą

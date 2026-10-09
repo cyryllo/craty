@@ -31,6 +31,7 @@ class UpdatePaths
         'art',
         'composer',
         'test',
+        'security-check',
         'app-storage/app/public',
         'app-storage/app/updates',
         // Wyjście samego release:build — bez tego każde kolejne wydanie

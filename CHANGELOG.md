@@ -3,6 +3,27 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-10-09 (1.2.2)
+
+- Poprawki bezpieczeństwa: załączniki przyjmują tylko dozwolone typy
+  plików (wcześniej każdy, także skrypty .php), wyłączone konto nie może
+  się zalogować i jest wylogowywane z otwartej sesji, favicon i logo bez
+  SVG.
+- Nagłówki bezpieczeństwa wysyłane przez aplikację; `.htaccess` na stałe
+  wyłącza listing katalogów, w `/storage/` udostępnia tylko zdjęcia, kody
+  QR i logo, blokuje skrypty w `/storage/` oraz ukryte pliki i pliki .md.
+- Migracja usuwa stare, prywatne katalogi, które mogły trafić do
+  publicznego `/storage/` (m.in. migawki kodu z dawnej funkcji cofania
+  aktualizacji).
+- Wyłączono nieużywane trasy Laravela do serwowania plików prywatnych.
+- Dodano testy bezpieczeństwa (mapa uprawnień wszystkich tras, wgrywanie
+  plików, XSS, role, wyłączone konta, blokada logowania) i skrypt
+  `security-check` do sprawdzania działającej instalacji z zewnątrz.
+- "Ustawienia sklepu" nazywają się teraz "Opcje sprzedaży" (1.2.1).
+- README: założenia projektu (program magazynowy, nie sklep), plany,
+  sekcje "Jak pomóc" i "Bezpieczeństwo"; strona projektu na GitHub Pages
+  i formularze zgłoszeń błędów oraz pomysłów.
+
 ## 2026-10-09 (1.2.0)
 
 - Dodano Ustawienia sklepu (kafelek widoczny przy włączonej Sprzedaży):

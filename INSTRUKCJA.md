@@ -75,7 +75,10 @@ duplikat.
 seryjny/EAN (opcjonalne, osobne od numeru ewidencyjnego), kategoria,
 lokalizacja, wartość, data zakupu, stan (nowy/używany/uszkodzony), status
 (dostępny/wypożyczony/w naprawie/do sprzedaży/sprzedany/wycofany), opis,
-zdjęcia i załączniki (np. faktura, instrukcja).
+zdjęcia i załączniki (np. faktura, instrukcja). Załącznikiem może być
+plik PDF, dokument biurowy (Word, Excel, LibreOffice, RTF), obraz, plik
+tekstowy lub CSV albo archiwum ZIP; inne typy plików (np. skrypty czy
+strony HTML) są odrzucane ze względów bezpieczeństwa.
 
 **Numer ewidencyjny i kod QR** generują się automatycznie przy zapisie, w
 formacie `KATEGORIA-LOKALIZACJA-ROK-NUMER` (np. `NAR-M1-2026-00042`). Jeśli
@@ -196,12 +199,14 @@ miejscu:
 - **Kategorie** i **Struktura magazynu** — opisane wyżej (magazyny,
   pomieszczenia, regały, półki i pojemniki w jednym drzewie).
 - **Ustawienia aplikacji** *(tylko Administrator)*: nazwa, logo i
-  favicon (ikonka karty przeglądarki; bez własnej używane jest logo) oraz
+  favicon (ikonka karty przeglądarki w PNG albo ICO; bez własnej używane
+  jest logo) oraz
   domyślny język (PL/EN).
 - **Opcje sprzedaży** *(tylko Administrator, przy włączonej Sprzedaży)*:
   opis sprzedaży, kontakt, polityka prywatności i regulamin, opisane wyżej.
-- **Użytkownicy** *(tylko Administrator)* — konta, role, aktywacja/
-  dezaktywacja.
+- **Użytkownicy** *(tylko Administrator)*: konta, role, aktywacja i
+  dezaktywacja. Wyłączone konto nie może się zalogować, a jeśli ktoś był
+  akurat zalogowany, zostaje wylogowany przy następnym kliknięciu.
 - **Poczta** *(tylko Administrator)* — własne SMTP zamiast domyślnej
   konfiguracji serwera.
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego

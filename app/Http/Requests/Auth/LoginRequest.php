@@ -42,7 +42,9 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        // 'active' => true: konto wyłączone przez admina nie może się zalogować
+        // (ten sam komunikat co przy złym haśle, żeby nie zdradzać, czy konto istnieje).
+        if (! Auth::attempt([...$this->only('email', 'password'), 'active' => true], $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

@@ -43,8 +43,8 @@
                         <img src="{{ $setting->faviconUrl() }}" alt="" class="w-8 h-8 object-contain">
                     </div>
                     <div class="flex-1">
-                        <input id="favicon" name="favicon" type="file" accept=".png,.ico,.svg,.jpg,.jpeg,.webp,.gif,image/*" class="block w-full text-sm">
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Small square icon shown on the browser tab (PNG, ICO or SVG, ideally 32×32 or larger, max 512 KB). Without it, the logo is used.') }}</p>
+                        <input id="favicon" name="favicon" type="file" accept=".png,.ico,.jpg,.jpeg,.webp,.gif" class="block w-full text-sm">
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Small square icon shown on the browser tab (PNG or ICO, ideally 32×32 or larger, max 512 KB). Without it, the logo is used.') }}</p>
                         <x-input-error :messages="$errors->get('favicon')" class="mt-1" />
                     </div>
                 </div>

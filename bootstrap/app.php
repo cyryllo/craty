@@ -31,6 +31,8 @@ return tap(Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\RedirectToInstallerIfNotInstalled::class,
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\LogOutInactiveUsers::class,
+            \App\Http\Middleware\AddSecurityHeaders::class,
         ]);
         // Bez tego "auth" (domyślna lista priorytetów Laravela odwołuje się
         // do NIEGO przez interfejs AuthenticatesRequests, nie konkretną

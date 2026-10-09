@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+# Zewnętrzny przegląd bezpieczeństwa działającej instalacji Craty.
+#
+#   ./security-check https://twoja-domena.pl
+#
+# Wykonuje WYŁĄCZNIE zapytania GET bez logowania (niczego nie zapisuje, nie
+# wysyła formularzy, nie zgaduje haseł), więc można go bezpiecznie puszczać
+# na produkcji, np. po każdej aktualizacji. Sprawdza to, co widzi ktoś z
+# zewnątrz: czy nie da się pobrać plików z kodem/hasłami, czy nie ma
+# listingu katalogów, czy panel wymaga logowania, nagłówki, ciasteczka i HTTPS.
+# Kod wyjścia 1, jeśli cokolwiek wymaga poprawy.
+
+set -u
+BASE="${1:-}"
+if [[ -z "$BASE" ]]; then
+    echo "Użycie: $0 https://twoja-domena.pl" >&2
+    exit 2
+fi
+BASE="${BASE%/}"
+
+FAILS=0
+WARNS=0
+ok()   { printf '  \033[32m✔\033[0m %s\n' "$1"; }
+fail() { printf '  \033[31m✘\033[0m %s\n' "$1"; FAILS=$((FAILS + 1)); }
+warn() { printf '  \033[33m!\033[0m %s\n' "$1"; WARNS=$((WARNS + 1)); }
+code() { curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$1"; }
+
+echo "Craty: przegląd bezpieczeństwa $BASE"
+
+echo
+echo "1. Pliki, których nie wolno pobrać"
+for path in /.env /.env.example /composer.json /composer.lock /artisan /VERSION /update-manifest.json \
+            /phpunit.xml /.htaccess /.git/HEAD /.git/config /app/Models/User.php /config/app.php \
+            /routes/web.php /bootstrap/cache/config.php /vendor/autoload.php /database/database.sqlite \
+            /resources/views/welcome.blade.php /app-storage/logs/laravel.log /CLAUDE.md /TODO.md \
+            /storage/app/updates/state.json /storage/framework/.gitignore /storage/logs/laravel.log; do
+    c=$(code "$BASE$path")
+    if [[ "$c" == "200" ]]; then
+        fail "$path jest do pobrania (HTTP $c)"
+    else
+        ok "$path zablokowany (HTTP $c)"
+    fi
+done
+
+echo
+echo "2. Listing katalogów"
+for path in /storage/ /storage/items/ /storage/qr/ /build/ /pwa-icons/; do
+    if curl -s --max-time 20 "$BASE$path" | grep -qi 'Index of'; then
+        fail "$path pokazuje listę plików"
+    else
+        ok "$path bez listy plików"
+    fi
+done
+
+echo
+echo "3. Dostęp bez logowania"
+for path in /dashboard /items /ustawienia /users /ustawienia/aktualizacje /sales; do
+    c=$(code "$BASE$path")
+    if [[ "$c" == "302" || "$c" == "401" || "$c" == "403" || "$c" == "404" ]]; then
+        ok "$path wymaga logowania (HTTP $c)"
+    else
+        fail "$path odpowiada bez logowania (HTTP $c)"
+    fi
+done
+c=$(code "$BASE/install")
+if [[ "$c" == "200" ]]; then fail "/install (instalator) jest dostępny po instalacji"; else ok "/install zablokowany (HTTP $c)"; fi
+
+echo
+echo "4. Strona błędu"
+if curl -s --max-time 20 "$BASE/offer/999999999?x=$RANDOM" | grep -qiE 'stack trace|whoops|vendor/laravel|Illuminate\\|APP_KEY|DB_PASSWORD'; then
+    fail "Strona błędu pokazuje szczegóły techniczne (APP_DEBUG włączony?)"
+else
+    ok "Strona błędu nie zdradza szczegółów technicznych"
+fi
+
+echo
+echo "5. Nagłówki i ciasteczka"
+HEADERS=$(curl -s -D - -o /dev/null --max-time 20 "$BASE/")
+for h in X-Content-Type-Options X-Frame-Options Referrer-Policy Permissions-Policy; do
+    if grep -qi "^$h:" <<<"$HEADERS"; then ok "$h obecny"; else fail "Brak nagłówka $h"; fi
+done
+if grep -qi '^x-powered-by:' <<<"$HEADERS"; then
+    warn "Serwer zdradza wersję PHP ($(grep -i '^x-powered-by:' <<<"$HEADERS" | tr -d '\r' | cut -d' ' -f2-)), do ukrycia w ustawieniach PHP hostingu (expose_php = Off)"
+else
+    ok "Wersja PHP ukryta"
+fi
+SESSION=$(grep -i '^set-cookie:.*_session=' <<<"$HEADERS" | head -1)
+if [[ -z "$SESSION" ]]; then
+    warn "Nie znaleziono ciasteczka sesji do sprawdzenia"
+else
+    if [[ "$BASE" == https://* ]]; then
+        grep -qi 'secure' <<<"$SESSION" && ok "Ciasteczko sesji: Secure" || fail "Ciasteczko sesji bez Secure"
+    fi
+    grep -qi 'httponly' <<<"$SESSION" && ok "Ciasteczko sesji: HttpOnly" || fail "Ciasteczko sesji bez HttpOnly"
+    grep -qi 'samesite' <<<"$SESSION" && ok "Ciasteczko sesji: SameSite" || fail "Ciasteczko sesji bez SameSite"
+fi
+
+if [[ "$BASE" == https://* ]]; then
+    echo
+    echo "6. HTTPS"
+    HTTP_URL="http://${BASE#https://}/"
+    LOCATION=$(curl -s -o /dev/null -w '%{redirect_url}' --max-time 20 "$HTTP_URL")
+    if [[ "$LOCATION" == https://* ]]; then ok "HTTP przekierowuje na HTTPS"; else fail "HTTP nie przekierowuje na HTTPS"; fi
+    if grep -qi '^strict-transport-security:' <<<"$HEADERS"; then ok "HSTS włączone"; else warn "Brak HSTS (Strict-Transport-Security), opcjonalnie do włączenia w panelu hostingu"; fi
+fi
+
+echo
+if [[ $FAILS -eq 0 ]]; then
+    printf '\033[32mWynik: wszystko w porządku\033[0m (ostrzeżenia: %d)\n' "$WARNS"
+    exit 0
+fi
+printf '\033[31mWynik: do poprawy %d\033[0m (ostrzeżenia: %d)\n' "$FAILS" "$WARNS"
+exit 1

@@ -124,6 +124,27 @@ of the box in dev) — browsers won't grant camera access over plain HTTP in
 production. Sort out a certificate before someone wonders why "the scanner
 doesn't work".
 
+## Security
+
+After every update it's worth checking your install with the script from
+the repository:
+
+```bash
+./security-check https://your-domain.com
+```
+
+It only makes read-only requests, without logging in, so it's safe to run
+against production. It checks that code and secret files can't be
+downloaded, that directory listing is off, that the panel requires login,
+that the error page doesn't leak details, plus headers, cookies and the
+HTTPS redirect. Access to every page of the app and common attacks
+(uploading scripts, code injection) are covered by the automated tests in
+`tests/Feature/Security/`.
+
+Found a security issue? Please report it privately through
+[GitHub Security Advisories](https://github.com/cyryllo/craty/security/advisories/new),
+not in a public issue.
+
 ## How to help
 
 Craty is a young project developed in spare time, and **I'm looking for

@@ -33,7 +33,10 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Wyłączone: appka nie serwuje plików prywatnych przez URL, a
+            // `serve` dokładało publiczne trasy GET/PUT storage/{path}
+            // (podpisane linki), czyli zbędną powierzchnię ataku.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
