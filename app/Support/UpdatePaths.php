@@ -58,6 +58,9 @@ class UpdatePaths
         'README.md',
         'README.en.md',
         'CHANGELOG.md',
+        // Strona projektu na GitHub Pages i zrzut ekranu do README — nie są częścią appki.
+        'docs',
+        'app.png',
         'TODO.md',
         'LICENSE',
         // Konfiguracja narzędzi budujących/testujących, zbędna po tym, jak
