@@ -17,12 +17,21 @@ class LoanController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        $item->loans()->create([
+        $loan = $item->loans()->create([
             ...$data,
             'borrowed_at' => now(),
         ]);
 
         $item->update(['status' => 'wypozyczony']);
+
+        // Sama zmiana statusu w historii nie mówi, KOMU wypożyczono — osobny
+        // wpis z nazwą wypożyczającego (i terminem zwrotu, jeśli podany).
+        $item->histories()->create([
+            'user_id' => $request->user()->id,
+            'action' => 'loaned',
+            'new_value' => $loan->borrowerLabel(),
+            'old_value' => $loan->due_at?->format('d.m.Y'),
+        ]);
 
         return back()->with('status', __('Item marked as on loan.'));
     }
@@ -32,6 +41,12 @@ class LoanController extends Controller
     {
         $loan->update(['returned_at' => now()]);
         $loan->item->update(['status' => 'dostepny']);
+
+        $loan->item->histories()->create([
+            'user_id' => auth()->id(),
+            'action' => 'returned',
+            'old_value' => $loan->borrowerLabel(),
+        ]);
 
         return back()->with('status', __('Return registered.'));
     }

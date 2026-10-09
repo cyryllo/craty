@@ -65,6 +65,8 @@
                                     <div class="w-20 h-20 rounded-md bg-gray-100 overflow-hidden shrink-0 relative dark:bg-gray-700">
                                         @if ($photos->isNotEmpty())
                                             <img src="{{ $photos->first()->url() }}" alt="" class="w-full h-full object-cover">
+                                        @else
+                                            <x-photo-placeholder size="sm" />
                                         @endif
                                         @include('marketplace._photo-count')
                                     </div>
@@ -95,6 +97,8 @@
                                     <div class="aspect-video bg-gray-100 relative overflow-hidden shrink-0 dark:bg-gray-700">
                                         @if ($photos->isNotEmpty())
                                             <img src="{{ $photos->first()->url() }}" alt="" class="absolute inset-0 w-full h-full object-cover">
+                                        @else
+                                            <x-photo-placeholder />
                                         @endif
                                         @include('marketplace._photo-count')
                                     </div>

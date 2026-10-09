@@ -3,7 +3,26 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
-## 2026-10-09
+## 2026-10-09 (1.1.17)
+
+- Pchli targ jest teraz stroną główną aplikacji (`/`); przy wyłączonym
+  pokazuje informację, że nic nie jest wystawione. Logowanie przez kłódkę w
+  prawym górnym rogu, dla zalogowanych przycisk "Panel". Oferty pod
+  `/offer/{id}`, stary adres `/flea-market` usunięty.
+- Dodano Strukturę magazynu (Ustawienia): magazyny, pomieszczenia, regały,
+  półki i pojemniki w jednym drzewie, z liczbą przedmiotów, dymkiem z
+  nazwami po najechaniu, linkiem do przefiltrowanej listy przedmiotów i
+  przyciskami "+" otwierającymi wypełnione formularze. Zastępuje osobne
+  listy magazynów, pomieszczeń i lokalizacji.
+- Usunięcie pomieszczenia/regału/półki/pojemnika przenosi przedmioty poziom
+  wyżej (z wpisem w historii) zamiast blokować usunięcie.
+- Usunięto moduł "Rozszerzony magazyn" — pomieszczenia i lokalizacje są
+  zawsze dostępne.
+- Przedmioty i oferty bez zdjęcia pokazują grafikę "Brak zdjęcia".
+- W historii przedmiotu widać, komu go wypożyczono i od kogo wrócił.
+- Uzupełniono brakującą lokalizację "cały magazyn" tam, gdzie jej nie było.
+
+## 2026-10-09 (1.1.16)
 
 - Sprzedane i wycofane przedmioty znikają z listy przedmiotów (także z
   wyszukiwania) i ze statystyk Panelu — widać je tylko po wybraniu filtra

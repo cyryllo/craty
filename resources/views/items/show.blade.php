@@ -90,6 +90,8 @@
                             <span>
                                 {{ $history->user?->name ?? __('system') }} —
                                 @if ($history->action === 'created') {{ __('item created') }}
+                                @elseif ($history->action === 'loaned') {{ __('loaned to') }} <b>{{ $history->new_value }}</b>@if ($history->old_value) ({{ __('due') }} {{ $history->old_value }})@endif
+                                @elseif ($history->action === 'returned') {{ __('returned by') }} <b>{{ $history->old_value }}</b>
                                 @elseif ($history->field) {{ __('changed') }} <b>{{ $history->field }}</b>: {{ $history->old_value ?: '—' }} → {{ $history->new_value ?: '—' }}
                                 @else {{ $history->action }}
                                 @endif
@@ -134,7 +136,8 @@
                     @else
                         <form method="POST" action="{{ route('items.loans.store', $item) }}" class="space-y-2">
                             @csrf
-                            <input type="text" name="borrower_name" placeholder="{{ __('Loaned to whom') }}" required class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                            <input type="text" name="borrower_name" placeholder="{{ __('Loaned to whom') }} *" aria-label="{{ __('Loaned to whom') }}" value="{{ old('borrower_name') }}" required class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                            <x-input-error :messages="$errors->get('borrower_name')" />
                             <input type="date" name="due_at" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
                             <button class="w-full px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700">{{ __('Loan out') }}</button>
                         </form>

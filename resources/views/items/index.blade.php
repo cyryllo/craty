@@ -127,9 +127,11 @@
                                     <input type="checkbox" name="items[]" value="{{ $item->id }}" class="item-checkbox">
                                 </td>
                                 <td class="px-4 py-2 w-10">
-                                    <div class="w-8 h-8 rounded bg-gray-100 overflow-hidden flex items-center justify-center dark:bg-gray-700">
+                                    <div class="relative w-8 h-8 rounded bg-gray-100 overflow-hidden flex items-center justify-center dark:bg-gray-700">
                                         @if ($item->primaryPhoto->first())
                                             <img src="{{ $item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
+                                        @else
+                                            <x-photo-placeholder size="sm" />
                                         @endif
                                     </div>
                                 </td>
@@ -162,11 +164,11 @@
                         <input type="checkbox" name="items[]" value="{{ $item->id }}" class="item-checkbox absolute top-2 left-2 z-10 w-4 h-4 rounded shadow">
                         {{-- h-full: karta wypełnia całą komórkę siatki, więc wszystkie kafelki w rzędzie mają równą wysokość (dolna linia przez mt-auto). --}}
                         <a href="{{ route('items.show', $item) }}" class="h-full bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden flex flex-col dark:bg-gray-800">
-                        <div class="aspect-[4/3] shrink-0 bg-gray-100 flex items-center justify-center overflow-hidden dark:bg-gray-700">
+                        <div class="relative aspect-[4/3] shrink-0 bg-gray-100 flex items-center justify-center overflow-hidden dark:bg-gray-700">
                             @if ($item->primaryPhoto->first())
                                 <img src="{{ $item->primaryPhoto->first()->url() }}" alt="" class="w-full h-full object-cover">
                             @else
-                                <span class="text-gray-300 text-sm">{{ __('no photo') }}</span>
+                                <x-photo-placeholder />
                             @endif
                         </div>
                         <div class="p-4 flex-1 flex flex-col gap-1">

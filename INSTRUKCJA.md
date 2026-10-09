@@ -13,7 +13,7 @@ struktura magazynowa) — różnica względem Administratora to tylko dostęp do
 aktualizacje appki). Konta zakłada Administrator w Ustawienia → Użytkownicy
 — nie ma samodzielnej rejestracji.
 
-## Struktura magazynowa: Kategorie, Magazyny, Pomieszczenia, Lokalizacje
+## Struktura magazynowa: Kategorie i Struktura magazynu
 
 To jest część, która najczęściej budzi pytania, więc tłumaczymy dokładnie,
 jak się to wszystko do siebie ma i co jest naprawdę wymagane.
@@ -22,57 +22,52 @@ jak się to wszystko do siebie ma i co jest naprawdę wymagane.
 "Elektronika") — decyduje o pierwszym segmencie numeru ewidencyjnego (np.
 `NAR-...`). Kategorie mogą mieć podkategorie.
 
-**Magazyn** (Ustawienia → Magazyny) to fizyczne miejsce — hala, budynek,
-pomieszczenie gospodarcze. Ma nazwę i krótki kod (np. "M1"). **Od razu po
-założeniu magazynu można go wybrać przy dodawaniu przedmiotu** — nie trzeba
-nic więcej konfigurować. Dzieje się tak dlatego, że każdy nowy magazyn
-automatycznie dostaje "bazową" lokalizację reprezentującą po prostu cały
-magazyn, bez podziału na regały/półki. Jeśli to Ci wystarcza (mały warsztat,
-jeden magazyn, nie chce się Wam rozpisywać każdego regału) — nic więcej nie
-trzeba robić.
+**Struktura magazynu** (Ustawienia → Struktura magazynu) to jedno miejsce,
+w którym widać i układa się całe „gdzie co leży”, jako drzewo:
 
-**Pomieszczenia i Lokalizacje to moduł „Rozszerzony magazyn”**, który
-Administrator włącza w Ustawienia → Moduły. Gdy jest wyłączony, w
-Ustawieniach nie ma kafelków „Pomieszczenia” i „Lokalizacje”, a na
-formularzu przedmiotu pole nazywa się po prostu „Magazyn” i wybierasz w
-nim sam magazyn — to wystarcza większości małych warsztatów. Na nowej
-instalacji moduł jest domyślnie wyłączony; jeśli korzystaliście już z
-pomieszczeń lub regałów/półek, po aktualizacji jest włączony sam, więc nic
-Wam nie zniknie. Wyłączenie modułu niczego nie kasuje — przedmiot, który
-już leży na konkretnym regale, zachowuje tę lokalizację (widać ją na jego
-karcie i zostaje przy edycji), a po ponownym włączeniu modułu wszystko
-wraca tak, jak było. Opis poniżej dotyczy sytuacji z włączonym modułem.
+- **Magazyn** — fizyczne miejsce (hala, budynek, garaż), z nazwą i krótkim
+  kodem (np. "M1"). Na stronie to ciemny, szeroki nagłówek. Nowy magazyn
+  dodajesz przyciskiem "+ Nowy magazyn" u góry strony, a edytujesz (i
+  usuwasz) ołówkiem w jego nagłówku. **Od razu po założeniu magazynu można
+  go wybrać przy dodawaniu przedmiotu** jako "cały magazyn" — nic więcej
+  nie trzeba konfigurować. Jeśli to Ci wystarcza (mały warsztat, jeden
+  magazyn), na tym możesz skończyć.
+- **Pomieszczenie** — *opcjonalny* podział magazynu (np. "Hala warsztatowa"
+  i "Strych" w tym samym budynku). Dodajesz je przyciskiem
+  "+ Pomieszczenie" w nagłówku magazynu; na stronie to karty, po dwie w
+  rzędzie. Pomieszczenie też od razu jest wybieralne na formularzu
+  przedmiotu jako "całe pomieszczenie".
+- **Regał → półka → pojemnik** — najbardziej szczegółowe miejsca, w obrębie
+  pomieszczenia. Regał dodajesz przyciskiem "+ Regał w: …" na dole karty
+  pomieszczenia, półkę przyciskiem "+ Półka" pod regałem, a pojemnik
+  przyciskiem "+ Pojemnik" przy półce — formularz otwiera się już z
+  wpisanym magazynem, pomieszczeniem, regałem i półką, zostaje tylko
+  uzupełnić numer. Regały można zwijać (strzałka przy nazwie albo "Zwiń
+  wszystko" u góry), a pojemniki wyświetlają się jako małe "chipy" (np.
+  `K1 · 2`).
 
-**Pomieszczenie** (Ustawienia → Pomieszczenia) to *opcjonalny* poziom
-między magazynem a regałem — przydatny, gdy jeden magazyn ma więcej niż
-jedno pomieszczenie/halę (np. "Hala produkcyjna" i "Magazyn narzędzi" w tym
-samym budynku). Pomieszczenie zawsze należy do jednego magazynu i — tak
-samo jak magazyn — od razu po założeniu jest wybieralne na formularzu
-przedmiotu (dostaje własną bazową lokalizację). Jeśli nie potrzebujesz
-takiego podziału, po prostu nie zakładaj żadnych pomieszczeń — wszystko
-działa tak samo, jak gdyby ich nie było.
+**Liczby przy każdym miejscu** to przedmioty, które tam leżą (bez
+sprzedanych i wycofanych), łącznie ze wszystkim, co niżej — regał liczy
+też swoje półki i pojemniki. **Po najechaniu myszką** na liczbę albo na
+pojemnik pokazuje się dymek z nazwami tych przedmiotów (i notatką miejsca,
+jeśli ją dodano). **Kliknięcie** otwiera listę przedmiotów z tego miejsca;
+nad nią jest przycisk "← Struktura magazynu", który wraca prosto do tego
+magazynu.
 
-**Lokalizacja** (Ustawienia → Lokalizacje) to najbardziej szczegółowy
-poziom: regał / półka / pojemnik w obrębie magazynu (i opcjonalnie
-pomieszczenia). Wszystkie trzy pola (regał, półka, pojemnik) są opcjonalne
-— możesz wypełnić tylko regał, albo regał + półkę, albo wszystkie trzy.
-Zostawienie ich pustych przy zakładaniu nowej lokalizacji oznacza po prostu
-"cały magazyn" (albo "całe pomieszczenie", jeśli je wybrałeś) — to
-dokładnie ta sama bazowa lokalizacja, którą dostajesz automatycznie przy
-zakładaniu magazynu/pomieszczenia.
-
-**Podsumowując — trzy poziomy szczegółowości do wyboru, wszystkie
-działające od razu bez dodatkowej konfiguracji:**
-1. Sam magazyn (nic więcej nie trzeba zakładać).
-2. Magazyn + pomieszczenie (jeśli magazyn ma kilka hal/pomieszczeń).
-3. Magazyn (+ pomieszczenie) + konkretny regał/półka/pojemnik (jeśli
-   zależy Wam na dokładnej ewidencji "gdzie leży co").
+**Usuwanie niczego nie gubi.** Usunięcie pomieszczenia przenosi wszystkie
+jego przedmioty (także z regałów, półek i pojemników) do samego magazynu.
+Usunięcie regału, półki albo pojemnika przenosi przedmioty poziom wyżej —
+do "całego pomieszczenia" (albo do samego magazynu, jeśli regał nie był w
+żadnym pomieszczeniu). Każde takie przeniesienie widać w historii
+przedmiotu. Przycisk usuwania jest na dole formularza edycji (ołówek).
+Magazynu, w którym coś leży, nie da się usunąć — najpierw przenieś
+przedmioty.
 
 **Jedna lokalizacja może trzymać wiele przedmiotów naraz** — nie trzeba
-zakładać nowej lokalizacji dla każdego kolejnego przedmiotu w tym samym
-pojemniku. Próba założenia lokalizacji z już istniejącą kombinacją
-regał/półka/pojemnik w tym samym magazynie zwróci błąd z podpowiedzią,
-której lokalizacji użyć zamiast tworzyć duplikat.
+zakładać nowego pojemnika dla każdego kolejnego przedmiotu. Próba
+założenia miejsca z już istniejącym regałem/półką/pojemnikiem w tym samym
+magazynie zwróci błąd z podpowiedzią, którego użyć zamiast tworzyć
+duplikat.
 
 ## Przedmioty
 
@@ -115,8 +110,10 @@ wydruku.
 
 ## Wypożyczenia
 
-Z karty przedmiotu — "Wypożycz", z komu (imię/nazwisko albo osoba spoza
-systemu) i opcjonalnym terminem zwrotu. Przeterminowane wypożyczenia widać
+Z karty przedmiotu — "Wypożycz", z **obowiązkowym** polem komu
+(imię/nazwisko albo osoba spoza systemu) i opcjonalnym terminem zwrotu. W
+historii przedmiotu zapisuje się, komu go wypożyczono (i do kiedy), a przy
+zwrocie — od kogo wrócił. Przeterminowane wypożyczenia widać
 na Panelu; opcjonalnie appka wysyła codzienne e-mailowe podsumowanie
 przeterminowanych wypożyczeń do wszystkich aktywnych kont (Ustawienia →
 Powiadomienia).
@@ -144,12 +141,17 @@ go dopisać albo zmienić także później: kliknij wiersz oferty na zakładce
 "Przygotowane" lub "Wystawione", a w okienku podglądu na dole jest pole na
 link. Oferty, które mają link, mają w tabeli ikonkę 🔗.
 
-**Pchli targ** — opcjonalna publiczna strona (bez logowania) pokazująca
-wystawione oferty, do włączenia w Ustawienia → Ustawienia aplikacji. Link
-do niej możesz wysłać znajomym, żeby pokazać, co aktualnie sprzedajesz —
-bez koszyka i bez typowego sklepu (kontakt tylko przez podany e-mail/
-telefon). Gdy jest włączony, obok zakładek Sprzedaży pojawia się
-odnośnik "🛒 Pchli targ", który otwiera go w nowej karcie.
+**Pchli targ** — publiczna strona (bez logowania) z wystawionymi ofertami,
+**to strona główna aplikacji** (sam adres, np. `https://twoja-domena.pl/`),
+do włączenia w Ustawienia → Ustawienia aplikacji. Adres możesz wysłać
+znajomym, żeby pokazać, co aktualnie sprzedajesz — bez koszyka i bez
+typowego sklepu (kontakt tylko przez podany e-mail/telefon). Gdy pchli targ
+jest wyłączony, strona główna pokazuje tylko informację, że nic nie jest
+wystawione. W prawym górnym rogu jest **kłódka** prowadząca do logowania
+(dla zalogowanych — przycisk "Panel"); zainstalowana na telefonie
+aplikacja i tak otwiera się od razu na panelu. Gdy pchli targ jest
+włączony, obok zakładek Sprzedaży pojawia się odnośnik "🛒 Pchli targ",
+który otwiera go w nowej karcie.
 
 Na liście pchlego targu każda oferta to tylko zdjęcie (z liczbą zdjęć,
 jeśli jest ich więcej), nazwa, cena i stan techniczny, plus przycisk
@@ -180,9 +182,8 @@ przeglądarce — Chrome/Android pokazuje to sam, wymaga HTTPS). Strona
 Rozdzielnik Ustawień (link w prawym górnym rogu) grupuje wszystko w jednym
 miejscu:
 
-- **Kategorie / Magazyny / Pomieszczenia / Lokalizacje** — struktura
-  magazynowa, opisana wyżej (Pomieszczenia i Lokalizacje tylko z
-  włączonym modułem „Rozszerzony magazyn”).
+- **Kategorie** i **Struktura magazynu** — opisane wyżej (magazyny,
+  pomieszczenia, regały, półki i pojemniki w jednym drzewie).
 - **Ustawienia aplikacji** *(tylko Administrator)* — nazwa i logo appki,
   domyślny język (PL/EN), dane kontaktowe i przełącznik Pchlego targu.
 - **Użytkownicy** *(tylko Administrator)* — konta, role, aktywacja/
@@ -192,7 +193,7 @@ miejscu:
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego
   resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń.
 - **Moduły** *(tylko Administrator)* — włącz/wyłącz opcjonalne części
-  appki (dziś: Sprzedaż i Rozszerzony magazyn).
+  appki (dziś: Sprzedaż).
 - **Aktualizacje** *(tylko Administrator)* — samodzielna aktualizacja
   appki przez wgranie paczki `.zip`, bez SSH/Composera. Zawsze rób kopię
   plików i bazy danych przed wgraniem nowej wersji.

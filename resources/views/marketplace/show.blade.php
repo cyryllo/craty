@@ -19,7 +19,7 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="aspect-[4/3] rounded-md bg-gray-100 flex items-center justify-center text-gray-400 text-sm dark:bg-gray-900 dark:text-gray-500">{{ __('No photos') }}</div>
+                    <div class="relative aspect-[4/3] rounded-md overflow-hidden"><x-photo-placeholder size="lg" /></div>
                 @endif
             </div>
 
