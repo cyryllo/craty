@@ -37,6 +37,26 @@
             </div>
 
             <div>
+                <x-input-label for="favicon" value="{{ __('Favicon') }}" />
+                <div class="mt-2 flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-md border border-gray-200 flex items-center justify-center bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
+                        <img src="{{ $setting->faviconUrl() }}" alt="" class="w-8 h-8 object-contain">
+                    </div>
+                    <div class="flex-1">
+                        <input id="favicon" name="favicon" type="file" accept=".png,.ico,.svg,.jpg,.jpeg,.webp,.gif,image/*" class="block w-full text-sm">
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Small square icon shown on the browser tab (PNG, ICO or SVG, ideally 32×32 or larger, max 512 KB). Without it, the logo is used.') }}</p>
+                        <x-input-error :messages="$errors->get('favicon')" class="mt-1" />
+                    </div>
+                </div>
+                @if ($setting->favicon_path)
+                    <label class="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <input type="checkbox" name="remove_favicon" value="1" class="rounded border-gray-300 dark:border-gray-600">
+                        {{ __('Remove the current favicon and revert to the default') }}
+                    </label>
+                @endif
+            </div>
+
+            <div>
                 <x-input-label for="locale" :value="__('Default language for everyone')" />
                 <select id="locale" name="locale" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600">
                     <option value="">— {{ __('follow server default') }} —</option>
@@ -47,24 +67,17 @@
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Used for anyone who has not picked a personal language from the user menu.') }}</p>
             </div>
 
-            <div class="pt-4 border-t border-gray-100 space-y-4 dark:border-gray-700" x-data="{ enabled: {{ old('public_marketplace_enabled', $setting->public_marketplace_enabled) ? 'true' : 'false' }} }">
-                <div class="flex items-start gap-2">
-                    <input type="hidden" name="public_marketplace_enabled" value="0">
-                    <input type="checkbox" id="public_marketplace_enabled" name="public_marketplace_enabled" value="1"
-                           x-model="enabled"
-                           @checked(old('public_marketplace_enabled', $setting->public_marketplace_enabled)) class="mt-1 rounded border-gray-300 dark:border-gray-600">
-                    <label for="public_marketplace_enabled" class="text-sm text-gray-700 dark:text-gray-300">
-                        {{ __('Publish a public "flea market" page') }}
-                        <span class="block text-xs text-gray-500 dark:text-gray-400">
-                            {{ __('Shows a public, login-free page listing items marked for sale, with no purchasing — visitors are asked to email you.') }}
-                            @if ($setting->public_marketplace_enabled)
-                                <a href="{{ route('marketplace.index', [], false) }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('View the public page') }}</a>
-                            @endif
-                        </span>
-                    </label>
-                </div>
+            {{-- Pchli targ (strona główna) jest włączony razem z modułem Sprzedaż — osobnego przełącznika już nie ma. --}}
+            @if (\App\Support\Modules::isEnabled('sales'))
+                <div class="pt-4 border-t border-gray-100 space-y-4 dark:border-gray-700">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Flea market (home page)') }}</h3>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {{ __('The public home page lists items you have put up for sale, with no purchasing: visitors contact you. It is on whenever the Sale module is on.') }}
+                            <a href="{{ route('marketplace.index', [], false) }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('View the public page') }}</a>
+                        </p>
+                    </div>
 
-                <div x-show="enabled" x-cloak class="space-y-4">
                     <div>
                         <x-input-label for="public_contact_email" :value="__('Contact email shown on the public page')" />
                         <x-text-input id="public_contact_email" name="public_contact_email" type="email" class="mt-1 block w-full" value="{{ old('public_contact_email', $setting->public_contact_email) }}" />
@@ -78,7 +91,7 @@
                         <x-input-error :messages="$errors->get('public_contact_phone')" class="mt-1" />
                     </div>
                 </div>
-            </div>
+            @endif
 
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                 <a href="{{ route('settings.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>

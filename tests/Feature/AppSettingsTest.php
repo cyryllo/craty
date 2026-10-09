@@ -31,6 +31,44 @@ class AppSettingsTest extends TestCase
         $this->actingAs($admin)->get('/dashboard')->assertSee('Graty Sp. z o.o.');
     }
 
+    public function test_admin_can_set_and_remove_a_custom_favicon_used_on_every_page(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        // Domyślnie ikona aplikacji, także na publicznej stronie głównej.
+        $this->get('/')->assertSee('<link rel="icon" href="/pwa-icons/icon-192.png">', false);
+
+        $this->actingAs($admin)->post(route('settings.app.update'), [
+            'favicon' => UploadedFile::fake()->image('favicon.png', 64, 64),
+        ])->assertSessionHasNoErrors();
+
+        $setting = AppSetting::current();
+        Storage::disk('public')->assertExists($setting->favicon_path);
+        $this->actingAs($admin)->get('/dashboard')
+            ->assertSee('<link rel="icon" href="'.$setting->faviconUrl().'">', false);
+
+        $this->actingAs($admin)->post(route('settings.app.update'), ['remove_favicon' => 1]);
+        Storage::disk('public')->assertMissing($setting->favicon_path);
+        $this->assertNull(AppSetting::current()->favicon_path);
+
+        // Bez własnego faviconu, ale z wgranym logo — favicon to logo.
+        $this->actingAs($admin)->post(route('settings.app.update'), [
+            'logo' => UploadedFile::fake()->image('logo.png', 200, 200),
+        ]);
+        $logoUrl = Storage::disk('public')->url(AppSetting::current()->logo_path);
+        $this->get('/')->assertSee('<link rel="icon" href="'.$logoUrl.'">', false);
+    }
+
+    public function test_favicon_rejects_non_image_files(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)->post(route('settings.app.update'), [
+            'favicon' => UploadedFile::fake()->create('virus.php', 10, 'application/x-php'),
+        ])->assertSessionHasErrors('favicon');
+    }
+
     public function test_magazynier_cannot_access_app_settings(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);

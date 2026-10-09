@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Storage;
 class AppSetting extends Model
 {
     protected $fillable = [
-        'name', 'logo_path', 'locale',
+        'name', 'logo_path', 'favicon_path', 'locale',
         'mail_host', 'mail_port', 'mail_encryption', 'mail_username', 'mail_password',
         'mail_from_address', 'mail_from_name',
-        'public_marketplace_enabled', 'public_contact_email', 'public_contact_phone',
+        'public_contact_email', 'public_contact_phone',
         'module_sales_enabled',
         'password_reset_enabled', 'loan_due_notifications_enabled',
     ];
@@ -26,7 +26,6 @@ class AppSetting extends Model
         // Jedyne miejsce w appce, gdzie w bazie ląduje sekret tego typu —
         // reszta AppSetting to jawne, nieszyfrowane dane (nazwa, logo...).
         'mail_password' => 'encrypted',
-        'public_marketplace_enabled' => 'boolean',
         'module_sales_enabled' => 'boolean',
         'password_reset_enabled' => 'boolean',
         'loan_due_notifications_enabled' => 'boolean',
@@ -36,7 +35,6 @@ class AppSetting extends Model
     // firstOrNew() (patrz current()) miałby te pola jako null zamiast
     // wartości domyślnej z migracji, dopóki ktoś raz nie zapisałby ustawień.
     protected $attributes = [
-        'public_marketplace_enabled' => false,
         'module_sales_enabled' => true,
         'password_reset_enabled' => true,
         'loan_due_notifications_enabled' => false,
@@ -78,6 +76,20 @@ class AppSetting extends Model
     public function logoUrl(): ?string
     {
         return $this->logo_path ? Storage::disk('public')->url($this->logo_path) : null;
+    }
+
+    /**
+     * Favicon na każdej stronie (layouts/_theme-head), w kolejności: własny
+     * favicon z Ustawień, wgrane logo aplikacji, a bez obu ikona aplikacji z
+     * PWA (to samo logo, co domyślne x-application-logo). /favicon.ico w
+     * katalogu głównym to pusty (0 B) plik ze szkieletu Laravela, więc się
+     * nie nadaje. Względny adres, tak samo jak zdjęcia.
+     */
+    public function faviconUrl(): string
+    {
+        $path = $this->favicon_path ?: $this->logo_path;
+
+        return $path ? Storage::disk('public')->url($path) : '/pwa-icons/icon-192.png';
     }
 
     /** Czy admin skonfigurował własną pocztę SMTP (zamiast polegać na .env). */

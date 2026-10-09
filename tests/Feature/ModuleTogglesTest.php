@@ -38,9 +38,7 @@ class ModuleTogglesTest extends TestCase
     /** Decyzja: wyłączenie modułu Sprzedaż chowa też pchli targ, niezależnie od jego własnego przełącznika. */
     public function test_disabling_the_sales_module_also_hides_the_flea_market(): void
     {
-        AppSetting::current()->fill([
-            'public_marketplace_enabled' => true,
-            'module_sales_enabled' => false,
+        AppSetting::current()->fill(['module_sales_enabled' => false,
         ])->save();
 
         $this->get(route('marketplace.index'))

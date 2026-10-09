@@ -36,7 +36,6 @@ class FooterTest extends TestCase
 
     public function test_footer_appears_on_the_public_marketplace_page(): void
     {
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
 
         $this->get(route('marketplace.index'))
             ->assertSee('Craty v'.app(AppVersion::class)->current())

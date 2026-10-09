@@ -174,14 +174,9 @@ class SaleListingWorkflowTest extends TestCase
         $this->actingAs($magazynier)->put(route('sale-listings.update', $sold), ['platform' => 'olx', 'title' => 'X'])->assertNotFound();
     }
 
-    public function test_sale_tabs_link_to_the_flea_market_only_when_it_is_enabled(): void
+    public function test_sale_tabs_link_to_the_flea_market(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);
-
-        $this->actingAs($magazynier)->get(route('sale-listings.index'))
-            ->assertDontSee('🛒', false);
-
-        \App\Models\AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
 
         $this->actingAs($magazynier)->get(route('sale-listings.index'))->assertSee('🛒', false);
         $this->actingAs($magazynier)->get(route('sale-listings.exported'))->assertSee('🛒', false);

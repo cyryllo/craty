@@ -22,7 +22,7 @@ class MarketplaceController extends Controller
         // Strona główna nie robi 404 przy wyłączonym pchlim targu (jak
         // podstrony ofert) — pokazuje tylko informację, że nic nie jest
         // wystawione, i kłódkę do logowania w nagłówku.
-        if (! $this->isEnabled($setting)) {
+        if (! $this->isEnabled()) {
             return view('marketplace.index', [
                 'enabled' => false,
                 'appName' => $setting->effectiveName(),
@@ -111,18 +111,18 @@ class MarketplaceController extends Controller
     {
         $setting = AppSetting::current();
 
-        abort_unless($this->isEnabled($setting), 404);
+        abort_unless($this->isEnabled(), 404);
 
         return $setting;
     }
 
     /**
-     * Wyłączenie modułu Sprzedaż chowa też pchli targ, niezależnie od jego
-     * własnego przełącznika — inaczej pokazywałby zamrożone oferty, których
-     * nie dałoby się już obsłużyć (patrz App\Support\Modules).
+     * Pchli targ działa dokładnie wtedy, gdy moduł Sprzedaż jest włączony —
+     * osobny przełącznik "public_marketplace_enabled" usunięto (2026-10-09,
+     * kolumna została w bazie, nic jej nie czyta).
      */
-    private function isEnabled(AppSetting $setting): bool
+    private function isEnabled(): bool
     {
-        return $setting->public_marketplace_enabled && Modules::isEnabled('sales');
+        return Modules::isEnabled('sales');
     }
 }

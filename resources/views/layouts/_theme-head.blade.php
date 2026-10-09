@@ -1,3 +1,5 @@
+{{-- Favicon: własny z Ustawień → Ustawienia aplikacji albo domyślna ikona aplikacji. Ten partial jest w <head> każdej strony. --}}
+<link rel="icon" href="{{ \App\Models\AppSetting::current()->faviconUrl() }}">
 {{-- Tryb ciemny (TODO.md "Wygoda dnia codziennego") — Tailwind skonfigurowany
      z darkMode: 'class' (tailwind.config.js), nie samym media-query, żeby
      dało się to przełączyć ręcznie niezależnie od ustawień systemu. Świadomie

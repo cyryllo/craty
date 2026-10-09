@@ -16,9 +16,11 @@ class MarketplaceTest extends TestCase
     use RefreshDatabase;
 
     /** Strona główna przy wyłączonym pchlim targu: bez 404, tylko informacja i bez ofert. */
-    public function test_home_page_shows_nothing_for_sale_when_marketplace_is_disabled(): void
+    /** Wyłączony moduł Sprzedaż = sklep wyłączony: strona główna zawsze bez ofert, strona oferty 404. */
+    public function test_home_page_shows_nothing_for_sale_when_the_sale_module_is_off(): void
     {
         $listing = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka', 'wyeksportowana');
+        AppSetting::current()->fill(['module_sales_enabled' => false])->save();
 
         $this->get(route('marketplace.index'))
             ->assertOk()
@@ -41,16 +43,13 @@ class MarketplaceTest extends TestCase
 
     public function test_old_flea_market_address_no_longer_exists(): void
     {
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
 
         $this->get('/flea-market')->assertNotFound();
     }
 
     public function test_marketplace_lists_only_active_listings_for_guests(): void
     {
-        AppSetting::current()->fill([
-            'public_marketplace_enabled' => true,
-            'public_contact_email' => 'kontakt@example.com',
+        AppSetting::current()->fill(['public_contact_email' => 'kontakt@example.com',
         ])->save();
 
         $listed = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka na sprzedaż', 'wyeksportowana');
@@ -68,7 +67,6 @@ class MarketplaceTest extends TestCase
 
     public function test_marketplace_view_toggle_is_remembered_in_its_own_session_key(): void
     {
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
 
         $this->get(route('marketplace.index', ['view' => 'list']))->assertOk();
 
@@ -77,7 +75,6 @@ class MarketplaceTest extends TestCase
 
     public function test_marketplace_can_be_filtered_by_category(): void
     {
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
         $tools = Category::create(['name' => 'Narzędzia', 'code' => 'NAR']);
         $electronics = Category::create(['name' => 'Elektronika', 'code' => 'ELE']);
 
@@ -101,7 +98,6 @@ class MarketplaceTest extends TestCase
     public function test_marketplace_list_shows_the_cover_photo_and_photo_count_in_both_views(): void
     {
         Storage::fake('public');
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
         $listing = $this->createListingWithPhotos(['main-cover.jpg', 'second-photo.jpg', 'third-photo.jpg']);
 
         foreach (['grid', 'list'] as $view) {
@@ -131,7 +127,6 @@ class MarketplaceTest extends TestCase
     /** Na liście zamiast przycisku OLX/Allegro jest "Więcej informacji" — link zewnętrzny dopiero na stronie oferty. */
     public function test_external_listing_button_is_shown_only_on_the_product_page_when_link_was_given(): void
     {
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
         $withLink = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka z linkiem', 'wyeksportowana');
         $withLink->update(['external_url' => 'https://www.olx.pl/d/oferta/wiertarka-CID99-ID123.html']);
         $withoutLink = $this->createListing('NAR-BRAK-2026-00002', 'Szlifierka bez linku', 'wyeksportowana');
@@ -160,7 +155,6 @@ class MarketplaceTest extends TestCase
 
     public function test_description_is_shown_only_on_the_product_page_not_on_the_list(): void
     {
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
         $listing = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka', 'wyeksportowana');
 
         foreach (['grid', 'list'] as $view) {
@@ -177,7 +171,6 @@ class MarketplaceTest extends TestCase
     public function test_grid_cover_photo_is_absolutely_positioned_inside_a_clipping_frame(): void
     {
         Storage::fake('public');
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
         $this->createListingWithPhotos(['main-cover.jpg']);
 
         $this->get(route('marketplace.index', ['view' => 'grid']))
@@ -187,7 +180,6 @@ class MarketplaceTest extends TestCase
 
     public function test_category_links_are_clean_urls_without_a_dangling_question_mark(): void
     {
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
         $tools = Category::create(['name' => 'Narzędzia', 'code' => 'NAR']);
         $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka', 'wyeksportowana', $tools->id);
 
@@ -203,7 +195,6 @@ class MarketplaceTest extends TestCase
 
     public function test_listing_on_the_list_links_to_its_own_product_page(): void
     {
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
         $listing = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka', 'wyeksportowana');
 
         foreach (['grid', 'list'] as $view) {
@@ -216,9 +207,7 @@ class MarketplaceTest extends TestCase
     public function test_product_page_shows_full_description_every_photo_and_contact(): void
     {
         Storage::fake('public');
-        AppSetting::current()->fill([
-            'public_marketplace_enabled' => true,
-            'public_contact_email' => 'kontakt@example.com',
+        AppSetting::current()->fill(['public_contact_email' => 'kontakt@example.com',
         ])->save();
         $listing = $this->createListingWithPhotos(['main-cover.jpg', 'second-photo.jpg', 'third-photo.jpg']);
         $listing->update(['description' => "Linia pierwsza\nLinia druga", 'external_url' => 'https://allegro.pl/oferta/1']);
@@ -234,15 +223,11 @@ class MarketplaceTest extends TestCase
             ->assertSee('mailto:kontakt@example.com?subject=', false);
     }
 
-    public function test_product_page_is_not_found_for_listings_not_currently_listed_or_when_disabled(): void
+    public function test_product_page_is_not_found_for_listings_not_currently_listed(): void
     {
         $listed = $this->createListing('NAR-BRAK-2026-00001', 'Wystawiona', 'wyeksportowana');
         $sold = $this->createListing('NAR-BRAK-2026-00002', 'Sprzedana', 'sprzedana');
         $draft = $this->createListing('NAR-BRAK-2026-00003', 'Szkic', 'szkic');
-
-        $this->get(route('marketplace.show', $listed))->assertNotFound();
-
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
 
         $this->get(route('marketplace.show', $listed))->assertOk();
         $this->get(route('marketplace.show', $sold))->assertNotFound();
@@ -281,30 +266,28 @@ class MarketplaceTest extends TestCase
         ]);
     }
 
-    public function test_admin_can_enable_marketplace_with_contact_email(): void
+    public function test_admin_can_set_flea_market_contact_details(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
 
-        $response = $this->actingAs($admin)->post(route('settings.app.update'), [
-            'public_marketplace_enabled' => '1',
-            'public_contact_email' => 'sprzedaz@example.com',
-        ]);
+        $this->actingAs($admin)->get(route('settings.app.edit'))->assertSee('name="public_contact_email"', false);
 
-        $response->assertRedirect();
-        $setting = AppSetting::current();
-        $this->assertTrue($setting->public_marketplace_enabled);
-        $this->assertSame('sprzedaz@example.com', $setting->public_contact_email);
+        $this->actingAs($admin)->post(route('settings.app.update'), [
+            'public_contact_email' => 'sprzedaz@example.com',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame('sprzedaz@example.com', AppSetting::current()->public_contact_email);
     }
 
-    public function test_enabling_marketplace_without_contact_email_fails_validation(): void
+    /** Bez modułu Sprzedaż pól kontaktu nie ma w formularzu — zapis reszty ustawień ich nie kasuje. */
+    public function test_contact_details_survive_saving_settings_while_the_sale_module_is_off(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
+        AppSetting::current()->fill(['public_contact_email' => 'sprzedaz@example.com', 'module_sales_enabled' => false])->save();
 
-        $response = $this->actingAs($admin)->post(route('settings.app.update'), [
-            'public_marketplace_enabled' => '1',
-        ]);
+        $this->actingAs($admin)->get(route('settings.app.edit'))->assertDontSee('name="public_contact_email"', false);
+        $this->actingAs($admin)->post(route('settings.app.update'), ['name' => 'Warsztat']);
 
-        $response->assertSessionHasErrors('public_contact_email');
-        $this->assertFalse(AppSetting::current()->public_marketplace_enabled);
+        $this->assertSame('sprzedaz@example.com', AppSetting::current()->public_contact_email);
     }
 }

@@ -45,7 +45,6 @@ class DarkModeTest extends TestCase
 
     public function test_flea_market_page_includes_the_theme_toggle_and_anti_flash_script(): void
     {
-        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
 
         $this->get(route('marketplace.index'))
             ->assertOk()
