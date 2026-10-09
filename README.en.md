@@ -5,7 +5,8 @@
 A simple inventory/asset management app for a workshop: categories,
 locations (warehouse → rack → shelf → bin), auto-generated inventory
 numbers with QR codes, item records (photos, specs, value, condition),
-loans, change history, and CSV export of sale listings (OLX). Also includes
+loans, change history, and (for now) a simplified CSV export of sale
+listings. Also includes
 a public "flea market" page for listed items, a web-based installer, and a
 self-update module via the admin panel.
 
@@ -34,8 +35,7 @@ Its sale features are deliberately limited to two things:
   for sale, and anyone interested emails or calls the given address or
   number, and you arrange the rest yourselves, locally;
 - **links to popular classified/auction sites** such as OLX, Allegro or
-  Vinted, where the same item may be listed (plus a CSV export of listings
-  to make posting them there easier).
+  Vinted, where the same item may be listed.
 
 Proposals to grow it into a shop (cart, payments, orders) will be declined
 as out of the project's scope.

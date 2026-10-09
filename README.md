@@ -5,8 +5,8 @@
 Prosta aplikacja do ewidencji sprzętu i magazynu w warsztacie/pracowni:
 kategorie, lokalizacje (magazyn → regał → półka → pojemnik), automatyczne
 numery ewidencyjne z kodami QR, kartoteka przedmiotu (zdjęcia, specyfikacja,
-wartość, stan), wypożyczenia, historia zmian i eksport ofert sprzedażowych
-do CSV (OLX). Do tego publiczna strona „pchli targ” dla wystawionych ofert,
+wartość, stan), wypożyczenia, historia zmian i na razie uproszczony eksport
+ofert sprzedaży do CSV. Do tego publiczna strona „pchli targ” dla wystawionych ofert,
 webowy instalator i moduł samo-aktualizacji przez panel administratora.
 
 ![Craty — lista przedmiotów w widoku kafelków](app.png)
@@ -35,8 +35,7 @@ Funkcje sprzedaży ograniczają się celowo do dwóch rzeczy:
   jest do sprzedania, a zainteresowany pisze albo dzwoni na podany e-mail
   lub telefon i dalej umawiacie się sami, lokalnie;
 - **linki do popularnych serwisów ogłoszeniowych**, takich jak OLX,
-  Allegro czy Vinted, gdzie ta sama rzecz może być wystawiona (plus eksport
-  ofert do CSV, żeby łatwiej je tam przenieść).
+  Allegro czy Vinted, gdzie ta sama rzecz może być wystawiona.
 
 Propozycje rozbudowy w stronę sklepu (koszyk, płatności, zamówienia)
 będą odrzucane jako niezgodne z założeniami projektu.
