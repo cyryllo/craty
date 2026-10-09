@@ -60,7 +60,7 @@
     }
 }
 
-/* Tekst z prostego Markdownu (Ustawienia sklepu: opis, polityka, regulamin) — bez wtyczki typography,
+/* Tekst z prostego Markdownu (Opcje sprzedaży: opis, polityka, regulamin) — bez wtyczki typography,
    tylko podstawowe odstępy, nagłówki, listy i linki, dziedziczące kolor z otoczenia. */
 @layer components {
     .md-content > * + * { @apply mt-3; }

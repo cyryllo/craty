@@ -22,6 +22,25 @@ Zbudowana na Laravel 12 + MariaDB, w pełni dwujęzyczna (PL/EN).
 > wewnętrzne narzędzie „Graty” i zachowała podobne brzmienie przy zmianie
 > nazwy na wersję open source.
 
+## Założenia: to program magazynowy, nie sklep
+
+Craty jest i zostanie **prostym programem do ewidencji magazynu**. Nigdy nie
+stanie się pełnoprawnym sklepem internetowym: nie ma i nie będzie w nim
+koszyka, składania zamówień, płatności online, wysyłek ani obsługi
+klientów jak w sklepie.
+
+Funkcje sprzedaży ograniczają się celowo do dwóch rzeczy:
+
+- **kontakt z właścicielem**: publiczna strona „pchli targ” pokazuje, co
+  jest do sprzedania, a zainteresowany pisze albo dzwoni na podany e-mail
+  lub telefon i dalej umawiacie się sami, lokalnie;
+- **linki do popularnych serwisów ogłoszeniowych**, takich jak OLX,
+  Allegro czy Vinted, gdzie ta sama rzecz może być wystawiona (plus eksport
+  ofert do CSV, żeby łatwiej je tam przenieść).
+
+Propozycje rozbudowy w stronę sklepu (koszyk, płatności, zamówienia)
+będą odrzucane jako niezgodne z założeniami projektu.
+
 ## Wymagania (własny hosting)
 
 Dotyczy instalacji poza Dockerem (patrz [Wdrożenie na hostingu](#wdrożenie-na-hostingu-bez-dockera-i-ssh)

@@ -6,7 +6,7 @@ use App\Models\AppSetting;
 use Illuminate\Http\Request;
 
 /**
- * Ustawienia → Ustawienia sklepu (tylko admin, tylko przy włączonym module
+ * Ustawienia → Opcje sprzedaży (tylko admin, tylko przy włączonym module
  * Sprzedaż): wszystko o publicznej stronie głównej w jednym miejscu — opis
  * sklepu, dane kontaktowe, polityka prywatności i regulamin.
  */
@@ -33,6 +33,6 @@ class ShopSettingController extends Controller
         }
         $setting->save();
 
-        return back()->with('status', __('Shop settings saved.'));
+        return back()->with('status', __('Sale options saved.'));
     }
 }

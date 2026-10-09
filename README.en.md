@@ -22,6 +22,24 @@ Built with Laravel 12 + MariaDB, fully bilingual (EN/PL).
 > started out as an internal tool called "Graty" and kept a similar sound
 > when it was renamed for the open-source release.
 
+## Scope: an inventory app, not a shop
+
+Craty is, and will stay, **a simple inventory/warehouse app**. It will
+never become a full online shop: there is no cart, ordering, online
+payment, shipping or shop-style customer handling, and there won't be.
+
+Its sale features are deliberately limited to two things:
+
+- **contacting the owner**: the public "flea market" page shows what is
+  for sale, and anyone interested emails or calls the given address or
+  number, and you arrange the rest yourselves, locally;
+- **links to popular classified/auction sites** such as OLX, Allegro or
+  Vinted, where the same item may be listed (plus a CSV export of listings
+  to make posting them there easier).
+
+Proposals to grow it into a shop (cart, payments, orders) will be declined
+as out of the project's scope.
+
 ## Requirements (self-hosting)
 
 Applies to installs outside Docker (see

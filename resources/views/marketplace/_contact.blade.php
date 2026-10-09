@@ -1,4 +1,4 @@
-{{-- Ramka "o sklepie": na stronie głównej opis sklepu z Ustawień sklepu (Markdown, już bezpiecznie przerobiony
+{{-- Ramka "o sprzedaży": na stronie głównej opis sprzedaży z Opcji sprzedaży (Markdown, już bezpiecznie przerobiony
      na HTML w AppSetting::markdown()) + kontakt; na stronie oferty sam kontakt, mail z tematem = tytuł oferty. --}}
 @php
     $onListing = isset($listing) && $listing instanceof \App\Models\SaleListing;

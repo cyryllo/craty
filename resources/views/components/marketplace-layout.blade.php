@@ -44,7 +44,7 @@
             {{ $slot }}
         </main>
 
-        {{-- Polityka prywatności / regulamin z Ustawień sklepu: linki nad stopką (tylko gdy tekst jest wpisany),
+        {{-- Polityka prywatności / regulamin z Opcji sprzedaży: linki nad stopką (tylko gdy tekst jest wpisany),
              treść w okienku, bez osobnych podstron. Markdown przerobiony bezpiecznie w AppSetting::markdown(). --}}
         @php
             $shop = \App\Models\AppSetting::current();

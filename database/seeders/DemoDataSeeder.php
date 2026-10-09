@@ -78,7 +78,7 @@ class DemoDataSeeder extends Seeder
             $item->saveQuietly();
         }
 
-        // Przykładowe Ustawienia sklepu — tylko puste pola, żeby nie nadpisać
+        // Przykładowe Opcje sprzedaży — tylko puste pola, żeby nie nadpisać
         // czegoś, co admin już wpisał (dane kontaktowe zostają nietknięte).
         $setting = AppSetting::current();
         $setting->shop_description ??= DemoShopTexts::DESCRIPTION;

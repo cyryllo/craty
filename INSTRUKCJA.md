@@ -162,9 +162,9 @@ tytułem oferty w temacie. Kliknięcie zdjęcia otwiera je w okienku na
 ciemnym tle: zdjęcia przełącza się strzałkami (także klawiszami ← →), a
 okienko zamyka krzyżykiem, klawiszem Esc albo kliknięciem w tło.
 
-**Ustawienia sklepu** (Ustawienia, tylko Administrator, widoczne przy
+**Opcje sprzedaży** (Ustawienia, tylko Administrator, widoczne przy
 włączonym module Sprzedaż) to wszystko, co dotyczy strony głównej:
-- **opis sklepu**, widoczny na stronie głównej w ramce kontaktu, nad
+- **opis sprzedaży**, widoczny na stronie głównej w ramce kontaktu, nad
   e-mailem i telefonem (np. kim jesteś, jak odebrać rzecz, płatność),
 - **e-mail i telefon kontaktowy**,
 - **polityka prywatności** i **regulamin**: linki do nich pojawiają się w
@@ -198,8 +198,8 @@ miejscu:
 - **Ustawienia aplikacji** *(tylko Administrator)*: nazwa, logo i
   favicon (ikonka karty przeglądarki; bez własnej używane jest logo) oraz
   domyślny język (PL/EN).
-- **Ustawienia sklepu** *(tylko Administrator, przy włączonej Sprzedaży)*:
-  opis sklepu, kontakt, polityka prywatności i regulamin, opisane wyżej.
+- **Opcje sprzedaży** *(tylko Administrator, przy włączonej Sprzedaży)*:
+  opis sprzedaży, kontakt, polityka prywatności i regulamin, opisane wyżej.
 - **Użytkownicy** *(tylko Administrator)* — konta, role, aktywacja/
   dezaktywacja.
 - **Poczta** *(tylko Administrator)* — własne SMTP zamiast domyślnej

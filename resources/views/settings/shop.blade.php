@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="space-y-1">
             @include('settings._back-link')
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">{{ __('Shop settings') }}</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">{{ __('Sale options') }}</h2>
         </div>
     </x-slot>
 
@@ -16,7 +16,7 @@
             </p>
 
             <div>
-                <x-input-label for="shop_description" :value="__('Shop description')" />
+                <x-input-label for="shop_description" :value="__('Sale description')" />
                 <textarea id="shop_description" name="shop_description" rows="5" class="mt-1 block w-full rounded-md border-gray-300 text-sm dark:border-gray-600">{{ old('shop_description', $setting->shop_description) }}</textarea>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Shown on the home page in the contact box, above the email and phone. For example who sells, how to pick up, payment.') }}</p>
                 <x-input-error :messages="$errors->get('shop_description')" class="mt-1" />

@@ -95,7 +95,7 @@ class AppSetting extends Model
     }
 
     /**
-     * Teksty z Ustawień sklepu (opis, polityka prywatności, regulamin) to
+     * Teksty z Opcji sprzedaży (opis, polityka prywatności, regulamin) to
      * prosty Markdown wklejany przez admina, ale wyświetlany publicznie —
      * stąd html_input=strip i bez niebezpiecznych linków (javascript: itp.).
      */

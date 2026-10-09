@@ -115,8 +115,8 @@ Route::middleware('auth')->group(function () {
         Route::post('ustawienia/aplikacja', [AppSettingController::class, 'update'])->name('settings.app.update');
 
         Route::middleware('module:sales')->group(function () {
-            Route::get('ustawienia/sklep', [ShopSettingController::class, 'edit'])->name('settings.shop.edit');
-            Route::post('ustawienia/sklep', [ShopSettingController::class, 'update'])->name('settings.shop.update');
+            Route::get('ustawienia/opcje-sprzedazy', [ShopSettingController::class, 'edit'])->name('settings.shop.edit');
+            Route::post('ustawienia/opcje-sprzedazy', [ShopSettingController::class, 'update'])->name('settings.shop.update');
         });
 
         Route::get('ustawienia/moduly', [ModuleSettingController::class, 'edit'])->name('settings.modules.edit');

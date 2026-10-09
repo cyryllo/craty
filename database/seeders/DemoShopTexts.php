@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 /**
- * Przykładowe teksty Ustawień sklepu (opis, polityka prywatności, regulamin)
+ * Przykładowe teksty Opcji sprzedaży (opis, polityka prywatności, regulamin)
  * dla danych demo. Pisane z punktu widzenia osoby prywatnej, która sprzedaje
  * własne rzeczy (nie sklep ani firma), i oznaczone jako przykład: na
  * prawdziwej instalacji trzeba je zastąpić własnymi.
@@ -17,7 +17,7 @@ Odbiór osobisty po wcześniejszym umówieniu się, płatność gotówką albo p
 MD;
 
     public const PRIVACY_POLICY = <<<'MD'
-*To jest przykładowy tekst z danych demo. Zastąp go własnym w Ustawieniach sklepu.*
+*To jest przykładowy tekst z danych demo. Zastąp go własnym w Opcjach sprzedaży.*
 
 ## Kto przetwarza dane
 
@@ -48,7 +48,7 @@ Strona używa tylko technicznych plików cookies potrzebnych do działania (np. 
 MD;
 
     public const TERMS = <<<'MD'
-*To jest przykładowy tekst z danych demo. Zastąp go własnym w Ustawieniach sklepu.*
+*To jest przykładowy tekst z danych demo. Zastąp go własnym w Opcjach sprzedaży.*
 
 ## Czym jest ta strona
 
