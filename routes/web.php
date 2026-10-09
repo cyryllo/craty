@@ -15,6 +15,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SaleListingController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\ShopSettingController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StorageLocationController;
 use App\Http\Controllers\UpdateController;
@@ -112,6 +113,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', UserController::class)->except('show');
         Route::get('ustawienia/aplikacja', [AppSettingController::class, 'edit'])->name('settings.app.edit');
         Route::post('ustawienia/aplikacja', [AppSettingController::class, 'update'])->name('settings.app.update');
+
+        Route::middleware('module:sales')->group(function () {
+            Route::get('ustawienia/sklep', [ShopSettingController::class, 'edit'])->name('settings.shop.edit');
+            Route::post('ustawienia/sklep', [ShopSettingController::class, 'update'])->name('settings.shop.update');
+        });
 
         Route::get('ustawienia/moduly', [ModuleSettingController::class, 'edit'])->name('settings.modules.edit');
         Route::post('ustawienia/moduly', [ModuleSettingController::class, 'update'])->name('settings.modules.update');

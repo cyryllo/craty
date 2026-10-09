@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * Ustawienia wyglądu i infrastruktury appki trzymane jako pojedynczy wiersz
@@ -18,6 +19,7 @@ class AppSetting extends Model
         'mail_host', 'mail_port', 'mail_encryption', 'mail_username', 'mail_password',
         'mail_from_address', 'mail_from_name',
         'public_contact_email', 'public_contact_phone',
+        'shop_description', 'privacy_policy', 'terms',
         'module_sales_enabled',
         'password_reset_enabled', 'loan_due_notifications_enabled',
     ];
@@ -90,6 +92,18 @@ class AppSetting extends Model
         $path = $this->favicon_path ?: $this->logo_path;
 
         return $path ? Storage::disk('public')->url($path) : '/pwa-icons/icon-192.png';
+    }
+
+    /**
+     * Teksty z Ustawień sklepu (opis, polityka prywatności, regulamin) to
+     * prosty Markdown wklejany przez admina, ale wyświetlany publicznie —
+     * stąd html_input=strip i bez niebezpiecznych linków (javascript: itp.).
+     */
+    public static function markdown(?string $text): string
+    {
+        return filled($text)
+            ? Str::markdown($text, ['html_input' => 'strip', 'allow_unsafe_links' => false])
+            : '';
     }
 
     /** Czy admin skonfigurował własną pocztę SMTP (zamiast polegać na .env). */

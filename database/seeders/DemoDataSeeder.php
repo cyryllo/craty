@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AppSetting;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\Room;
@@ -76,5 +77,13 @@ class DemoDataSeeder extends Seeder
             $item->qr_path = $qr->generateForItem($item);
             $item->saveQuietly();
         }
+
+        // Przykładowe Ustawienia sklepu — tylko puste pola, żeby nie nadpisać
+        // czegoś, co admin już wpisał (dane kontaktowe zostają nietknięte).
+        $setting = AppSetting::current();
+        $setting->shop_description ??= DemoShopTexts::DESCRIPTION;
+        $setting->privacy_policy ??= DemoShopTexts::PRIVACY_POLICY;
+        $setting->terms ??= DemoShopTexts::TERMS;
+        $setting->save();
     }
 }

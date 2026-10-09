@@ -24,8 +24,6 @@ class AppSettingController extends Controller
             'favicon' => ['nullable', 'file', 'mimes:png,ico,svg,jpg,jpeg,webp,gif', 'max:512'],
             'remove_favicon' => ['nullable', 'boolean'],
             'locale' => ['nullable', 'string', Rule::in(array_keys(AppSetting::LOCALES))],
-            'public_contact_email' => ['nullable', 'email', 'max:255'],
-            'public_contact_phone' => ['nullable', 'string', 'max:30'],
         ]);
 
         $setting = AppSetting::current();
@@ -52,12 +50,6 @@ class AppSettingController extends Controller
 
         $setting->name = ($data['name'] ?? null) ?: null;
         $setting->locale = ($data['locale'] ?? null) ?: null;
-        // Pola kontaktu są w formularzu tylko przy włączonym module Sprzedaż —
-        // przy wyłączonym nie kasujemy zapisanych wartości.
-        if ($request->has('public_contact_email') || $request->has('public_contact_phone')) {
-            $setting->public_contact_email = ($data['public_contact_email'] ?? null) ?: null;
-            $setting->public_contact_phone = ($data['public_contact_phone'] ?? null) ?: null;
-        }
         $setting->save();
 
         return back()->with('status', __('App settings saved.'));

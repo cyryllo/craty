@@ -141,28 +141,39 @@ go dopisać albo zmienić także później: kliknij wiersz oferty na zakładce
 "Przygotowane" lub "Wystawione", a w okienku podglądu na dole jest pole na
 link. Oferty, które mają link, mają w tabeli ikonkę 🔗.
 
-**Pchli targ** — publiczna strona (bez logowania) z wystawionymi ofertami,
-**to strona główna aplikacji** (sam adres, np. `https://twoja-domena.pl/`),
-do włączenia w Ustawienia → Ustawienia aplikacji. Adres możesz wysłać
-znajomym, żeby pokazać, co aktualnie sprzedajesz — bez koszyka i bez
-typowego sklepu (kontakt tylko przez podany e-mail/telefon). Gdy pchli targ
-jest wyłączony, strona główna pokazuje tylko informację, że nic nie jest
-wystawione. W prawym górnym rogu jest **kłódka** prowadząca do logowania
-(dla zalogowanych — przycisk "Panel"); zainstalowana na telefonie
-aplikacja i tak otwiera się od razu na panelu. Gdy pchli targ jest
-włączony, obok zakładek Sprzedaży pojawia się odnośnik "🛒 Pchli targ",
-który otwiera go w nowej karcie.
+**Pchli targ**: publiczna strona (bez logowania) z wystawionymi ofertami.
+**To strona główna aplikacji** (sam adres, np. `https://twoja-domena.pl/`)
+i działa zawsze wtedy, gdy włączony jest moduł Sprzedaż, bez osobnego
+przełącznika. Adres możesz wysłać znajomym, żeby pokazać, co aktualnie
+sprzedajesz: bez koszyka i bez typowego sklepu, kontakt tylko przez podany
+e-mail lub telefon. Gdy moduł Sprzedaż jest wyłączony, strona główna
+pokazuje tylko informację, że nic nie jest wystawione. W prawym górnym
+rogu jest **kłódka** prowadząca do logowania (dla zalogowanych przycisk
+"Panel"), a zainstalowana na telefonie aplikacja i tak otwiera się od razu
+na panelu. Obok zakładek Sprzedaży jest odnośnik "🛒 Pchli targ", który
+otwiera stronę główną w tej samej karcie.
 
 Na liście pchlego targu każda oferta to tylko zdjęcie (z liczbą zdjęć,
 jeśli jest ich więcej), nazwa, cena i stan techniczny, plus przycisk
 "Więcej informacji". Po kliknięciu otwiera się **strona oferty** z
-wszystkimi zdjęciami (kliknięcie otwiera pełny rozmiar), pełnym opisem,
-przyciskiem "Zobacz na OLX / Allegro / Vinted" (jeśli podano link) i
-kontaktem — e-mail otwiera się od razu z tytułem oferty w temacie.
+wszystkimi zdjęciami, pełnym opisem, przyciskiem "Zobacz na OLX / Allegro
+/ Vinted" (jeśli podano link) i kontaktem; e-mail otwiera się od razu z
+tytułem oferty w temacie. Kliknięcie zdjęcia otwiera je w okienku na
+ciemnym tle: zdjęcia przełącza się strzałkami (także klawiszami ← →), a
+okienko zamyka krzyżykiem, klawiszem Esc albo kliknięciem w tło.
 
-Dwa niezależne przełączniki muszą być włączone naraz: moduł Sprzedaży i
-sam "Pchli targ" — jeśli wyłączysz moduł Sprzedaży, publiczna strona
-znika automatycznie, nawet gdy jej własny przełącznik zostaje włączony.
+**Ustawienia sklepu** (Ustawienia, tylko Administrator, widoczne przy
+włączonym module Sprzedaż) to wszystko, co dotyczy strony głównej:
+- **opis sklepu**, widoczny na stronie głównej w ramce kontaktu, nad
+  e-mailem i telefonem (np. kim jesteś, jak odebrać rzecz, płatność),
+- **e-mail i telefon kontaktowy**,
+- **polityka prywatności** i **regulamin**: linki do nich pojawiają się w
+  stopce strony głównej i stron ofert tylko wtedy, gdy tekst jest wpisany,
+  a sam tekst otwiera się w okienku.
+
+Teksty wpisujesz prostym Markdownem: pusta linia zaczyna nowy akapit,
+`**pogrubienie**`, `## nagłówek`, `- punkt listy`, `[link](https://…)`.
+Zwykły HTML wklejony do tych pól jest pomijany.
 
 ## Skanowanie kamerą i aplikacja mobilna (PWA)
 
@@ -184,8 +195,11 @@ miejscu:
 
 - **Kategorie** i **Struktura magazynu** — opisane wyżej (magazyny,
   pomieszczenia, regały, półki i pojemniki w jednym drzewie).
-- **Ustawienia aplikacji** *(tylko Administrator)* — nazwa i logo appki,
-  domyślny język (PL/EN), dane kontaktowe i przełącznik Pchlego targu.
+- **Ustawienia aplikacji** *(tylko Administrator)*: nazwa, logo i
+  favicon (ikonka karty przeglądarki; bez własnej używane jest logo) oraz
+  domyślny język (PL/EN).
+- **Ustawienia sklepu** *(tylko Administrator, przy włączonej Sprzedaży)*:
+  opis sklepu, kontakt, polityka prywatności i regulamin, opisane wyżej.
 - **Użytkownicy** *(tylko Administrator)* — konta, role, aktywacja/
   dezaktywacja.
 - **Poczta** *(tylko Administrator)* — własne SMTP zamiast domyślnej

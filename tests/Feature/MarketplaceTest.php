@@ -234,6 +234,19 @@ class MarketplaceTest extends TestCase
         $this->get(route('marketplace.show', $draft))->assertNotFound();
     }
 
+    /** Zdjęcia na stronie oferty otwierają się w okienku z przełączaniem, nie w nowej karcie. */
+    public function test_product_page_photos_open_in_a_lightbox_instead_of_a_new_tab(): void
+    {
+        Storage::fake('public');
+        $listing = $this->createListingWithPhotos(['main-cover.jpg', 'second-photo.jpg']);
+
+        $this->get(route('marketplace.show', $listing))
+            ->assertOk()
+            ->assertSee('role="dialog"', false)
+            ->assertSee('@click.prevent="show(1)"', false)
+            ->assertDontSee('target="_blank" rel="noopener" class="block"', false);
+    }
+
     /** @param  array<int, string>  $filenames */
     private function createListingWithPhotos(array $filenames): SaleListing
     {
@@ -264,30 +277,5 @@ class MarketplaceTest extends TestCase
             'item_id' => $item->id, 'platform' => 'olx', 'title' => $title,
             'description' => 'Opis testowy', 'price' => 99.99, 'status' => $status, 'exported_at' => now(),
         ]);
-    }
-
-    public function test_admin_can_set_flea_market_contact_details(): void
-    {
-        $admin = User::factory()->create(['role' => 'admin']);
-
-        $this->actingAs($admin)->get(route('settings.app.edit'))->assertSee('name="public_contact_email"', false);
-
-        $this->actingAs($admin)->post(route('settings.app.update'), [
-            'public_contact_email' => 'sprzedaz@example.com',
-        ])->assertSessionHasNoErrors();
-
-        $this->assertSame('sprzedaz@example.com', AppSetting::current()->public_contact_email);
-    }
-
-    /** Bez modułu Sprzedaż pól kontaktu nie ma w formularzu — zapis reszty ustawień ich nie kasuje. */
-    public function test_contact_details_survive_saving_settings_while_the_sale_module_is_off(): void
-    {
-        $admin = User::factory()->create(['role' => 'admin']);
-        AppSetting::current()->fill(['public_contact_email' => 'sprzedaz@example.com', 'module_sales_enabled' => false])->save();
-
-        $this->actingAs($admin)->get(route('settings.app.edit'))->assertDontSee('name="public_contact_email"', false);
-        $this->actingAs($admin)->post(route('settings.app.update'), ['name' => 'Warsztat']);
-
-        $this->assertSame('sprzedaz@example.com', AppSetting::current()->public_contact_email);
     }
 }

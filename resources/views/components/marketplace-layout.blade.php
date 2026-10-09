@@ -44,6 +44,40 @@
             {{ $slot }}
         </main>
 
+        {{-- Polityka prywatności / regulamin z Ustawień sklepu: linki nad stopką (tylko gdy tekst jest wpisany),
+             treść w okienku, bez osobnych podstron. Markdown przerobiony bezpiecznie w AppSetting::markdown(). --}}
+        @php
+            $shop = \App\Models\AppSetting::current();
+            $legal = array_filter([
+                'privacy' => [__('Privacy policy'), \App\Models\AppSetting::markdown($shop->privacy_policy)],
+                'terms' => [__('Terms and conditions'), \App\Models\AppSetting::markdown($shop->terms)],
+            ], fn ($doc) => $doc[1] !== '');
+        @endphp
+        @if ($legal && \App\Support\Modules::isEnabled('sales'))
+            <div x-data="{ doc: null }" @keydown.escape.window="doc = null" class="text-center text-xs pt-2">
+                @foreach ($legal as $key => [$title, $html])
+                    @if (! $loop->first) <span class="text-gray-400 dark:text-gray-500">&middot;</span> @endif
+                    <button type="button" @click="doc = '{{ $key }}'" class="text-gray-500 hover:text-gray-800 hover:underline dark:text-gray-400 dark:hover:text-gray-200">{{ $title }}</button>
+                @endforeach
+
+                @foreach ($legal as $key => [$title, $html])
+                    <div x-show="doc === '{{ $key }}'" x-cloak x-transition.opacity
+                         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+                         role="dialog" aria-modal="true" aria-label="{{ $title }}" @click.self="doc = null">
+                        <div class="w-full max-w-2xl max-h-[85dvh] flex flex-col rounded-lg bg-white text-left shadow-xl dark:bg-gray-800">
+                            <div class="flex items-center justify-between gap-4 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+                                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $title }}</h2>
+                                <button type="button" @click="doc = null" class="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white" aria-label="{{ __('Close') }}">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                                </button>
+                            </div>
+                            <div class="md-content overflow-y-auto px-6 py-5 text-sm text-gray-700 dark:text-gray-300">{!! $html !!}</div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
         @include('layouts._footer')
     </body>
 </html>

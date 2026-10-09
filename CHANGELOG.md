@@ -3,6 +3,22 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-10-09 (1.2.0)
+
+- Dodano Ustawienia sklepu (kafelek widoczny przy włączonej Sprzedaży):
+  opis sklepu w ramce kontaktu na stronie głównej, przeniesione dane
+  kontaktowe, polityka prywatności i regulamin jako linki w stopce
+  otwierane w okienku. Teksty w prostym Markdownie, bez surowego HTML.
+- Pchli targ działa zawsze przy włączonym module Sprzedaż; usunięto osobny
+  przełącznik "Publikuj publiczną stronę pchli targ".
+- Dodano własny favicon w Ustawieniach aplikacji; bez niego favicon to
+  wgrane logo, a bez logo domyślna ikona aplikacji.
+- Zdjęcia na stronie oferty otwierają się w okienku z przełączaniem
+  (strzałki, klawisze ← →, miniatury) zamiast w nowej karcie.
+- Odnośniki do pchlego targu w panelu otwierają się w tej samej karcie.
+- Dane demo zawierają przykładowe teksty Ustawień sklepu (sprzedaż
+  prywatna).
+
 ## 2026-10-09 (1.1.17)
 
 - Pchli targ jest teraz stroną główną aplikacji (`/`); przy wyłączonym

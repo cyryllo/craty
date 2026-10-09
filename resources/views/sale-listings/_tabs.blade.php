@@ -9,8 +9,8 @@
         {{ __('Listed offers') }} @isset($exportedCount)<span class="text-gray-400 dark:text-gray-500">({{ $exportedCount }})</span>@endisset
     </a>
     {{-- Podgląd publicznej strony głównej — działa zawsze, gdy działa moduł Sprzedaż (czyli zawsze tutaj). --}}
-    <a href="{{ route('marketplace.index', [], false) }}" target="_blank" rel="noopener"
+    <a href="{{ route('marketplace.index', [], false) }}"
        class="ms-auto pb-3 text-sm font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-        🛒 {{ __('Flea market') }} ↗
+        🛒 {{ __('Flea market') }}
     </a>
 </div>

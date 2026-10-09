@@ -72,6 +72,7 @@ class MarketplaceController extends Controller
             'categories' => $categories,
             'categoryId' => $categoryId,
             'totalCount' => $activeListings->count(),
+            'shopDescription' => AppSetting::markdown($setting->shop_description),
             'contactEmail' => $setting->public_contact_email,
             'contactPhone' => $setting->public_contact_phone,
             'appName' => $setting->effectiveName(),

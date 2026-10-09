@@ -67,32 +67,6 @@
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Used for anyone who has not picked a personal language from the user menu.') }}</p>
             </div>
 
-            {{-- Pchli targ (strona główna) jest włączony razem z modułem Sprzedaż — osobnego przełącznika już nie ma. --}}
-            @if (\App\Support\Modules::isEnabled('sales'))
-                <div class="pt-4 border-t border-gray-100 space-y-4 dark:border-gray-700">
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Flea market (home page)') }}</h3>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            {{ __('The public home page lists items you have put up for sale, with no purchasing: visitors contact you. It is on whenever the Sale module is on.') }}
-                            <a href="{{ route('marketplace.index', [], false) }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('View the public page') }}</a>
-                        </p>
-                    </div>
-
-                    <div>
-                        <x-input-label for="public_contact_email" :value="__('Contact email shown on the public page')" />
-                        <x-text-input id="public_contact_email" name="public_contact_email" type="email" class="mt-1 block w-full" value="{{ old('public_contact_email', $setting->public_contact_email) }}" />
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Independent from the SMTP "from" address in Settings → Mail.') }}</p>
-                        <x-input-error :messages="$errors->get('public_contact_email')" class="mt-1" />
-                    </div>
-
-                    <div>
-                        <x-input-label for="public_contact_phone" :value="__('Contact phone shown on the public page (optional)')" />
-                        <x-text-input id="public_contact_phone" name="public_contact_phone" type="tel" class="mt-1 block w-full" value="{{ old('public_contact_phone', $setting->public_contact_phone) }}" />
-                        <x-input-error :messages="$errors->get('public_contact_phone')" class="mt-1" />
-                    </div>
-                </div>
-            @endif
-
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                 <a href="{{ route('settings.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>
                 <x-primary-button>{{ __('Save') }}</x-primary-button>
