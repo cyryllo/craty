@@ -10,6 +10,13 @@ use Illuminate\Validation\ValidationException;
 
 class StorageLocationController extends Controller
 {
+    /**
+     * Regał/półka/pojemnik trafiają do kodu lokalizacji, a ten do numeru
+     * ewidencyjnego i nazwy pliku QR — tylko litery, cyfry, spacja, myślnik
+     * i podkreślnik. Bez "/" i ".." (path traversal, pentest 2026-10-09).
+     */
+    private const SEGMENT_RULE = 'regex:/^[\pL\pN _-]+$/u';
+
     /** Dawna płaska lista — zastąpiona drzewem w Strukturze magazynu. */
     public function index()
     {
@@ -87,9 +94,9 @@ class StorageLocationController extends Controller
         $data = $request->validate([
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'room_id' => ['nullable', 'exists:rooms,id'],
-            'rack' => ['nullable', 'string', 'max:32'],
-            'shelf' => ['nullable', 'string', 'max:32'],
-            'bin' => ['nullable', 'string', 'max:32'],
+            'rack' => ['nullable', 'string', 'max:32', self::SEGMENT_RULE],
+            'shelf' => ['nullable', 'string', 'max:32', self::SEGMENT_RULE],
+            'bin' => ['nullable', 'string', 'max:32', self::SEGMENT_RULE],
             'note' => ['nullable', 'string', 'max:255'],
         ]);
 

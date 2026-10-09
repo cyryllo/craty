@@ -81,7 +81,10 @@ tekstowy lub CSV albo archiwum ZIP; inne typy plików (np. skrypty czy
 strony HTML) są odrzucane ze względów bezpieczeństwa.
 
 **Numer ewidencyjny i kod QR** generują się automatycznie przy zapisie, w
-formacie `KATEGORIA-LOKALIZACJA-ROK-NUMER` (np. `NAR-M1-2026-00042`). Jeśli
+formacie `KATEGORIA-LOKALIZACJA-ROK-NUMER` (np. `NAR-M1-2026-00042`).
+Dlatego kody kategorii, magazynów i pomieszczeń mogą zawierać tylko
+litery, cyfry, myślnik i podkreślnik, a nazwy regałów, półek i
+pojemników dodatkowo spację (bez znaków typu `/` czy `.`). Jeśli
 dodasz przedmiot bez kategorii lub lokalizacji, numer dostaje w tym miejscu
 "GEN"/"BRAK" — jeśli uzupełnisz te dane później, na karcie przedmiotu obok
 kodu QR jest przycisk odświeżenia, który przelicza numer i QR na nowo na
@@ -128,7 +131,9 @@ Można wyłączyć w Ustawienia → Moduły, jeśli nie sprzedajecie sprzętu.
 Ścieżka: z karty przedmiotu "Przygotuj ofertę sprzedaży" → zakładka
 "Przygotowane" (Sprzedaż) → eksport do CSV (opcja wyeksportowania swoich
 przedmiotów przeznaczonych do sprzedaży — gotowe tytuły i opisy, do
-dalszego wykorzystania jak Ci wygodnie) albo ręczne "wystaw" przy
+dalszego wykorzystania jak Ci wygodnie; tekst zaczynający się od `=`,
+`+`, `-` lub `@` dostaje w pliku apostrof na początku, żeby arkusz nie
+potraktował go jak formuły) albo ręczne "wystaw" przy
 pojedynczej ofercie → oferta trafia do zakładki "Wystawione", gdzie
 oznaczasz ją jako "sprzedane" albo "wycofaj".
 

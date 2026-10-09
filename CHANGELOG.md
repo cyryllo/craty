@@ -3,6 +3,23 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-10-09 (1.2.3)
+
+Poprawki po lokalnym teście penetracyjnym (ręczne ataki, OWASP ZAP,
+sqlmap):
+
+- Kody kategorii, magazynów i pomieszczeń oraz nazwy regałów, półek i
+  pojemników przyjmują tylko bezpieczne znaki; nazwa pliku z kodem QR jest
+  dodatkowo czyszczona (wcześniej regał w rodzaju `/../../x` zapisywał plik
+  QR poza katalogiem `qr/`).
+- Eksport CSV neutralizuje formuły arkusza (wartości zaczynające się od
+  `=`, `+`, `-`, `@` dostają apostrof na początku).
+- Reset hasła odpowiada tak samo dla istniejącego i nieistniejącego
+  konta, więc nie zdradza, kto ma konto.
+- Link "Wróć" na stronie oferty nie prowadzi już na obce domeny.
+- Nagłówki bezpieczeństwa także na stronach 404, dodatkowo
+  Cross-Origin-Opener-Policy.
+
 ## 2026-10-09 (1.2.2)
 
 - Poprawki bezpieczeństwa: załączniki przyjmują tylko dozwolone typy

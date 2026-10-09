@@ -59,7 +59,7 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:8', 'unique:categories,code,'.($category?->id)],
+            'code' => ['required', 'string', 'max:8', 'alpha_dash:ascii', 'unique:categories,code,'.($category?->id)],
             'parent_id' => ['nullable', 'exists:categories,id'],
         ]);
 

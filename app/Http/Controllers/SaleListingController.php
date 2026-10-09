@@ -160,7 +160,7 @@ class SaleListingController extends Controller
 
             foreach ($listings as $listing) {
                 $item = $listing->item;
-                fputcsv($handle, [
+                fputcsv($handle, array_map([self::class, 'csvSafe'], [
                     $item->inventory_no,
                     $item->ean,
                     $listing->title,
@@ -175,7 +175,7 @@ class SaleListingController extends Controller
                     // ścieżkę względem korzenia (patrz config/filesystems.php),
                     // więc dopełniamy ją tu wprost helperem url().
                     $item->photos->map(fn ($p) => url($p->url()))->implode(', '),
-                ], ';');
+                ]), ';');
             }
 
             fclose($handle);
@@ -231,5 +231,20 @@ class SaleListingController extends Controller
         $lines[] = __('Condition').': '.$item->conditionLabel();
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * Neutralizuje formuły w CSV (CSV/formula injection, pentest 2026-10-09):
+     * tytuł "=HYPERLINK(...)" albo "+cmd|..." Excel/LibreOffice wykonałby
+     * jako formułę po otwarciu pliku. Taka wartość dostaje na początek
+     * apostrof, więc arkusz pokazuje ją jako zwykły tekst.
+     */
+    public static function csvSafe(mixed $value): mixed
+    {
+        if (is_string($value) && $value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+            return "'".$value;
+        }
+
+        return $value;
     }
 }

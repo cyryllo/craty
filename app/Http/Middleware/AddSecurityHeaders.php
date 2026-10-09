@@ -24,6 +24,8 @@ class AddSecurityHeaders
         'Referrer-Policy' => 'strict-origin-when-cross-origin',
         // Aparat tylko dla tej strony (skanowanie kodów), mikrofon i lokalizacja nigdy.
         'Permissions-Policy' => 'camera=(self), microphone=(), geolocation=()',
+        // Okno otwarte z obcej strony nie dostaje dostępu do okna aplikacji (i odwrotnie).
+        'Cross-Origin-Opener-Policy' => 'same-origin',
     ];
 
     public function handle(Request $request, Closure $next): Response

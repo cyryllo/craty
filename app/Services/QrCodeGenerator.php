@@ -28,7 +28,11 @@ class QrCodeGenerator
             margin: 12,
         ))->build();
 
-        $path = 'qr/'.$item->inventory_no.'.svg';
+        // Numer ewidencyjny składa się z kodów wpisywanych przez użytkowników
+        // (kategoria, magazyn, regał...). Bez tej filtracji regał "/../../x"
+        // zapisywał plik QR poza katalogiem qr/ (path traversal, znalezione w
+        // pentestach 2026-10-09). W nazwie pliku zostają tylko bezpieczne znaki.
+        $path = 'qr/'.preg_replace('/[^A-Za-z0-9_-]+/', '_', $item->inventory_no).'.svg';
         Storage::disk('public')->put($path, $result->getString());
 
         return $path;

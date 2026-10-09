@@ -84,7 +84,7 @@ class MarketplaceController extends Controller
      * oferty aktualnie wystawione; sprzedana/wycofana/szkic to 404, tak
      * samo jak na liście (nie zdradzamy, że taka oferta w ogóle istniała).
      */
-    public function show(SaleListing $listing)
+    public function show(Request $request, SaleListing $listing)
     {
         $setting = $this->enabledSetting();
 
@@ -94,10 +94,14 @@ class MarketplaceController extends Controller
 
         // "Wróć" zachowuje filtr kategorii/stronę listy, jeśli gość przyszedł
         // z listy — w każdym innym przypadku (link z zewnątrz) po prostu lista.
-        $previous = url()->previous();
-        $backUrl = parse_url($previous, PHP_URL_PATH) === parse_url(route('marketplace.index'), PHP_URL_PATH)
-            ? $previous
-            : route('marketplace.index');
+        // Tylko względny adres listy z tej samej strony. url()->previous()
+        // bierze nagłówek Referer, więc bez sprawdzenia hosta link "Wróć"
+        // potrafił prowadzić na obcą domenę (pentest 2026-10-09).
+        $previous = parse_url(url()->previous());
+        $sameHost = ! isset($previous['host']) || $previous['host'] === $request->getHost();
+        $backUrl = $sameHost && in_array($previous['path'] ?? '/', ['', '/'], true)
+            ? '/'.(isset($previous['query']) ? '?'.$previous['query'] : '')
+            : route('marketplace.index', [], false);
 
         return view('marketplace.show', [
             'listing' => $listing,

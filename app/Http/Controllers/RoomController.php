@@ -87,7 +87,7 @@ class RoomController extends Controller
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'code' => [
-                'required', 'string', 'max:16',
+                'required', 'string', 'max:16', 'alpha_dash:ascii',
                 Rule::unique('rooms', 'code')
                     ->where('warehouse_id', $room?->warehouse_id ?? $request->input('warehouse_id'))
                     ->ignore($room),

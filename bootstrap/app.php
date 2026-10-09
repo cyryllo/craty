@@ -32,8 +32,10 @@ return tap(Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\RedirectToInstallerIfNotInstalled::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\LogOutInactiveUsers::class,
-            \App\Http\Middleware\AddSecurityHeaders::class,
         ]);
+        // Globalnie, nie w grupie "web": inaczej strony 404 (adres bez trasy)
+        // nie dostawały nagłówków, co wyłapał OWASP ZAP w pentestach.
+        $middleware->append(\App\Http\Middleware\AddSecurityHeaders::class);
         // Bez tego "auth" (domyślna lista priorytetów Laravela odwołuje się
         // do NIEGO przez interfejs AuthenticatesRequests, nie konkretną
         // klasę Authenticate — dlatego kotwiczymy o ten sam interfejs) mogło
