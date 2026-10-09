@@ -11,17 +11,17 @@ use Illuminate\Validation\Rule;
 
 class RoomController extends Controller
 {
+    /** Dawna płaska lista — zastąpiona drzewem w Strukturze magazynu. */
     public function index()
     {
-        return view('rooms.index', [
-            'rooms' => Room::with('warehouse')->withCount('storageLocations')->orderBy('warehouse_id')->orderBy('name')->get(),
-        ]);
+        return redirect()->route('warehouse-structure.index');
     }
 
-    public function create()
+    public function create(Request $request)
     {
         return view('rooms.form', [
-            'room' => new Room,
+            // "+ Pomieszczenie" przy magazynie w Strukturze magazynu podaje ?warehouse_id=.
+            'room' => new Room(['warehouse_id' => $request->integer('warehouse_id') ?: null]),
             'warehouses' => Warehouse::orderBy('name')->get(),
         ]);
     }
@@ -36,7 +36,7 @@ class RoomController extends Controller
         // jeśli komuś to wystarcza jako poziom szczegółowości.
         StorageLocation::create(['warehouse_id' => $room->warehouse_id, 'room_id' => $room->id]);
 
-        return redirect()->route('rooms.index')->with('status', __('Room added.'));
+        return redirect()->route('warehouse-structure.index')->with('status', __('Room added.'));
     }
 
     public function edit(Room $room)
@@ -48,20 +48,30 @@ class RoomController extends Controller
     {
         $room->update($this->validated($request, $room));
 
-        return redirect()->route('rooms.index')->with('status', __('Room updated.'));
+        return redirect()->route('warehouse-structure.index')->with('status', __('Room updated.'));
     }
 
+    /**
+     * Przedmioty z usuwanego pomieszczenia (z każdego jego regału/półki/
+     * pojemnika) nie blokują usunięcia — przechodzą do "całego magazynu".
+     */
     public function destroy(Room $room)
     {
-        $hasItems = Item::whereIn('storage_location_id', $room->storageLocations()->pluck('id'))->exists();
-
-        if ($hasItems) {
-            return back()->with('error', __('This room cannot be deleted because it has items in it.'));
+        $moved = 0;
+        $locationIds = $room->storageLocations()->pluck('id');
+        if (Item::whereIn('storage_location_id', $locationIds)->exists()) {
+            $target = StorageLocation::baseFor($room->warehouse_id);
+            $moved = $room->storageLocations()->get()->sum(fn (StorageLocation $l) => $l->moveItemsTo($target));
         }
 
         $room->delete(); // lokalizacje kaskadowo (storage_locations.room_id ->cascadeOnDelete())
 
-        return redirect()->route('rooms.index')->with('status', __('Room deleted.'));
+        if ($moved) {
+            return redirect()->route('warehouse-structure.index')
+                ->with('status', __('Room deleted. :count items moved to: :target.', ['count' => $moved, 'target' => $target->label()]));
+        }
+
+        return redirect()->route('warehouse-structure.index')->with('status', __('Room deleted.'));
     }
 
     /**

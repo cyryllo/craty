@@ -10,17 +10,18 @@ use Illuminate\Validation\ValidationException;
 
 class StorageLocationController extends Controller
 {
+    /** Dawna płaska lista — zastąpiona drzewem w Strukturze magazynu. */
     public function index()
     {
-        return view('storage-locations.index', [
-            'locations' => StorageLocation::with(['warehouse', 'room'])->withCount('items')->get(),
-        ]);
+        return redirect()->route('warehouse-structure.index');
     }
 
-    public function create()
+    public function create(Request $request)
     {
         return view('storage-locations.form', [
-            'location' => new StorageLocation,
+            // Przyciski "+ Regał/Półka/Pojemnik" w Strukturze magazynu podają
+            // miejsce w drzewie w adresie — formularz startuje już wypełniony.
+            'location' => new StorageLocation($request->only(['warehouse_id', 'room_id', 'rack', 'shelf'])),
             'warehouses' => Warehouse::orderBy('name')->get(),
             'rooms' => Room::with('warehouse')->orderBy('warehouse_id')->orderBy('name')->get(),
         ]);
@@ -30,7 +31,7 @@ class StorageLocationController extends Controller
     {
         StorageLocation::create($this->validated($request));
 
-        return redirect()->route('storage-locations.index')->with('status', __('Location added.'));
+        return redirect()->route('warehouse-structure.index')->with('status', __('Location added.'));
     }
 
     public function edit(StorageLocation $storageLocation)
@@ -46,18 +47,39 @@ class StorageLocationController extends Controller
     {
         $storageLocation->update($this->validated($request, $storageLocation));
 
-        return redirect()->route('storage-locations.index')->with('status', __('Location updated.'));
+        return redirect()->route('warehouse-structure.index')->with('status', __('Location updated.'));
     }
 
+    /**
+     * Przedmioty z usuwanej lokalizacji nie blokują usunięcia — trafiają
+     * poziom wyżej: do "całego pomieszczenia", a bez pomieszczenia do
+     * "całego magazynu". Samego "całego magazynu" usunąć się nie da — to
+     * właściwie magazyn jako taki (usuwa się go razem z magazynem).
+     */
     public function destroy(StorageLocation $storageLocation)
     {
+        if ($storageLocation->isBase()) {
+            return back()->with('error', __('The "whole warehouse" location cannot be deleted on its own — delete the warehouse instead.'));
+        }
+
+        $moved = 0;
         if ($storageLocation->items()->exists()) {
-            return back()->with('error', __('This location cannot be deleted because it has items in it.'));
+            $target = $storageLocation->room_id && ! $this->isRoomBase($storageLocation)
+                ? StorageLocation::baseFor($storageLocation->warehouse_id, $storageLocation->room_id)
+                : StorageLocation::baseFor($storageLocation->warehouse_id);
+            $moved = $storageLocation->moveItemsTo($target);
         }
 
         $storageLocation->delete();
 
-        return redirect()->route('storage-locations.index')->with('status', __('Location deleted.'));
+        return redirect()->route('warehouse-structure.index')->with('status', $moved
+            ? __('Location deleted. :count items moved to: :target.', ['count' => $moved, 'target' => $target->label()])
+            : __('Location deleted.'));
+    }
+
+    private function isRoomBase(StorageLocation $location): bool
+    {
+        return $location->room_id && ! $location->rack && ! $location->shelf && ! $location->bin;
     }
 
     private function validated(Request $request, ?StorageLocation $storageLocation = null): array

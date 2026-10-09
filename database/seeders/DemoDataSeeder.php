@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Item;
+use App\Models\Room;
 use App\Models\StorageLocation;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -37,9 +38,19 @@ class DemoDataSeeder extends Seeder
             'address' => 'Hala warsztatowa',
         ]);
 
-        $lokR3P2 = StorageLocation::create(['warehouse_id' => $warehouse->id, 'rack' => '3', 'shelf' => '2']);
-        $lokR3P2K1 = StorageLocation::create(['warehouse_id' => $warehouse->id, 'rack' => '3', 'shelf' => '2', 'bin' => '1']);
-        $lokR7 = StorageLocation::create(['warehouse_id' => $warehouse->id, 'rack' => '7']);
+        // Tak samo jak WarehouseController/RoomController::store(): "cały
+        // magazyn" i "całe pomieszczenie" zawsze istnieją jako lokalizacje.
+        StorageLocation::create(['warehouse_id' => $warehouse->id]);
+        $hall = Room::create(['warehouse_id' => $warehouse->id, 'name' => 'Hala warsztatowa', 'code' => 'HALA']);
+        StorageLocation::create(['warehouse_id' => $warehouse->id, 'room_id' => $hall->id]);
+        $tools = Room::create(['warehouse_id' => $warehouse->id, 'name' => 'Magazyn narzędzi', 'code' => 'NARZ']);
+        StorageLocation::create(['warehouse_id' => $warehouse->id, 'room_id' => $tools->id]);
+
+        $lokR3P2 = StorageLocation::create(['warehouse_id' => $warehouse->id, 'room_id' => $hall->id, 'rack' => '3', 'shelf' => '2']);
+        $lokR3P2K1 = StorageLocation::create(['warehouse_id' => $warehouse->id, 'room_id' => $hall->id, 'rack' => '3', 'shelf' => '2', 'bin' => '1']);
+        StorageLocation::create(['warehouse_id' => $warehouse->id, 'room_id' => $hall->id, 'rack' => '3', 'shelf' => '2', 'bin' => '2']);
+        $lokR7 = StorageLocation::create(['warehouse_id' => $warehouse->id, 'room_id' => $tools->id, 'rack' => '7']);
+        StorageLocation::create(['warehouse_id' => $warehouse->id, 'room_id' => $tools->id, 'rack' => '7', 'shelf' => '1']);
 
         $numbers = app(InventoryNumberGenerator::class);
         $qr = app(QrCodeGenerator::class);

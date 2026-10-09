@@ -17,7 +17,17 @@ class MarketplaceController extends Controller
 {
     public function index(Request $request)
     {
-        $setting = $this->enabledSetting();
+        $setting = AppSetting::current();
+
+        // Strona główna nie robi 404 przy wyłączonym pchlim targu (jak
+        // podstrony ofert) — pokazuje tylko informację, że nic nie jest
+        // wystawione, i kłódkę do logowania w nagłówku.
+        if (! $this->isEnabled($setting)) {
+            return view('marketplace.index', [
+                'enabled' => false,
+                'appName' => $setting->effectiveName(),
+            ]);
+        }
 
         // Ten sam wzorzec co ItemController::index() dla /items, ale osobny
         // klucz sesji — wybór gościa na tej stronie nie ma nadpisywać
@@ -56,6 +66,7 @@ class MarketplaceController extends Controller
             ->withQueryString();
 
         return view('marketplace.index', [
+            'enabled' => true,
             'listings' => $listings,
             'view' => $view,
             'categories' => $categories,
@@ -100,11 +111,18 @@ class MarketplaceController extends Controller
     {
         $setting = AppSetting::current();
 
-        // Wyłączenie modułu Sprzedaż chowa też pchli targ, niezależnie od
-        // jego własnego przełącznika — inaczej pokazywałby zamrożone oferty,
-        // których nie dałoby się już obsłużyć (patrz App\Support\Modules).
-        abort_unless($setting->public_marketplace_enabled && Modules::isEnabled('sales'), 404);
+        abort_unless($this->isEnabled($setting), 404);
 
         return $setting;
+    }
+
+    /**
+     * Wyłączenie modułu Sprzedaż chowa też pchli targ, niezależnie od jego
+     * własnego przełącznika — inaczej pokazywałby zamrożone oferty, których
+     * nie dałoby się już obsłużyć (patrz App\Support\Modules).
+     */
+    private function isEnabled(AppSetting $setting): bool
+    {
+        return $setting->public_marketplace_enabled && Modules::isEnabled('sales');
     }
 }

@@ -151,7 +151,7 @@
 
             <div class="mt-3 space-y-1">
                 @if (auth()->user()->isMagazynier())
-                    <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*', 'categories.*', 'warehouses.*', 'storage-locations.*', 'users.*')">
+                    <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*', 'categories.*', 'warehouses.*', 'warehouse-structure.*', 'rooms.*', 'storage-locations.*', 'users.*')">
                         <span class="inline-flex items-center gap-2">
                             <x-icon name="settings" class="w-4 h-4" />
                             {{ __('Settings') }}

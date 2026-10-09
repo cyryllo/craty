@@ -43,7 +43,9 @@ class ModuleTogglesTest extends TestCase
             'module_sales_enabled' => false,
         ])->save();
 
-        $this->get(route('marketplace.index'))->assertNotFound();
+        $this->get(route('marketplace.index'))
+            ->assertOk()
+            ->assertSee(__('Nothing for sale right now — check back later.'));
     }
 
     public function test_disabling_the_sales_module_hides_the_nav_link(): void

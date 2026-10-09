@@ -1,4 +1,10 @@
 <x-marketplace-layout :app-name="$appName">
+    @if (! $enabled)
+        {{-- Pchli targ wyłączony (albo moduł Sprzedaż) — strona główna zostaje, tylko bez ofert. --}}
+        <div class="bg-white rounded-lg shadow p-8 text-center text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+            {{ __('Nothing for sale right now — check back later.') }}
+        </div>
+    @else
             <div class="lg:flex lg:items-start lg:gap-8">
 
                 @if ($categories->isNotEmpty())
@@ -115,4 +121,5 @@
                     </div>
                 </div>
             </div>
+    @endif
 </x-marketplace-layout>

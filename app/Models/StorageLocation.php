@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Support\Modules;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -62,6 +61,35 @@ class StorageLocation extends Model
      * dopisku wyglądałaby na liście identycznie jak zwykła, konkretna
      * lokalizacja (kod pokrywa się wtedy z kodem magazynu).
      */
+    /**
+     * Lokalizacja "całe pomieszczenie" ($roomId) albo "cały magazyn" (bez
+     * $roomId) — tworzona w locie, gdyby jej brakowało. Tu trafiają
+     * przedmioty z usuwanego pomieszczenia/regału/półki/pojemnika (patrz
+     * RoomController::destroy(), StorageLocationController::destroy()).
+     */
+    public static function baseFor(int $warehouseId, ?int $roomId = null): self
+    {
+        return self::query()
+            ->where('warehouse_id', $warehouseId)
+            ->where('room_id', $roomId)
+            ->whereNull('rack')->whereNull('shelf')->whereNull('bin')
+            ->first()
+            ?? self::create(['warehouse_id' => $warehouseId, 'room_id' => $roomId]);
+    }
+
+    /**
+     * Przenosi wszystkie przedmioty z tej lokalizacji do $target — pojedynczo
+     * przez update(), żeby ItemObserver zapisał zmianę lokalizacji w historii
+     * każdego przedmiotu. Zwraca liczbę przeniesionych.
+     */
+    public function moveItemsTo(self $target): int
+    {
+        $items = $this->items()->get();
+        $items->each->update(['storage_location_id' => $target->id]);
+
+        return $items->count();
+    }
+
     /** "Bazowa" lokalizacja = cały magazyn, bez pomieszczenia i regału/półki/pojemnika. */
     public function isBase(): bool
     {
@@ -71,11 +99,7 @@ class StorageLocation extends Model
     public function label(): string
     {
         if ($this->isBase()) {
-            // Bez modułu "Rozszerzony magazyn" nie ma innych lokalizacji do
-            // odróżnienia, więc wystarczy sama nazwa magazynu.
-            return Modules::isEnabled('locations')
-                ? $this->warehouse->name.' — '.__('whole warehouse, no specific spot')
-                : $this->warehouse->name;
+            return $this->warehouse->name.' — '.__('whole warehouse, no specific spot');
         }
 
         return $this->warehouse->name.' — '.$this->code;

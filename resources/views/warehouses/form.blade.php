@@ -24,9 +24,17 @@
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
-                <a href="{{ route('warehouses.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>
+                <a href="{{ route('warehouse-structure.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>
                 <x-primary-button>{{ __('Save') }}</x-primary-button>
             </div>
         </form>
+
+        {{-- Osobny formularz (HTML nie zagnieżdża form) — usuwanie przeniesione tu z dawnej listy magazynów. --}}
+        @if ($warehouse->exists)
+            <form method="POST" action="{{ route('warehouses.destroy', $warehouse) }}" class="mt-4 text-right" onsubmit="return confirm('{{ __('Delete this warehouse?') }}');">
+                @csrf @method('DELETE')
+                <button class="text-sm text-red-600 hover:underline dark:text-red-400">{{ __('delete') }}</button>
+            </form>
+        @endif
     </div>
 </x-app-layout>

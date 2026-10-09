@@ -14,14 +14,6 @@ class RoomManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** Pomieszczenia/lokalizacje żyją w module "Rozszerzony magazyn" — domyślnie wyłączonym. */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        \App\Models\AppSetting::current()->fill(['module_locations_enabled' => true])->save();
-    }
-
     /**
      * Tak samo jak magazyn dostaje bazową lokalizację przy tworzeniu
      * (WarehouseController::store()), pomieszczenie ma być wybieralne od
@@ -37,7 +29,7 @@ class RoomManagementTest extends TestCase
             'warehouse_id' => $warehouse->id,
             'name' => 'Hala produkcyjna',
             'code' => 'hala1',
-        ])->assertRedirect(route('rooms.index'));
+        ])->assertRedirect(route('warehouse-structure.index'));
 
         $room = Room::firstOrFail();
         $this->assertSame('HALA1', $room->code);
@@ -105,29 +97,36 @@ class RoomManagementTest extends TestCase
 
         $response = $this->actingAs($magazynier)->delete(route('rooms.destroy', $room));
 
-        $response->assertRedirect(route('rooms.index'));
+        $response->assertRedirect(route('warehouse-structure.index'));
         $this->assertModelMissing($room);
         $this->assertSame(0, StorageLocation::count());
     }
 
-    public function test_room_cannot_be_deleted_while_its_base_location_holds_an_item(): void
+    /** Usunięcie pomieszczenia z przedmiotami nie jest blokowane — przedmioty (z każdego jego regału) trafiają do samego magazynu. */
+    public function test_deleting_a_room_moves_its_items_to_the_whole_warehouse(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);
-        $warehouse = Warehouse::create(['name' => 'Magazyn główny', 'code' => 'M1']);
+        $this->actingAs($magazynier)->post(route('warehouses.store'), ['name' => 'Magazyn główny', 'code' => 'M1']);
+        $warehouse = Warehouse::firstOrFail();
         $this->actingAs($magazynier)->post(route('rooms.store'), [
             'warehouse_id' => $warehouse->id, 'name' => 'Hala', 'code' => 'HALA1',
         ]);
         $room = Room::firstOrFail();
-        $location = StorageLocation::where('room_id', $room->id)->firstOrFail();
-        Item::create([
-            'inventory_no' => 'GEN-M1-HALA1-2026-00001', 'name' => 'Wiertarka', 'condition' => 'nowy',
-            'status' => 'dostepny', 'storage_location_id' => $location->id,
-        ]);
+        $roomBase = StorageLocation::where('room_id', $room->id)->firstOrFail();
+        $rack = StorageLocation::create(['warehouse_id' => $warehouse->id, 'room_id' => $room->id, 'rack' => '3']);
+        $onRack = Item::create(['inventory_no' => 'GEN-M1HALA1R3-2026-00001', 'name' => 'Wiertarka', 'condition' => 'nowy', 'status' => 'dostepny', 'storage_location_id' => $rack->id]);
+        $inRoom = Item::create(['inventory_no' => 'GEN-M1HALA1-2026-00002', 'name' => 'Klucze', 'condition' => 'nowy', 'status' => 'dostepny', 'storage_location_id' => $roomBase->id]);
 
-        $response = $this->actingAs($magazynier)->delete(route('rooms.destroy', $room));
+        $this->actingAs($magazynier)->delete(route('rooms.destroy', $room))
+            ->assertRedirect(route('warehouse-structure.index'))
+            ->assertSessionHas('status');
 
-        $response->assertRedirect();
-        $this->assertModelExists($room);
+        $this->assertModelMissing($room);
+        $warehouseBase = StorageLocation::baseFor($warehouse->id);
+        $this->assertSame($warehouseBase->id, $onRack->fresh()->storage_location_id);
+        $this->assertSame($warehouseBase->id, $inRoom->fresh()->storage_location_id);
+        // Przeniesienie widać w historii przedmiotu.
+        $this->assertTrue($onRack->histories()->where('field', 'storage_location_id')->exists());
     }
 
     /** Formularz lokalizacji grupuje pokoje po magazynie (optgroup), ale serwer i tak dopilnowuje spójności. */

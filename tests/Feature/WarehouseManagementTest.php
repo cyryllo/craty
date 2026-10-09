@@ -28,7 +28,7 @@ class WarehouseManagementTest extends TestCase
         $this->actingAs($magazynier)->post(route('warehouses.store'), [
             'name' => 'Magazyn główny',
             'code' => 'M1',
-        ])->assertRedirect(route('warehouses.index'));
+        ])->assertRedirect(route('warehouse-structure.index'));
 
         $warehouse = Warehouse::firstOrFail();
         $location = StorageLocation::where('warehouse_id', $warehouse->id)->firstOrFail();
@@ -37,41 +37,25 @@ class WarehouseManagementTest extends TestCase
         $this->assertNull($location->bin);
         $this->assertSame('M1', $location->code);
 
-        // Bez modułu "Rozszerzony magazyn" wystarczy sama nazwa magazynu...
-        $this->actingAs($magazynier)->get(route('items.create'))
-            ->assertSee('Magazyn główny')
-            ->assertDontSee('whole warehouse, no specific spot');
-
-        // ...z modułem trzeba ją odróżnić od szczegółowych lokalizacji.
-        AppSetting::current()->fill(['module_locations_enabled' => true])->save();
         $this->actingAs($magazynier)->get(route('items.create'))
             ->assertSee('Magazyn główny — whole warehouse, no specific spot');
     }
 
-    public function test_rooms_and_locations_are_hidden_when_extended_warehouse_module_is_off(): void
+    /** Magazyny, pomieszczenia i lokalizacje żyją teraz w jednym drzewie — dawne listy tylko przekierowują. */
+    public function test_old_flat_lists_redirect_to_the_warehouse_structure(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);
 
-        $this->actingAs($magazynier)->get(route('rooms.index'))->assertNotFound();
-        $this->actingAs($magazynier)->get(route('storage-locations.index'))->assertNotFound();
+        $this->actingAs($magazynier)->get(route('warehouse-structure.index'))->assertOk();
+        foreach (['warehouses.index', 'rooms.index', 'storage-locations.index'] as $route) {
+            $this->actingAs($magazynier)->get(route($route))->assertRedirect(route('warehouse-structure.index'));
+        }
         $this->actingAs($magazynier)->get(route('settings.index'))
-            ->assertDontSee(route('rooms.index'), false)
-            ->assertDontSee(route('storage-locations.index'), false);
-
-        AppSetting::current()->fill(['module_locations_enabled' => true])->save();
-
-        $this->actingAs($magazynier)->get(route('rooms.index'))->assertOk();
-        $this->actingAs($magazynier)->get(route('storage-locations.index'))->assertOk();
-        $this->actingAs($magazynier)->get(route('settings.index'))
-            ->assertSee(route('rooms.index'), false)
-            ->assertSee(route('storage-locations.index'), false);
+            ->assertSee(route('warehouse-structure.index'), false)
+            ->assertDontSee(route('warehouses.index'), false);
     }
 
-    /**
-     * Wyłączenie modułu tylko ukrywa szczegóły — przedmiot zapisany wcześniej
-     * na konkretnym regale zachowuje go, także po zwykłym zapisie formularza.
-     */
-    public function test_item_form_without_module_offers_only_warehouses_but_keeps_an_existing_detailed_location(): void
+    public function test_deleting_a_detailed_location_moves_its_items_one_level_up(): void
     {
         $magazynier = User::factory()->create(['role' => 'magazynier']);
         $warehouse = Warehouse::create(['name' => 'Magazyn główny', 'code' => 'M1']);
@@ -82,15 +66,15 @@ class WarehouseManagementTest extends TestCase
             'status' => 'dostepny', 'storage_location_id' => $shelf->id,
         ]);
 
-        $this->actingAs($magazynier)->get(route('items.create'))
-            ->assertSee('value="'.$base->id.'"', false)
-            ->assertDontSee('value="'.$shelf->id.'"', false);
+        $this->actingAs($magazynier)->delete(route('storage-locations.destroy', $shelf))
+            ->assertRedirect(route('warehouse-structure.index'));
 
-        $this->actingAs($magazynier)->get(route('items.edit', $item))
-            ->assertSee('value="'.$shelf->id.'" selected', false);
+        $this->assertModelMissing($shelf);
+        $this->assertSame($base->id, $item->fresh()->storage_location_id);
 
-        $this->actingAs($magazynier)->get(route('items.show', $item))
-            ->assertSee('M1-R3-P2');
+        // Samego "całego magazynu" nie da się usunąć osobno.
+        $this->actingAs($magazynier)->delete(route('storage-locations.destroy', $base))->assertRedirect();
+        $this->assertModelExists($base);
     }
 
     public function test_warehouse_with_only_the_base_location_and_no_items_can_be_deleted(): void
@@ -101,7 +85,7 @@ class WarehouseManagementTest extends TestCase
 
         $response = $this->actingAs($magazynier)->delete(route('warehouses.destroy', $warehouse));
 
-        $response->assertRedirect(route('warehouses.index'));
+        $response->assertRedirect(route('warehouse-structure.index'));
         $this->assertModelMissing($warehouse);
         $this->assertSame(0, StorageLocation::count());
     }

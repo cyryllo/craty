@@ -15,9 +15,35 @@ class MarketplaceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_marketplace_is_not_found_when_disabled(): void
+    /** Strona główna przy wyłączonym pchlim targu: bez 404, tylko informacja i bez ofert. */
+    public function test_home_page_shows_nothing_for_sale_when_marketplace_is_disabled(): void
     {
-        $this->get(route('marketplace.index'))->assertNotFound();
+        $listing = $this->createListing('NAR-BRAK-2026-00001', 'Wiertarka', 'wyeksportowana');
+
+        $this->get(route('marketplace.index'))
+            ->assertOk()
+            ->assertSee(__('Nothing for sale right now — check back later.'))
+            ->assertDontSee('Wiertarka');
+        $this->get(route('marketplace.show', $listing))->assertNotFound();
+    }
+
+    public function test_header_shows_login_lock_for_guests_and_dashboard_link_for_users(): void
+    {
+        $this->get(route('marketplace.index'))
+            ->assertSee('href="/login"', false)
+            ->assertDontSee('href="/dashboard"', false);
+
+        $this->actingAs(User::factory()->create(['role' => 'magazynier']))
+            ->get(route('marketplace.index'))
+            ->assertSee('href="/dashboard"', false)
+            ->assertDontSee('href="/login"', false);
+    }
+
+    public function test_old_flea_market_address_no_longer_exists(): void
+    {
+        AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
+
+        $this->get('/flea-market')->assertNotFound();
     }
 
     public function test_marketplace_lists_only_active_listings_for_guests(): void
@@ -167,11 +193,12 @@ class MarketplaceTest extends TestCase
 
         $this->get(route('marketplace.index', ['category_id' => $tools->id, 'page' => 1]))
             ->assertOk()
-            ->assertSee('href="/flea-market"', false)
-            ->assertSee('href="/flea-market?category_id='.$tools->id.'"', false)
-            ->assertDontSee('flea-market?"', false)
+            ->assertSee('href="/"', false)
+            ->assertSee('href="/?category_id='.$tools->id.'"', false)
+            ->assertDontSee('href="/?"', false)
             // Względne, nie z http:// — za serwerem pośredniczącym z HTTPS pełny adres dawał 502.
-            ->assertDontSee('href="http://localhost/flea-market', false);
+            ->assertDontSee('href="http://localhost/?', false)
+            ->assertDontSee('href="http://localhost/offer', false);
     }
 
     public function test_listing_on_the_list_links_to_its_own_product_page(): void

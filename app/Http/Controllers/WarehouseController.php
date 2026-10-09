@@ -9,11 +9,10 @@ use Illuminate\Http\Request;
 
 class WarehouseController extends Controller
 {
+    /** Dawna płaska lista — magazyny są teraz nagłówkami w Strukturze magazynu. */
     public function index()
     {
-        return view('warehouses.index', [
-            'warehouses' => Warehouse::withCount('storageLocations')->orderBy('name')->get(),
-        ]);
+        return redirect()->route('warehouse-structure.index');
     }
 
     public function create()
@@ -32,7 +31,7 @@ class WarehouseController extends Controller
         // magazyn", a StorageLocation::label() ją odpowiednio opisuje.
         StorageLocation::create(['warehouse_id' => $warehouse->id]);
 
-        return redirect()->route('warehouses.index')->with('status', __('Warehouse added.'));
+        return redirect()->route('warehouse-structure.index')->with('status', __('Warehouse added.'));
     }
 
     public function edit(Warehouse $warehouse)
@@ -44,7 +43,7 @@ class WarehouseController extends Controller
     {
         $warehouse->update($this->validated($request, $warehouse));
 
-        return redirect()->route('warehouses.index')->with('status', __('Warehouse updated.'));
+        return redirect()->route('warehouse-structure.index')->with('status', __('Warehouse updated.'));
     }
 
     public function destroy(Warehouse $warehouse)
@@ -61,7 +60,7 @@ class WarehouseController extends Controller
 
         $warehouse->delete(); // lokalizacje kaskadowo (storage_locations.warehouse_id->cascadeOnDelete())
 
-        return redirect()->route('warehouses.index')->with('status', __('Warehouse deleted.'));
+        return redirect()->route('warehouse-structure.index')->with('status', __('Warehouse deleted.'));
     }
 
     private function validated(Request $request, ?Warehouse $warehouse = null): array

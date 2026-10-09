@@ -20,17 +20,15 @@ use App\Http\Controllers\StorageLocationController;
 use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\WarehouseStructureController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect()->route('dashboard');
-});
-
-// Jedyna dziś publiczna (bez logowania) trasa w appce — patrz TODO.md.
-// Świadomie poza grupą "auth" niżej; kontroler sam odpowiada 404, gdy admin
-// nie włączył tej strony w Ustawienia → Ustawienia aplikacji.
-Route::get('flea-market', [MarketplaceController::class, 'index'])->name('marketplace.index');
-Route::get('flea-market/{listing}', [MarketplaceController::class, 'show'])->name('marketplace.show');
+// Jedyne publiczne (bez logowania) trasy w appce — patrz TODO.md. Świadomie
+// poza grupą "auth" niżej. Strona główna to pchli targ: przy wyłączonym
+// pokazuje tylko informację, że nic nie jest wystawione (plus kłódkę do
+// logowania w nagłówku); strona pojedynczej oferty daje wtedy 404.
+Route::get('/', [MarketplaceController::class, 'index'])->name('marketplace.index');
+Route::get('offer/{listing}', [MarketplaceController::class, 'show'])->name('marketplace.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -88,10 +86,9 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('warehouses', WarehouseController::class)->except('show');
-        Route::middleware('module:locations')->group(function () {
-            Route::resource('rooms', RoomController::class)->except('show');
-            Route::resource('storage-locations', StorageLocationController::class)->except('show');
-        });
+        Route::get('warehouse-structure', [WarehouseStructureController::class, 'index'])->name('warehouse-structure.index');
+        Route::resource('rooms', RoomController::class)->except('show');
+        Route::resource('storage-locations', StorageLocationController::class)->except('show');
 
         // "Szybkie dodawanie" po nietrafionym skanie kodu kreskowego — mutuje
         // stan magazynu, więc te dwie trasy zostają w grupie admin/magazynier,

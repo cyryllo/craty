@@ -17,7 +17,27 @@
 
     <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
 
+        {{-- Filtr miejsca przychodzi z liczb w Strukturze magazynu — pokazany jako znacznik z "×", a w formularzu niżej
+             przenoszony ukrytymi polami, żeby wyszukiwanie/kategoria/status działały w obrębie tego miejsca. --}}
+        @if ($locationFilter)
+            <div class="flex flex-wrap items-center gap-2 text-sm">
+                @if ($locationBackUrl)
+                    <a href="{{ $locationBackUrl }}" class="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-1 font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">&larr; {{ __('Warehouse structure') }}</a>
+                @endif
+                <span class="text-gray-500 dark:text-gray-400">{{ __('Location') }}:</span>
+                <span class="inline-flex items-center gap-2 rounded-full bg-indigo-50 border border-indigo-200 px-3 py-1 text-indigo-800 dark:bg-indigo-950 dark:border-indigo-800 dark:text-indigo-300">
+                    {{ $locationFilter }}
+                    <a href="{{ request()->fullUrlWithoutQuery(['storage_location_id', 'warehouse_id', 'room_id', 'rack', 'shelf', 'page']) }}" class="font-semibold hover:text-indigo-950 dark:hover:text-white" aria-label="{{ __('Clear location filter') }}">&times;</a>
+                </span>
+            </div>
+        @endif
+
         <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap gap-3 items-end dark:bg-gray-800">
+            @foreach (['storage_location_id', 'warehouse_id', 'room_id', 'rack', 'shelf'] as $locationParam)
+                @if (request()->filled($locationParam))
+                    <input type="hidden" name="{{ $locationParam }}" value="{{ request($locationParam) }}">
+                @endif
+            @endforeach
             <input type="hidden" name="view" value="{{ $view }}">
             <a href="{{ route('scan.show') }}" title="{{ __('Scan') }}" class="inline-flex items-center justify-center w-9 h-9 shrink-0 rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700">
                 <x-icon name="scan" class="w-4 h-4" />

@@ -179,12 +179,12 @@ class SaleListingWorkflowTest extends TestCase
         $magazynier = User::factory()->create(['role' => 'magazynier']);
 
         $this->actingAs($magazynier)->get(route('sale-listings.index'))
-            ->assertDontSee('href="/flea-market"', false);
+            ->assertDontSee('🛒', false);
 
         \App\Models\AppSetting::current()->fill(['public_marketplace_enabled' => true])->save();
 
-        $this->actingAs($magazynier)->get(route('sale-listings.index'))->assertSee('href="/flea-market"', false);
-        $this->actingAs($magazynier)->get(route('sale-listings.exported'))->assertSee('href="/flea-market"', false);
+        $this->actingAs($magazynier)->get(route('sale-listings.index'))->assertSee('🛒', false);
+        $this->actingAs($magazynier)->get(route('sale-listings.exported'))->assertSee('🛒', false);
     }
 
     public function test_sold_and_retired_items_disappear_from_the_items_list_and_dashboard_unless_filtered(): void

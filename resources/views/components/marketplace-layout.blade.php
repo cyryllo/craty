@@ -25,7 +25,18 @@
                         <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Flea market') }}</div>
                     </div>
                 </a>
-                @include('layouts._theme-toggle')
+                <div class="flex items-center gap-2">
+                    @include('layouts._theme-toggle')
+                    {{-- Strona główna jest publiczna — wejście do ewidencji: kłódka dla gości, "Panel" dla zalogowanych. --}}
+                    @auth
+                        <a href="{{ route('dashboard', [], false) }}" class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium text-white bg-gray-900 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600">{{ __('Dashboard') }}</a>
+                    @else
+                        <a href="{{ route('login', [], false) }}" title="{{ __('Log in') }}" aria-label="{{ __('Log in') }}"
+                           class="inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700">
+                            <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"/></svg>
+                        </a>
+                    @endauth
+                </div>
             </div>
         </header>
 

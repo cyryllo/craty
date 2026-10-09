@@ -19,7 +19,7 @@
                     <select id="warehouse_id" name="warehouse_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600" required>
                         <option value="">— {{ __('choose') }} —</option>
                         @foreach ($warehouses as $warehouse)
-                            <option value="{{ $warehouse->id }}" @selected(old('warehouse_id') == $warehouse->id)>{{ $warehouse->name }} ({{ $warehouse->code }})</option>
+                            <option value="{{ $warehouse->id }}" @selected(old('warehouse_id', $room->warehouse_id) == $warehouse->id)>{{ $warehouse->name }} ({{ $warehouse->code }})</option>
                         @endforeach
                     </select>
                     <x-input-error :messages="$errors->get('warehouse_id')" class="mt-1" />
@@ -39,9 +39,17 @@
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
-                <a href="{{ route('rooms.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>
+                <a href="{{ route('warehouse-structure.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>
                 <x-primary-button>{{ __('Save') }}</x-primary-button>
             </div>
         </form>
+
+        {{-- Osobny formularz (HTML nie zagnieżdża form) — usuwanie przeniesione tu z dawnej płaskiej listy, teraz zastąpionej Strukturą magazynu. --}}
+        @if ($room->exists)
+            <form method="POST" action="{{ route('rooms.destroy', $room) }}" class="mt-4 text-right" onsubmit="return confirm('{{ __('Delete this room? Items in it will move to the warehouse itself.') }}');">
+                @csrf @method('DELETE')
+                <button class="text-sm text-red-600 hover:underline dark:text-red-400">{{ __('delete') }}</button>
+            </form>
+        @endif
     </div>
 </x-app-layout>

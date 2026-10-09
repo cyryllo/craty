@@ -13,12 +13,12 @@ class ExampleTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Gość trafiający na "/" jest przekierowywany do logowania
-     * (panel wymaga zalogowania — patrz routes/web.php).
+     * "/" to publiczna strona główna (pchli targ) z kłódką do logowania;
+     * sam panel nadal wymaga zalogowania.
      */
-    public function test_guests_are_redirected_to_login(): void
+    public function test_home_is_public_with_a_login_link_and_dashboard_requires_login(): void
     {
-        $this->get('/')->assertRedirect('/dashboard');
+        $this->get('/')->assertOk()->assertSee('href="/login"', false);
         $this->get('/dashboard')->assertRedirect('/login');
     }
 }

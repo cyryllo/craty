@@ -6,7 +6,7 @@
     <div class="max-w-lg mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <form method="POST" action="{{ $location->exists ? route('storage-locations.update', $location) : route('storage-locations.store') }}" class="bg-white rounded-lg shadow p-6 space-y-4 dark:bg-gray-800">
             @csrf
-            @if ($location->exists) @method('PUT') @endif
+            @if ($location->exists && ! $location->isBase()) @method('PUT') @endif
 
             <div>
                 <x-input-label for="warehouse_id" :value="__('Warehouse')" />
@@ -59,9 +59,17 @@
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
-                <a href="{{ route('storage-locations.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>
+                <a href="{{ route('warehouse-structure.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>
                 <x-primary-button>{{ __('Save') }}</x-primary-button>
             </div>
         </form>
+
+        {{-- Osobny formularz (HTML nie zagnieżdża form) — usuwanie przeniesione tu z dawnej płaskiej listy, teraz zastąpionej Strukturą magazynu. --}}
+        @if ($location->exists)
+            <form method="POST" action="{{ route('storage-locations.destroy', $location) }}" class="mt-4 text-right" onsubmit="return confirm('{{ __('Delete this location? Items in it will move one level up.') }}');">
+                @csrf @method('DELETE')
+                <button class="text-sm text-red-600 hover:underline dark:text-red-400">{{ __('delete') }}</button>
+            </form>
+        @endif
     </div>
 </x-app-layout>
