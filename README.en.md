@@ -63,7 +63,40 @@ what's missing before letting you proceed.
   browsers treat plain HTTP in production as an insecure context and block
   camera access
 
-## Quick start (Docker)
+## Running the ready-made Docker image
+
+The simplest way: one container with the app and its database inside, no need to download the code, Composer or npm.
+
+```bash
+docker run -d --name craty --restart unless-stopped \
+  -p 8000:8000 \
+  -v craty-data:/var/www/html/app-storage \
+  ghcr.io/cyryllo/craty:latest
+```
+
+or with Docker Compose, using the ready-made file:
+
+```bash
+curl -O https://raw.githubusercontent.com/cyryllo/craty/main/docker/release/compose.yml
+docker compose up -d
+```
+
+Then open http://localhost:8000 and go through the short setup wizard: app name, address and the administrator account. The wizard doesn't ask about the database, it is already set up inside the container (with a random password).
+
+All data (database, photos, QR codes, configuration) lives in a single `craty-data` volume, so a backup is a copy of that volume, and removing the container deletes nothing.
+
+**Updating** means pulling a new image (in the Docker version the Updates page in the panel just says so instead of accepting a .zip package):
+
+```bash
+docker compose pull && docker compose up -d
+# or without Compose: docker pull ghcr.io/cyryllo/craty:latest, then remove and re-run the container with the same volume
+```
+
+Database changes from the new version are applied automatically when the container starts. The image runs on x86 and ARM machines (e.g. Raspberry Pi 4/5). Camera scanning from a phone needs HTTPS, so in practice a reverse proxy with a certificate (e.g. Caddy, Nginx Proxy Manager, Traefik) in front of port 8000.
+
+## Development environment (Docker)
+
+For working on Craty's code, not for everyday use:
 
 ```bash
 git clone https://github.com/cyryllo/craty.git

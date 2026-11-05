@@ -63,7 +63,40 @@ czego ewentualnie brakuje, zanim pozwoli przejść dalej.
   zwykły HTTP na produkcji przeglądarki traktują jako niebezpieczny
   kontekst i blokują dostęp do kamery
 
-## Szybki start (Docker)
+## Uruchomienie z gotowego obrazu Docker
+
+Najprostszy sposób: jeden kontener z aplikacją i bazą danych w środku, bez pobierania kodu, composera ani npm.
+
+```bash
+docker run -d --name craty --restart unless-stopped \
+  -p 8000:8000 \
+  -v craty-data:/var/www/html/app-storage \
+  ghcr.io/cyryllo/craty:latest
+```
+
+albo z Docker Compose, pobierając gotowy plik:
+
+```bash
+curl -O https://raw.githubusercontent.com/cyryllo/craty/main/docker/release/compose.yml
+docker compose up -d
+```
+
+Potem otwórz http://localhost:8000 i przejdź krótki kreator instalacji: nazwa aplikacji, adres i konto administratora. O bazę danych kreator nie pyta, bo jest już skonfigurowana w kontenerze (z losowym hasłem).
+
+Wszystkie dane (baza, zdjęcia, kody QR, konfiguracja) leżą w jednym wolumenie `craty-data`, więc kopia zapasowa to kopia tego wolumenu, a usunięcie kontenera niczego nie kasuje.
+
+**Aktualizacja** to pobranie nowego obrazu (moduł Aktualizacje w panelu w wersji Docker tylko to podpowiada, zamiast przyjmować paczkę .zip):
+
+```bash
+docker compose pull && docker compose up -d
+# albo bez Compose: docker pull ghcr.io/cyryllo/craty:latest, potem usuń i uruchom kontener ponownie z tym samym wolumenem
+```
+
+Zmiany w bazie danych z nowej wersji wprowadzają się same przy starcie kontenera. Obraz działa na komputerach x86 i ARM (np. Raspberry Pi 4/5). Do skanowania kamerą z telefonu potrzebny jest HTTPS, czyli w praktyce reverse proxy z certyfikatem (np. Caddy, Nginx Proxy Manager, Traefik) przed portem 8000.
+
+## Środowisko deweloperskie (Docker)
+
+Do pracy nad kodem Craty, nie do codziennego używania:
 
 ```bash
 git clone https://github.com/cyryllo/craty.git

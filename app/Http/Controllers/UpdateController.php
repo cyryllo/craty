@@ -48,6 +48,9 @@ class UpdateController extends Controller
 
     public function upload(Request $request, UpdateService $updates)
     {
+        // W obrazie Docker aktualizacja = nowy obraz (patrz settings/updates.blade.php).
+        abort_if(config('app.docker'), 404);
+
         // PHP samo czyści $_POST/$_FILES (bez wyjątku) gdy body przekroczy
         // post_max_size — bez tej detekcji admin dostałby tylko mylącą
         // walidację "pole jest wymagane" zamiast prawdziwej przyczyny.

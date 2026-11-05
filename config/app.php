@@ -123,4 +123,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    | Obraz Docker (docker/release/Dockerfile) ustawia CRATY_DOCKER=true. Baza
+    | MariaDB działa wtedy w tym samym kontenerze i jest już skonfigurowana
+    | przez docker/release/entrypoint.sh, więc instalator pomija krok bazy,
+    | a aktualizacja polega na pobraniu nowego obrazu, nie na wgraniu .zip.
+    */
+    'docker' => (bool) env('CRATY_DOCKER', false),
+
 ];

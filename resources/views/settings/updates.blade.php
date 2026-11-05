@@ -19,7 +19,16 @@
             <p class="text-2xl font-semibold text-gray-900 mt-1 dark:text-gray-100">{{ $currentVersion }}</p>
         </div>
 
-        @if ($passwordConfirmed)
+        @if (config('app.docker'))
+            {{-- W Dockerze kod siedzi w obrazie: wgrana paczka zniknęłaby przy
+                następnym uruchomieniu kontenera. Aktualizacja = nowy obraz. --}}
+            <div class="bg-white rounded-lg shadow p-6 space-y-3 dark:bg-gray-800">
+                <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Updating the Docker version') }}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('This installation runs from a Docker image, so updates are installed by downloading a new image, not by uploading a package. Your data stays in the Docker volume. Pending database changes are applied automatically when the container starts.') }}</p>
+                <pre class="bg-gray-100 text-gray-800 text-xs rounded-md p-3 overflow-x-auto dark:bg-gray-900 dark:text-gray-200">docker compose pull
+docker compose up -d</pre>
+            </div>
+        @elseif ($passwordConfirmed)
             <form method="POST" action="{{ route('settings.updates.upload') }}" enctype="multipart/form-data" class="bg-white rounded-lg shadow p-6 space-y-4 dark:bg-gray-800">
                 @csrf
                 <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Upload an update package') }}</h3>

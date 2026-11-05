@@ -29,6 +29,9 @@
                     {{ __('Craty is ready. Log in with the administrator account you just created (:email).', ['email' => $adminEmail]) }}
                 </p>
 
+                {{-- W Dockerze kod obrazu jest tylko do odczytu i wraca przy każdym
+                    starcie kontenera, więc usuwanie plików kreatora nie ma sensu. --}}
+                @unless (config('app.docker'))
                 <div class="bg-amber-50 border border-amber-200 text-amber-900 text-sm rounded-md p-4 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-300">
                     <p class="font-medium mb-1">{{ __('One more thing (recommended)') }}</p>
                     <p>{{ __('The installer is already locked automatically — visiting it again now just redirects here. For extra peace of mind, you can also delete these from the server:') }}</p>
@@ -44,6 +47,7 @@
                         </button>
                     </form>
                 </div>
+                @endunless
 
                 <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">
                     {{ __('Go to login') }}

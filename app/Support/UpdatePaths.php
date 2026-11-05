@@ -28,6 +28,10 @@ class UpdatePaths
         'tests',
         'docker-compose.yml',
         'Dockerfile',
+        // Pliki obrazów Docker (deweloperskiego i produkcyjnego). W Dockerze
+        // aktualizacja to nowy obraz, paczka .zip ich nie potrzebuje.
+        '.dockerignore',
+        'docker',
         'art',
         'composer',
         'test',

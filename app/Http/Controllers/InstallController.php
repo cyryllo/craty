@@ -26,6 +26,7 @@ class InstallController extends Controller
     {
         return view('install.wizard', [
             'requirements' => $this->checkRequirements(),
+            'bundledDatabase' => $this->usesBundledDatabase(),
             'defaults' => [
                 'db_host' => $request->old('db_host', '127.0.0.1'),
                 'db_port' => $request->old('db_port', '3306'),
@@ -42,7 +43,7 @@ class InstallController extends Controller
     /** AJAX pod przyciskiem "testuj połączenie" w kroku 2 — nic nie zapisuje. */
     public function testDatabase(Request $request)
     {
-        $data = $request->validate($this->databaseRules());
+        $data = $this->usesBundledDatabase() ? $this->bundledDatabase() : $request->validate($this->databaseRules());
 
         try {
             $this->connect($data);
@@ -56,7 +57,7 @@ class InstallController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            ...$this->databaseRules(),
+            ...($this->usesBundledDatabase() ? [] : $this->databaseRules()),
             'app_name' => ['nullable', 'string', 'max:255'],
             'app_url' => ['required', 'url', 'max:255'],
             'admin_name' => ['required', 'string', 'max:255'],
@@ -64,6 +65,10 @@ class InstallController extends Controller
             'admin_password' => ['required', 'confirmed', Password::defaults()],
             'demo_data' => ['nullable', 'boolean'],
         ]);
+
+        if ($this->usesBundledDatabase()) {
+            $data = [...$data, ...$this->bundledDatabase()];
+        }
 
         // Sprawdzamy połączenie jeszcze raz tuż przed zapisem — nie ufamy
         // wynikowi wcześniejszego AJAX-a z kroku 2 (mogło minąć sporo czasu).
@@ -185,6 +190,31 @@ class InstallController extends Controller
                 'label' => __('Writable .env file'),
                 'ok' => app(EnvFileWriter::class)->isWritable(),
             ],
+        ];
+    }
+
+    /**
+     * Obraz Docker ma MariaDB w tym samym kontenerze, a jej dane dostępowe
+     * zapisuje do .env skrypt startowy (docker/release/entrypoint.sh). Kreator
+     * bierze je wtedy z konfiguracji, nigdy z formularza, i nie pokazuje
+     * hasła na stronie dostępnej przed instalacją.
+     */
+    private function usesBundledDatabase(): bool
+    {
+        return (bool) config('app.docker');
+    }
+
+    /** @return array<string, mixed> */
+    private function bundledDatabase(): array
+    {
+        $mysql = config('database.connections.mysql');
+
+        return [
+            'db_host' => $mysql['host'],
+            'db_port' => $mysql['port'],
+            'db_database' => $mysql['database'],
+            'db_username' => $mysql['username'],
+            'db_password' => $mysql['password'],
         ];
     }
 

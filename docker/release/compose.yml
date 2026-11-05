@@ -1,0 +1,19 @@
+# Craty z gotowego obrazu: aplikacja i baza danych w jednym kontenerze.
+#
+#   docker compose up -d
+#
+# Potem otwórz http://localhost:8000 i przejdź krótki kreator instalacji.
+# Wszystkie dane (baza, zdjęcia, kody QR, konfiguracja) są w wolumenie
+# craty-data. Aktualizacja: docker compose pull && docker compose up -d
+services:
+  craty:
+    image: ghcr.io/cyryllo/craty:latest
+    container_name: craty
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - craty-data:/var/www/html/app-storage
+
+volumes:
+  craty-data:

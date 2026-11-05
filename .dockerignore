@@ -1,0 +1,40 @@
+# Kontekst budowania obrazu produkcyjnego (docker/release/Dockerfile).
+# Zależności i skompilowane CSS/JS obraz buduje sam, a dane użytkownika
+# (zdjęcia, logi, .env) nigdy nie mogą trafić do obrazu.
+.git
+.github
+node_modules
+vendor
+!vendor/.htaccess
+build
+hot
+.env
+.env.*
+!.env.example
+storage
+app-storage/*.key
+app-storage/.env
+app-storage/database
+app-storage/pail
+app-storage/app/*
+app-storage/framework/cache/*
+app-storage/framework/sessions/*
+app-storage/framework/views/*
+app-storage/framework/testing
+app-storage/logs/*
+bootstrap/cache/*.php
+tests
+docs
+app.png
+CLAUDE.md
+TODO.md
+CHANGELOG.internal.md
+RELEASE_NOTES.md
+.phpunit.cache
+.phpunit.result.cache
+docker-compose.yml
+Dockerfile
+art
+composer
+test
+security-check

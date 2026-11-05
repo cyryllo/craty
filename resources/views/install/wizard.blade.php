@@ -131,6 +131,11 @@
                 {{-- Krok 2: Baza danych --}}
                 <div x-show="step === 2" x-cloak>
                     <h2 class="font-medium text-gray-900 mb-4 dark:text-gray-100">{{ __('Database') }}</h2>
+                    @if ($bundledDatabase)
+                    <p class="mb-4 text-sm text-gray-700 bg-emerald-50 border border-emerald-200 rounded-md p-4 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-300">
+                        {{ __('The database is built into this Docker image and is already set up. Nothing to fill in here.') }}
+                    </p>
+                    @else
                     <div class="grid grid-cols-3 gap-4 mb-4">
                         <div class="col-span-2">
                             <x-input-label for="db_host" :value="__('Host')" />
@@ -170,6 +175,7 @@
                            :class="dbResult && dbResult.ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'"
                            x-text="dbResult ? dbResult.message : ''"></p>
                     </div>
+                    @endif
 
                     <div class="flex justify-between">
                         <button type="button" @click="step = 1" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Back') }}</button>

@@ -1,0 +1,17 @@
+# MariaDB wbudowana w obraz Craty: pliki w wolumenie aplikacji, dostępna
+# tylko z wnętrza kontenera (127.0.0.1), nigdy z zewnątrz.
+[mysqld]
+datadir = /var/www/html/app-storage/database
+bind-address = 127.0.0.1
+port = 3306
+socket = /run/mysqld/mysqld.sock
+skip-name-resolve
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+# Mała instancja dla jednej aplikacji, nie serwer bazodanowy.
+innodb_buffer_pool_size = 128M
+max_connections = 50
+performance_schema = OFF
+
+[client]
+socket = /run/mysqld/mysqld.sock
