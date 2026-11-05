@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Loan;
+use App\Support\Modules;
 
 class DashboardController extends Controller
 {
@@ -27,6 +28,8 @@ class DashboardController extends Controller
             // eager-loadów category/storageLocation, których już nie wyświetla.
             'recentItems' => Item::inStock()->latest()->take(8)->get(),
             'needsCompletionItems' => Item::inStock()->where('needs_completion', true)->latest()->take(8)->get(),
+            // Moduł Serwis: naprawy w toku, przeglądy i gwarancje wymagające uwagi.
+            'service' => Modules::isEnabled('service') && auth()->user()->isMagazynier() ? ServiceController::overview() : null,
         ]);
     }
 }

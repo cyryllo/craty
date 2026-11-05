@@ -4,6 +4,7 @@ use App\Http\Controllers\AppSettingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemImportController;
 use App\Http\Controllers\LoanController;
@@ -14,9 +15,11 @@ use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\ModuleSettingController;
 use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RepairController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SaleListingController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ShopSettingController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StorageLocationController;
@@ -77,6 +80,14 @@ Route::middleware('auth')->group(function () {
         // dołożone na role:admin,magazynier.
         Route::middleware('module:contacts')->group(function () {
             Route::resource('contacts', ContactController::class);
+        });
+
+        // Moduł "Serwis": naprawy, przeglądy okresowe, gwarancje (domyślnie wyłączony).
+        Route::middleware('module:service')->group(function () {
+            Route::get('service', [ServiceController::class, 'index'])->name('service.index');
+            Route::post('items/{item}/repairs', [RepairController::class, 'store'])->name('items.repairs.store');
+            Route::post('repairs/{repair}/complete', [RepairController::class, 'complete'])->name('repairs.complete');
+            Route::post('items/{item}/inspections', [InspectionController::class, 'store'])->name('items.inspections.store');
         });
 
         // Moduł "Sprzedaż" (App\Support\Modules) — wyłączenie w Ustawieniach →

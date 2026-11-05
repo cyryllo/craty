@@ -99,6 +99,13 @@
         </svg>
         @break
 
+    @case('service')
+        {{-- klucz płaski: Serwis --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>
+            <path d="M12.6 3.2a4 4 0 0 0-4.9 5.3L3.4 12.8a1.6 1.6 0 0 0 0 2.3l1.5 1.5a1.6 1.6 0 0 0 2.3 0l4.3-4.3a4 4 0 0 0 5.3-4.9l-2.4 2.4-2.3-.6-.6-2.3z" stroke-linejoin="round"/>
+        </svg>
+        @break
+
     @case('branding')
         {{-- ramka ze zdjęciem: Ustawienia aplikacji --}}
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" {{ $attributes }}>

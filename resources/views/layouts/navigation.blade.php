@@ -38,6 +38,12 @@
                             <x-icon name="contacts" class="w-5 h-5" />
                         </a>
                     @endif
+                    @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('service'))
+                        <a href="{{ route('service.index') }}" title="{{ __('Service') }}"
+                           @class(['flex items-center justify-center w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('service.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('service.*')])>
+                            <x-icon name="service" class="w-5 h-5" />
+                        </a>
+                    @endif
                 </div>
 
                 <!-- Navigation Links -->
@@ -60,6 +66,12 @@
                         <x-nav-link :href="route('contacts.index')" :active="request()->routeIs('contacts.*')">
                             <x-icon name="contacts" class="w-4 h-4 me-1.5" />
                             {{ __('Contacts') }}
+                        </x-nav-link>
+                    @endif
+                    @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('service'))
+                        <x-nav-link :href="route('service.index')" :active="request()->routeIs('service.*')">
+                            <x-icon name="service" class="w-4 h-4 me-1.5" />
+                            {{ __('Service') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -159,6 +171,14 @@
                     <span class="inline-flex items-center gap-2">
                         <x-icon name="contacts" class="w-4 h-4" />
                         {{ __('Contacts') }}
+                    </span>
+                </x-responsive-nav-link>
+            @endif
+            @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('service'))
+                <x-responsive-nav-link :href="route('service.index')" :active="request()->routeIs('service.*')">
+                    <span class="inline-flex items-center gap-2">
+                        <x-icon name="service" class="w-4 h-4" />
+                        {{ __('Service') }}
                     </span>
                 </x-responsive-nav-link>
             @endif

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 
 class Item extends Model
@@ -17,6 +18,8 @@ class Item extends Model
         'inventory_no', 'name', 'serial_number', 'ean', 'description', 'value',
         'purchased_at', 'condition', 'status', 'category_id',
         'storage_location_id', 'created_by', 'qr_path',
+        // Moduł Serwis.
+        'warranty_until', 'inspection_interval_months', 'next_inspection_at',
         // 'needs_completion' celowo pominięte — ustawia je tylko
         // ScanController::quickAddStore() (przez forceFill), nigdy zwykły
         // formularz, tak samo jak 'protected' na User.
@@ -24,6 +27,9 @@ class Item extends Model
 
     protected $casts = [
         'purchased_at' => 'date',
+        'warranty_until' => 'date',
+        'next_inspection_at' => 'date',
+        'inspection_interval_months' => 'integer',
         'value' => 'decimal:2',
         'needs_completion' => 'boolean',
     ];
@@ -123,6 +129,11 @@ class Item extends Model
     /** Statusy oznaczające, że przedmiotu fizycznie nie ma już w magazynie. */
     public const OUT_OF_STOCK_STATUSES = ['sprzedany', 'wycofany'];
 
+    /** Moduł Serwis: z jakim wyprzedzeniem ostrzegać o końcu gwarancji i terminie przeglądu. */
+    public const WARRANTY_WARNING_DAYS = 30;
+
+    public const INSPECTION_WARNING_DAYS = 14;
+
     /**
      * Przedmioty faktycznie w magazynie — bez sprzedanych i wycofanych.
      * Taki przedmiot zostaje w bazie (historia, oferta sprzedaży), ale znika
@@ -142,5 +153,46 @@ class Item extends Model
     public function conditionLabel(): string
     {
         return __(self::CONDITIONS[$this->condition] ?? $this->condition);
+    }
+
+    public function repairs(): HasMany
+    {
+        return $this->hasMany(Repair::class)->latest('sent_at')->latest('id');
+    }
+
+    public function openRepair(): HasOne
+    {
+        return $this->hasOne(Repair::class)->whereNull('returned_at')->latestOfMany();
+    }
+
+    public function inspections(): HasMany
+    {
+        return $this->hasMany(Inspection::class)->latest('performed_at')->latest('id');
+    }
+
+    /** 'expired', 'soon' (w ciągu WARRANTY_WARNING_DAYS) albo null. */
+    public function warrantyState(): ?string
+    {
+        if (! $this->warranty_until) {
+            return null;
+        }
+        if ($this->warranty_until->lt(today())) {
+            return 'expired';
+        }
+
+        return $this->warranty_until->lte(today()->addDays(self::WARRANTY_WARNING_DAYS)) ? 'soon' : null;
+    }
+
+    /** 'overdue', 'soon' (w ciągu INSPECTION_WARNING_DAYS) albo null. */
+    public function inspectionState(): ?string
+    {
+        if (! $this->next_inspection_at) {
+            return null;
+        }
+        if ($this->next_inspection_at->lt(today())) {
+            return 'overdue';
+        }
+
+        return $this->next_inspection_at->lte(today()->addDays(self::INSPECTION_WARNING_DAYS)) ? 'soon' : null;
     }
 }

@@ -20,6 +20,11 @@ class LoanController extends Controller
      */
     public function store(Request $request, Item $item)
     {
+        // Przedmiotu w naprawie (moduł Serwis) nie da się wypożyczyć.
+        if ($item->openRepair()->exists()) {
+            return back()->withErrors(['loan' => __('This item is under repair. Complete the repair first.')]);
+        }
+
         $data = $request->validate([
             'due_at' => ['nullable', 'date', 'after_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:5000'],

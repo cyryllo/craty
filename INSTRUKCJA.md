@@ -140,6 +140,20 @@ Usunięcie kontaktu nie kasuje jego wypożyczeń: zostają w historii pod tą sa
 
 Moduł można wyłączyć w Ustawienia → Moduły: znika wtedy zakładka Kontakty, a „komu” przy wypożyczeniu znów wpisuje się zwykłym tekstem. Protokoły PDF działają w obu przypadkach.
 
+## Serwis (moduł opcjonalny, domyślnie wyłączony)
+
+Włączasz go w Ustawienia → Moduły. Dochodzi wtedy zakładka **Serwis** w menu, ramka „Serwis” na karcie przedmiotu i nowe pola w formularzu przedmiotu.
+
+**Naprawy.** Na karcie przedmiotu: „Wyślij do naprawy”. Wybierasz serwis z Kontaktów (serwisy są na górze listy), wpisujesz inny albo zostawiasz puste, jeśli naprawiasz we własnym warsztacie. Do tego opis usterki, data wysłania i opcjonalnie planowany powrót. Przedmiot dostaje status „W naprawie” i w tym czasie nie da się go wypożyczyć (a wypożyczonego nie da się wysłać do naprawy, najpierw trzeba zarejestrować zwrot). Gdy sprzęt wróci: „Zakończ naprawę”, z datą powrotu, kosztem, opisem tego, co zrobiono, i stanem po naprawie. Przedmiot wraca do statusu sprzed naprawy.
+
+**Przeglądy okresowe.** W formularzu przedmiotu ustawiasz „Przegląd co (miesięcy)” i datę następnego przeglądu, np. dla gaśnic albo elektronarzędzi. Wykonany przegląd zapisujesz na karcie przedmiotu („Zapisz przegląd”: data, wynik pozytywny albo negatywny, uwagi), a następny termin liczy się sam z podanego okresu.
+
+**Gwarancje.** W formularzu przedmiotu pole „Gwarancja do”. Na karcie przedmiotu widać, czy gwarancja się kończy albo już wygasła.
+
+**Co wymaga uwagi.** Strona Serwis (i skrót na Panelu) zbiera w jednym miejscu: przedmioty w naprawie (z zaznaczeniem, gdy minął planowany powrót), przeglądy po terminie i te w ciągu najbliższych 14 dni oraz gwarancje kończące się w ciągu 30 dni (i te, które skończyły się w ostatnich 30 dniach). Sprzedane i wycofane przedmioty są pomijane.
+
+Historia napraw i przeglądów jest na karcie przedmiotu, a na karcie kontaktu typu serwis widać wszystkie zlecone mu naprawy. Wyłączenie modułu chowa to wszystko, ale niczego nie kasuje: po ponownym włączeniu dane są na miejscu.
+
 ## Sprzedaż (moduł opcjonalny)
 
 Można wyłączyć w Ustawienia → Moduły, jeśli nie sprzedajecie sprzętu.
@@ -237,7 +251,7 @@ miejscu:
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego
   resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń.
 - **Moduły** *(tylko Administrator)* — włącz/wyłącz opcjonalne części
-  appki (dziś: Sprzedaż i Kontakty).
+  appki (dziś: Sprzedaż, Kontakty i Serwis).
 - **Aktualizacje** *(tylko Administrator)* — samodzielna aktualizacja
   appki przez wgranie paczki `.zip`, bez SSH/Composera. Zawsze rób kopię
   plików i bazy danych przed wgraniem nowej wersji. W wersji z obrazu

@@ -108,4 +108,20 @@ class AppSettingsTest extends TestCase
         $this->assertNull($setting->name);
         $this->assertSame(config('app.name'), $setting->effectiveName());
     }
+
+    /**
+     * Nawigacja daje logo klasę fill-current, która nadpisuje fill="none" na
+     * samym <svg>: każdy kształt domyślnego logo musi mieć własne fill="none",
+     * inaczej ramka skrzynki rysuje się jako pełny kwadrat (błąd z produkcji).
+     */
+    public function test_default_logo_shapes_are_never_filled(): void
+    {
+        $svg = (string) $this->blade('<x-application-logo class="fill-current" />');
+
+        preg_match_all('/<(rect|path)\b[^>]*>/', $svg, $shapes);
+        $this->assertNotEmpty($shapes[0]);
+        foreach ($shapes[0] as $shape) {
+            $this->assertStringContainsString('fill="none"', $shape);
+        }
+    }
 }

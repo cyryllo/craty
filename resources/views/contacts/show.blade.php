@@ -72,5 +72,42 @@
                 </tbody>
             </table>
         </div>
+
+        @if ($repairs->isNotEmpty())
+            <div class="lg:col-start-2 lg:col-span-2 bg-white rounded-lg shadow overflow-x-auto dark:bg-gray-800">
+                <h3 class="px-5 pt-5 pb-3 text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Repairs') }}</h3>
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase dark:bg-gray-900 dark:text-gray-400">
+                        <tr>
+                            <th class="text-left px-4 py-2">{{ __('Item') }}</th>
+                            <th class="text-left px-4 py-2">{{ __('Sent on') }}</th>
+                            <th class="text-left px-4 py-2">{{ __('Returned') }}</th>
+                            <th class="text-left px-4 py-2">{{ __('Cost') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                        @foreach ($repairs as $repair)
+                            <tr>
+                                <td class="px-4 py-2">
+                                    @if ($repair->item)
+                                        <a href="{{ route('items.show', $repair->item) }}" class="text-gray-900 hover:underline dark:text-gray-100">{{ $repair->item->name }}</a>
+                                    @endif
+                                    <span class="block text-xs text-gray-500 dark:text-gray-400">{{ \Illuminate\Support\Str::limit($repair->fault_description, 80) }}</span>
+                                </td>
+                                <td class="px-4 py-2 text-gray-500 whitespace-nowrap dark:text-gray-400">{{ $repair->sent_at->format('d.m.Y') }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap">
+                                    @if ($repair->returned_at)
+                                        <span class="text-gray-500 dark:text-gray-400">{{ $repair->returned_at->format('d.m.Y') }}</span>
+                                    @else
+                                        <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">{{ __('in progress') }}</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2 text-gray-500 whitespace-nowrap dark:text-gray-400">{{ $repair->cost ? number_format((float) $repair->cost, 2, ',', ' ').' zł' : '' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
     </div>
 </x-app-layout>

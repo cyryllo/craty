@@ -98,7 +98,17 @@ class ItemController extends Controller
         $pastLoans = $item->loans()->whereNotNull('returned_at')->with(['contact', 'borrower'])->latest('returned_at')->limit(5)->get();
         $contacts = Modules::isEnabled('contacts') ? Contact::orderBy('name')->get(['id', 'name']) : collect();
 
-        return view('items.show', compact('item', 'pastLoans', 'contacts'));
+        // Moduł Serwis: naprawa w toku, ostatnie naprawy i przeglądy, serwisy z Kontaktów.
+        $service = Modules::isEnabled('service') ? [
+            'openRepair' => $item->openRepair()->with('contact')->first(),
+            'repairs' => $item->repairs()->whereNotNull('returned_at')->with('contact')->limit(5)->get(),
+            'inspections' => $item->inspections()->with('user')->limit(5)->get(),
+            'serviceContacts' => Modules::isEnabled('contacts')
+                ? Contact::orderByRaw("type = 'serwis' desc")->orderBy('name')->get(['id', 'name', 'type'])
+                : collect(),
+        ] : null;
+
+        return view('items.show', compact('item', 'pastLoans', 'contacts', 'service'));
     }
 
     public function edit(Item $item)

@@ -34,6 +34,10 @@ class Modules
             'label' => 'Contacts',
             'description' => 'People, companies and repair services you lend equipment to, with their loan history. When off, "loaned to" is plain text.',
         ],
+        'service' => [
+            'label' => 'Service',
+            'description' => 'Repairs (sending items to a repair service or your own workshop), periodic inspections and warranty dates, with reminders on the dashboard.',
+        ],
     ];
 
     public static function isEnabled(string $key): bool

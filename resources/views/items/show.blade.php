@@ -92,6 +92,9 @@
                                 @if ($history->action === 'created') {{ __('item created') }}
                                 @elseif ($history->action === 'loaned') {{ __('loaned to') }} <b>{{ $history->new_value }}</b>@if ($history->old_value) ({{ __('due') }} {{ $history->old_value }})@endif
                                 @elseif ($history->action === 'returned') {{ __('returned by') }} <b>{{ $history->old_value }}</b>
+                                @elseif ($history->action === 'repair_sent') {{ __('sent for repair to') }} <b>{{ $history->new_value }}</b>
+                                @elseif ($history->action === 'repair_returned') {{ __('returned from repair at') }} <b>{{ $history->old_value }}</b>
+                                @elseif ($history->action === 'inspected') {{ __('inspection') }}: <b>{{ $history->new_value }}</b>
                                 @elseif ($history->field) {{ __('changed') }} <b>{{ $history->field }}</b>: {{ $history->old_value ?: '—' }} → {{ $history->new_value ?: '—' }}
                                 @else {{ $history->action }}
                                 @endif
@@ -126,6 +129,7 @@
                 @php($field = 'w-full rounded-md border-gray-300 text-sm dark:border-gray-600')
                 <div class="bg-white rounded-lg shadow p-5 space-y-3 dark:bg-gray-800">
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Loan') }}</h3>
+                    <x-input-error :messages="$errors->get('loan')" />
                     @if ($loan = $item->currentLoan)
                         <p class="text-sm text-gray-800 dark:text-gray-200">{{ __('Loaned to') }}:
                             @if ($contactsEnabled && $loan->contact)
@@ -201,6 +205,149 @@
                         </div>
                     @endif
                 </div>
+
+                @if ($service)
+                    @php($badge = 'text-xs font-medium px-2 py-0.5 rounded-full')
+                    @php($summary = 'cursor-pointer text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400')
+                    <div class="bg-white rounded-lg shadow p-5 space-y-3 dark:bg-gray-800">
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Service') }}</h3>
+                        <x-input-error :messages="$errors->get('repair')" />
+
+                        {{-- Naprawa --}}
+                        @if ($repair = $service['openRepair'])
+                            <div class="text-sm space-y-1">
+                                <p class="text-gray-800 dark:text-gray-200">{{ __('Under repair at') }} <b>{{ $repair->serviceLabel() }}</b></p>
+                                <p class="text-gray-500 dark:text-gray-400">
+                                    {{ __('since') }} {{ $repair->sent_at->format('d.m.Y') }}
+                                    @if ($repair->expected_at)
+                                        · <span @class(['text-red-600 dark:text-red-400' => $repair->isOverdue()])>{{ __('expected') }} {{ $repair->expected_at->format('d.m.Y') }}</span>
+                                    @endif
+                                </p>
+                                <p class="text-gray-600 whitespace-pre-line dark:text-gray-400">{{ $repair->fault_description }}</p>
+                            </div>
+                            <details @if ($errors->hasAny(['returned_at', 'cost', 'work_done'])) open @endif>
+                                <summary class="{{ $summary }}">{{ __('Complete repair') }}</summary>
+                                <form method="POST" action="{{ route('repairs.complete', $repair) }}" class="space-y-2 mt-2">
+                                    @csrf
+                                    <label for="returned_at" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Returned on') }}</label>
+                                    <input type="date" id="returned_at" name="returned_at" value="{{ old('returned_at', today()->format('Y-m-d')) }}" required class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                                    <x-input-error :messages="$errors->get('returned_at')" />
+                                    <input type="number" name="cost" step="0.01" min="0" placeholder="{{ __('Cost (zł, optional)') }}" aria-label="{{ __('Cost') }}" value="{{ old('cost') }}" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                                    <x-input-error :messages="$errors->get('cost')" />
+                                    <textarea name="work_done" rows="2" placeholder="{{ __('What was done (optional)') }}" aria-label="{{ __('What was done') }}" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">{{ old('work_done') }}</textarea>
+                                    <label for="repair_condition" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Condition after repair') }}</label>
+                                    <select id="repair_condition" name="condition" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                                        @foreach (\App\Models\Item::CONDITIONS as $value => $label)
+                                            <option value="{{ $value }}" @selected(old('condition', $item->condition) === $value)>{{ __($label) }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button class="w-full px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('Complete repair') }}</button>
+                                </form>
+                            </details>
+                        @elseif (! $item->currentLoan)
+                            <details @if ($errors->hasAny(['fault_description', 'sent_at', 'expected_at', 'service_name'])) open @endif>
+                                <summary class="{{ $summary }}">{{ __('Send for repair') }}</summary>
+                                <form method="POST" action="{{ route('items.repairs.store', $item) }}" class="space-y-2 mt-2"
+                                      x-data="{ contact: '{{ old('contact_id', '') }}' }">
+                                    @csrf
+                                    @if ($service['serviceContacts']->isNotEmpty())
+                                        <select name="contact_id" x-model="contact" aria-label="{{ __('Repair service') }}" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                                            <option value="">{{ __('Other / own workshop') }}</option>
+                                            @foreach ($service['serviceContacts'] as $option)
+                                                <option value="{{ $option->id }}">{{ $option->name }}@if ($option->type !== 'serwis') ({{ $option->typeLabel() }})@endif</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
+                                    <input type="text" name="service_name" x-show="contact === ''" placeholder="{{ __('Repair service (empty = own workshop)') }}" aria-label="{{ __('Repair service') }}" value="{{ old('service_name') }}" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                                    <textarea name="fault_description" rows="2" required placeholder="{{ __('Fault description') }} *" aria-label="{{ __('Fault description') }}" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">{{ old('fault_description') }}</textarea>
+                                    <x-input-error :messages="$errors->get('fault_description')" />
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label for="sent_at" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Sent on') }}</label>
+                                            <input type="date" id="sent_at" name="sent_at" value="{{ old('sent_at', today()->format('Y-m-d')) }}" required class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                                        </div>
+                                        <div>
+                                            <label for="expected_at" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Expected back') }}</label>
+                                            <input type="date" id="expected_at" name="expected_at" value="{{ old('expected_at') }}" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                                        </div>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('expected_at')" />
+                                    <button class="w-full px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700">{{ __('Send for repair') }}</button>
+                                </form>
+                            </details>
+                        @endif
+
+                        {{-- Gwarancja --}}
+                        <div class="pt-3 border-t border-gray-100 text-sm dark:border-gray-700">
+                            <span class="text-gray-500 dark:text-gray-400">{{ __('Warranty') }}:</span>
+                            @if ($item->warranty_until)
+                                <span class="text-gray-800 dark:text-gray-200">{{ __('until') }} {{ $item->warranty_until->format('d.m.Y') }}</span>
+                                @if ($item->warrantyState() === 'expired')
+                                    <span class="{{ $badge }} bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">{{ __('expired') }}</span>
+                                @elseif ($item->warrantyState() === 'soon')
+                                    <span class="{{ $badge }} bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">{{ __('ends soon') }}</span>
+                                @endif
+                            @else
+                                <span class="text-gray-400 dark:text-gray-500">{{ __('not set (edit the item)') }}</span>
+                            @endif
+                        </div>
+
+                        {{-- Przeglądy --}}
+                        <div class="text-sm space-y-2">
+                            <p>
+                                <span class="text-gray-500 dark:text-gray-400">{{ __('Next inspection') }}:</span>
+                                @if ($item->next_inspection_at)
+                                    <span class="text-gray-800 dark:text-gray-200">{{ $item->next_inspection_at->format('d.m.Y') }}</span>
+                                    @if ($item->inspectionState() === 'overdue')
+                                        <span class="{{ $badge }} bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">{{ __('overdue') }}</span>
+                                    @elseif ($item->inspectionState() === 'soon')
+                                        <span class="{{ $badge }} bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">{{ __('soon') }}</span>
+                                    @endif
+                                @else
+                                    <span class="text-gray-400 dark:text-gray-500">{{ __('not scheduled') }}</span>
+                                @endif
+                                @if ($item->inspection_interval_months)
+                                    <span class="block text-xs text-gray-400 dark:text-gray-500">{{ __('every :count months', ['count' => $item->inspection_interval_months]) }}</span>
+                                @endif
+                            </p>
+                            <details @if ($errors->hasAny(['performed_at', 'passed'])) open @endif>
+                                <summary class="{{ $summary }}">{{ __('Record an inspection') }}</summary>
+                                <form method="POST" action="{{ route('items.inspections.store', $item) }}" class="space-y-2 mt-2">
+                                    @csrf
+                                    <label for="performed_at" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Performed on') }}</label>
+                                    <input type="date" id="performed_at" name="performed_at" value="{{ old('performed_at', today()->format('Y-m-d')) }}" max="{{ today()->format('Y-m-d') }}" required class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                                    <x-input-error :messages="$errors->get('performed_at')" />
+                                    <select name="passed" aria-label="{{ __('Result') }}" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                                        <option value="1" @selected(old('passed', '1') === '1')>{{ __('Passed') }}</option>
+                                        <option value="0" @selected(old('passed') === '0')>{{ __('Failed') }}</option>
+                                    </select>
+                                    <textarea name="inspection_notes" rows="2" placeholder="{{ __('Notes (optional)') }}" aria-label="{{ __('Notes') }}" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">{{ old('inspection_notes') }}</textarea>
+                                    <button class="w-full px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700">{{ __('Save inspection') }}</button>
+                                </form>
+                            </details>
+                        </div>
+
+                        {{-- Historia --}}
+                        @if ($service['repairs']->isNotEmpty() || $service['inspections']->isNotEmpty())
+                            <div class="pt-3 border-t border-gray-100 dark:border-gray-700 space-y-1.5 text-sm">
+                                <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide dark:text-gray-400">{{ __('Service history') }}</h4>
+                                @foreach ($service['repairs'] as $past)
+                                    <p class="text-gray-700 dark:text-gray-300">
+                                        🔧 {{ $past->returned_at->format('d.m.Y') }} · {{ $past->serviceLabel() }}@if ($past->cost) · {{ number_format((float) $past->cost, 2, ',', ' ') }} zł @endif
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400">{{ \Illuminate\Support\Str::limit($past->work_done ?: $past->fault_description, 80) }}</span>
+                                    </p>
+                                @endforeach
+                                @foreach ($service['inspections'] as $inspection)
+                                    <p class="text-gray-700 dark:text-gray-300">
+                                        ✔ {{ $inspection->performed_at->format('d.m.Y') }} · {{ __('inspection') }}:
+                                        <span @class(['text-red-600 dark:text-red-400' => ! $inspection->passed])>{{ $inspection->passed ? __('passed') : __('failed') }}</span>
+                                        @if ($inspection->notes)<span class="block text-xs text-gray-500 dark:text-gray-400">{{ \Illuminate\Support\Str::limit($inspection->notes, 80) }}</span>@endif
+                                    </p>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
 
                 @if (\App\Support\Modules::isEnabled('sales'))
                 <div class="bg-white rounded-lg shadow p-5 space-y-3 dark:bg-gray-800">

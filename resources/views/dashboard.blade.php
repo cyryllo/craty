@@ -43,6 +43,16 @@
             </div>
         @endif
 
+        @if ($service && ($service['openRepairs']->isNotEmpty() || $service['inspectionsDue']->isNotEmpty() || $service['warrantiesEnding']->isNotEmpty()))
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Service: needs attention') }}</h3>
+                    <a href="{{ route('service.index') }}" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Service') }} →</a>
+                </div>
+                @include('service._lists', ['limit' => 5, ...$service])
+            </div>
+        @endif
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-white rounded-lg shadow dark:bg-gray-800">
                 <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Item;
+use App\Support\Modules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,6 +32,14 @@ class StoreItemRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Moduł Serwis: pola tylko przy włączonym module. Bez nich w regułach
+            // validated() ich nie zwraca, więc zapis formularza przy wyłączonym
+            // module nie kasuje wcześniej wpisanych dat.
+            ...(Modules::isEnabled('service') ? [
+                'warranty_until' => ['nullable', 'date'],
+                'inspection_interval_months' => ['nullable', 'integer', 'min:1', 'max:120'],
+                'next_inspection_at' => ['nullable', 'date'],
+            ] : []),
             'name' => ['required', 'string', 'max:255'],
             'serial_number' => ['nullable', 'string', 'max:255'],
             'ean' => ['nullable', 'string', 'max:32', 'regex:/^[0-9]{6,14}$/'],

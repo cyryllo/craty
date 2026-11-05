@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contact;
+use App\Models\Repair;
+use App\Support\Modules;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -47,8 +49,12 @@ class ContactController extends Controller
     public function show(Contact $contact)
     {
         $loans = $contact->loans()->with('item')->latest('borrowed_at')->get();
+        // Moduł Serwis: naprawy zlecone temu kontaktowi (zwykle typ "serwis").
+        $repairs = Modules::isEnabled('service')
+            ? Repair::where('contact_id', $contact->id)->with('item')->latest('sent_at')->get()
+            : collect();
 
-        return view('contacts.show', compact('contact', 'loans'));
+        return view('contacts.show', compact('contact', 'loans', 'repairs'));
     }
 
     public function edit(Contact $contact)

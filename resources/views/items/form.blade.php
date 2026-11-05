@@ -82,6 +82,28 @@
                     </select>
                 </div>
 
+                @if (\App\Support\Modules::isEnabled('service'))
+                    {{-- Moduł Serwis: gwarancja i przeglądy okresowe. --}}
+                    <div class="sm:col-span-2 grid sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <div>
+                            <x-input-label for="warranty_until" :value="__('Warranty until')" />
+                            <x-text-input id="warranty_until" name="warranty_until" type="date" class="mt-1 block w-full" value="{{ old('warranty_until', optional($item->warranty_until)->format('Y-m-d')) }}" />
+                            <x-input-error :messages="$errors->get('warranty_until')" class="mt-1" />
+                        </div>
+                        <div>
+                            <x-input-label for="inspection_interval_months" :value="__('Inspection every (months)')" />
+                            <x-text-input id="inspection_interval_months" name="inspection_interval_months" type="number" min="1" max="120" class="mt-1 block w-full" value="{{ old('inspection_interval_months', $item->inspection_interval_months) }}" />
+                            <x-input-error :messages="$errors->get('inspection_interval_months')" class="mt-1" />
+                        </div>
+                        <div>
+                            <x-input-label for="next_inspection_at" :value="__('Next inspection')" />
+                            <x-text-input id="next_inspection_at" name="next_inspection_at" type="date" class="mt-1 block w-full" value="{{ old('next_inspection_at', optional($item->next_inspection_at)->format('Y-m-d')) }}" />
+                            <x-input-error :messages="$errors->get('next_inspection_at')" class="mt-1" />
+                        </div>
+                        <p class="sm:col-span-3 -mt-2 text-xs text-gray-500 dark:text-gray-400">{{ __('After an inspection is recorded, the next date is calculated from the interval automatically.') }}</p>
+                    </div>
+                @endif
+
                 <div class="sm:col-span-2">
                     <x-input-label for="description" :value="__('Description')" />
                     <textarea id="description" name="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600" placeholder="{{ __('model, parameters, condition, anything worth noting...') }}">{{ old('description', $item->description) }}</textarea>

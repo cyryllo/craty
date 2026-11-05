@@ -5,7 +5,7 @@
 A simple inventory/asset management app for a workshop: categories,
 locations (warehouse → rack → shelf → bin), auto-generated inventory
 numbers with QR codes, item records (photos, specs, value, condition),
-loans with a contacts list and PDF issue/return protocols, change history, and (for now) a simplified CSV export of sale
+loans with a contacts list and PDF issue/return protocols, service (repairs, periodic inspections, warranties), change history, and (for now) a simplified CSV export of sale
 listings. Also includes
 a public "flea market" page for listed items, a web-based installer, and a
 self-update module via the admin panel.
@@ -204,9 +204,6 @@ Craty keeps growing, mainly through **optional modules** you can switch on
 in the settings when you need them and off when you don't. Planned, among
 others:
 
-- **Service**: repairs, periodic inspections and warranties, i.e. a fuller
-  "what happened to this piece of equipment" history, with sending items to
-  repair shops saved in Contacts.
 - **Consumables**: things counted in pieces, metres or litres, with a
   warning when you're running low.
 
