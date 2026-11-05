@@ -143,7 +143,9 @@
                         @endif
                         <a href="{{ route('loans.protocol.issue', $loan) }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-indigo-600 hover:underline dark:text-indigo-400">📄 {{ __('Issue protocol (PDF)') }}</a>
 
-                        <form method="POST" action="{{ route('loans.return', $loan) }}" class="space-y-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                        <details class="pt-3 border-t border-gray-100 dark:border-gray-700" @if ($errors->hasAny(['condition_in', 'return_notes'])) open @endif>
+                        <summary class="cursor-pointer text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Register return') }}</summary>
+                        <form method="POST" action="{{ route('loans.return', $loan) }}" class="space-y-2 mt-2">
                             @csrf
                             <label for="condition_in" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Condition when returned') }}</label>
                             <select id="condition_in" name="condition_in" class="{{ $field }}">
@@ -155,8 +157,15 @@
                             <x-input-error :messages="$errors->get('return_notes')" />
                             <button class="w-full px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('Register return') }}</button>
                         </form>
+                        </details>
+                    @elseif ($service && $service['openRepair'])
+                        {{-- Moduł Serwis: przedmiotu w naprawie nie da się wypożyczyć. --}}
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('This item is under repair. Complete the repair first.') }}</p>
                     @else
-                        <form method="POST" action="{{ route('items.loans.store', $item) }}" class="space-y-2"
+                        {{-- Zwinięte domyślnie (prośba właściciela), rozwija się samo po błędzie walidacji. --}}
+                        <details @if ($errors->hasAny(['contact_id', 'new_contact_name', 'new_contact_email', 'borrower_name', 'due_at', 'notes'])) open @endif>
+                        <summary class="cursor-pointer text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Loan out') }}</summary>
+                        <form method="POST" action="{{ route('items.loans.store', $item) }}" class="space-y-2 mt-2"
                               x-data="{ contact: '{{ old('contact_id', $contacts->isEmpty() ? 'new' : '') }}' }">
                             @csrf
                             @if ($contactsEnabled)
@@ -185,6 +194,7 @@
                             <textarea name="notes" rows="2" placeholder="{{ __('Notes, printed on the protocol (optional)') }}" aria-label="{{ __('Notes') }}" class="{{ $field }}">{{ old('notes') }}</textarea>
                             <button class="w-full px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700">{{ __('Loan out') }}</button>
                         </form>
+                        </details>
                     @endif
 
                     @if ($pastLoans->isNotEmpty())
