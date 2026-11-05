@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AppSetting;
 use App\Models\Item;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,6 +11,16 @@ use Tests\TestCase;
 class LoanTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * Te testy sprawdzają wypożyczenie z "komu" wpisanym zwykłym tekstem,
+     * czyli tryb bez modułu Kontakty. Wypożyczenia z kontaktami: ContactsTest.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        AppSetting::current()->fill(['module_contacts_enabled' => false])->save();
+    }
 
     private function item(): Item
     {

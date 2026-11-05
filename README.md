@@ -5,7 +5,7 @@
 Prosta aplikacja do ewidencji sprzętu i magazynu w warsztacie/pracowni:
 kategorie, lokalizacje (magazyn → regał → półka → pojemnik), automatyczne
 numery ewidencyjne z kodami QR, kartoteka przedmiotu (zdjęcia, specyfikacja,
-wartość, stan), wypożyczenia, historia zmian i na razie uproszczony eksport
+wartość, stan), wypożyczenia z bazą kontaktów i protokołami wydania/zwrotu w PDF, historia zmian i na razie uproszczony eksport
 ofert sprzedaży do CSV. Do tego publiczna strona „pchli targ” dla wystawionych ofert,
 webowy instalator i moduł samo-aktualizacji przez panel administratora.
 
@@ -200,12 +200,9 @@ Craty rozwija się dalej, głównie przez **moduły rozszerzające**, które
 będzie można włączyć w ustawieniach, gdy są potrzebne, i wyłączyć, gdy
 nie są. W planie są między innymi:
 
-- **Kontakty**: osoby i firmy, którym wypożyczasz rzeczy, oraz serwisy,
-  do których wysyłasz sprzęt do naprawy, z historią wypożyczeń przy
-  każdym kontakcie.
 - **Serwis**: naprawy, przeglądy okresowe i gwarancje, czyli pełniejsza
-  historia „co się działo z tym sprzętem”.
-- **Protokoły wypożyczenia i zwrotu** jako gotowe do druku dokumenty PDF.
+  historia „co się działo z tym sprzętem”, z wysyłką do serwisów zapisanych
+  w Kontaktach.
 - **Materiały eksploatacyjne**: rzeczy liczone w sztukach, metrach czy
   litrach, z ostrzeżeniem, gdy zaczyna ich brakować.
 

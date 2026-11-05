@@ -30,6 +30,10 @@ class Modules
             'label' => 'Sale',
             'description' => 'Sale listings, the "Sale" section, and the public flea market page.',
         ],
+        'contacts' => [
+            'label' => 'Contacts',
+            'description' => 'People, companies and repair services you lend equipment to, with their loan history. When off, "loaned to" is plain text.',
+        ],
     ];
 
     public static function isEnabled(string $key): bool

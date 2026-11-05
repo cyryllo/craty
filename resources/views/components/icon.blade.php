@@ -89,6 +89,16 @@
         </svg>
         @break
 
+    @case('contacts')
+        {{-- książka adresowa z sylwetką: Kontakty --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>
+            <rect x="4" y="2.5" width="12.5" height="15" rx="1.5"/>
+            <path d="M2.5 6h3M2.5 10h3M2.5 14h3" stroke-linecap="round"/>
+            <circle cx="10.3" cy="8.2" r="2"/>
+            <path d="M7 14.2c.5-1.8 1.8-2.7 3.3-2.7s2.8.9 3.3 2.7" stroke-linecap="round"/>
+        </svg>
+        @break
+
     @case('branding')
         {{-- ramka ze zdjęciem: Ustawienia aplikacji --}}
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" {{ $attributes }}>

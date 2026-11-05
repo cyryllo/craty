@@ -6,8 +6,8 @@ use Illuminate\Console\Command;
 
 /**
  * Generuje statyczne ikony PWA (192×192, 512×512, obie też jako "maskable")
- * z tego samego motywu co domyślne logo appki (regał z półkami — patrz
- * x-application-logo). Uruchamiane RAZ w tym repo przy budowie PWA, wynik
+ * i favicon.ico z jednego rysunku (skrzynka, ten sam motyw co domyślne logo
+ * appki, patrz x-application-logo). Uruchamiane RAZ w tym repo przy budowie PWA, wynik
  * commitowany do pwa-icons/ (NIE "icons/" — to zarezerwowana ścieżka:
  * domyślna konfiguracja Apache ma wbudowany alias `/icons/` na własne
  * ikonki do listowania katalogów, `/usr/share/apache2/icons/`, który po
@@ -27,12 +27,23 @@ class GeneratePwaIcons extends Command
 {
     protected $signature = 'pwa:icons';
 
-    protected $description = 'Generuje ikony PWA (pwa-icons/) z domyślnego motywu logo appki.';
+    protected $description = 'Generuje ikony PWA (pwa-icons/) i favicon.ico: skrzynka na ciemnym tle.';
 
-    /** Tło: indigo-600, ten sam odcień co akcenty w reszcie UI. */
-    private const BG = [79, 70, 229];
+    /**
+     * Wygląd od 2026-11-05 (zgłoszenie: dawny cienki biały regał na tle
+     * indigo był w małym rozmiarze nieczytelny i nie pasował do reszty):
+     * gruba, ciepła skrzynka (Craty = skrzynki) na ciemnym tle w kolorze
+     * przycisków appki (gray-900). Kształt jest prosty celowo, żeby był
+     * czytelny także jako favicon 16 px.
+     */
+    private const BG = [17, 24, 39];        // gray-900
 
-    private const FG = [255, 255, 255];
+    private const FRAME = [251, 191, 36];   // amber-400: rama i ukośna belka
+
+    private const BOARDS = [217, 119, 6];   // amber-600: deski
+
+    /** Rysujemy w 4× większej skali i zmniejszamy: GD nie wygładza wypełnionych kształtów. */
+    private const SUPERSAMPLE = 4;
 
     public function handle(): int
     {
@@ -42,53 +53,92 @@ class GeneratePwaIcons extends Command
         }
 
         foreach ([192, 512] as $size) {
-            $this->render($size, $dir."/icon-{$size}.png");
+            imagepng($this->render($size), $dir."/icon-{$size}.png");
         }
 
-        $this->info('Gotowe: '.$dir);
+        $this->writeIco(public_path('favicon.ico'), [16, 32, 48]);
+
+        $this->info('Gotowe: '.$dir.' oraz favicon.ico');
 
         return self::SUCCESS;
     }
 
-    private function render(int $size, string $path): void
+    /** Rysunek w układzie 512×512, przeskalowany do $size. */
+    private function render(int $size): \GdImage
     {
-        $img = imagecreatetruecolor($size, $size);
-        imagesavealpha($img, true);
+        $big = $size * self::SUPERSAMPLE;
+        $k = $big / 512;
+        $img = imagecreatetruecolor($big, $big);
 
         $bg = imagecolorallocate($img, ...self::BG);
-        imagefill($img, 0, 0, $bg);
+        $frame = imagecolorallocate($img, ...self::FRAME);
+        $boards = imagecolorallocate($img, ...self::BOARDS);
 
-        // Glyph rysowany w układzie viewBox 0..32 (jak w application-logo.blade.php),
-        // przeskalowany tak, żeby zmieścić się w bezpiecznej strefie ok. 62%
-        // środka kanwy — margines na wypadek maskowania przez system (Android
-        // przycina maskable ikony do własnego kształtu, poza centralnym kołem).
-        $boxSize = $size * 0.62;
-        $scale = $boxSize / 24; // 24 = szerokość/wysokość ramki w viewBox (4..28)
-        $offset = ($size - $boxSize) / 2;
-        $map = fn (float $v) => $offset + ($v - 4) * $scale;
+        // Tło na całą powierzchnię: ikona "maskable" (Android sam przycina kształt).
+        imagefilledrectangle($img, 0, 0, $big, $big, $bg);
 
-        $fg = imagecolorallocate($img, ...self::FG);
-        imageantialias($img, true);
-        imagesetthickness($img, max(1, (int) round(2 * $scale)));
+        // Skrzynka mieści się w bezpiecznym kole ikon maskable (promień 40%).
+        [$x1, $y1, $x2, $y2] = [116, 116, 396, 396];
+        $t = 40; // grubość ramy i belki
 
-        // Ramka regału.
-        imagerectangle($img, (int) $map(4), (int) $map(4), (int) $map(28), (int) $map(28), $fg);
-        // Dwie półki.
-        imageline($img, (int) $map(4), (int) $map(12), (int) $map(28), (int) $map(12), $fg);
-        imageline($img, (int) $map(4), (int) $map(20), (int) $map(28), (int) $map(20), $fg);
+        $this->roundedRect($img, $x1 * $k, $y1 * $k, $x2 * $k, $y2 * $k, 26 * $k, $frame);
 
-        // Przedmioty na półkach (te same prostokąty co w SVG).
-        foreach ([
-            [7, 6.5, 12, 11.5],
-            [16.5, 7.5, 20.5, 11.5],
-            [7, 14.5, 21, 19.5],
-            [7, 22.5, 11, 26.5],
-            [14, 21.5, 21, 27],
-        ] as [$x1, $y1, $x2, $y2]) {
-            imagefilledrectangle($img, (int) $map($x1), (int) $map($y1), (int) $map($x2), (int) $map($y2), $fg);
+        [$ix1, $iy1, $ix2, $iy2] = [$x1 + $t, $y1 + $t, $x2 - $t, $y2 - $t];
+        imagefilledrectangle($img, (int) ($ix1 * $k), (int) ($iy1 * $k), (int) ($ix2 * $k), (int) ($iy2 * $k), $boards);
+
+        // Szczeliny między deskami.
+        foreach ([$iy1 + ($iy2 - $iy1) / 3, $iy1 + 2 * ($iy2 - $iy1) / 3] as $gapY) {
+            imagefilledrectangle($img, (int) ($ix1 * $k), (int) (($gapY - 5) * $k), (int) ($ix2 * $k), (int) (($gapY + 5) * $k), $bg);
         }
 
-        imagepng($img, $path);
+        // Ukośna belka z lewego dolnego do prawego górnego rogu wnętrza.
+        $h = $t / 2 / M_SQRT2;
+        imagefilledpolygon($img, array_map(fn ($v) => (int) round($v * $k), [
+            $ix1 - $h, $iy2 - $h,
+            $ix2 - $h, $iy1 - $h,
+            $ix2 + $h, $iy1 + $h,
+            $ix1 + $h, $iy2 + $h,
+        ]), $frame);
+
+        $out = imagecreatetruecolor($size, $size);
+        imagecopyresampled($out, $img, 0, 0, 0, 0, $size, $size, $big, $big);
         imagedestroy($img);
+
+        return $out;
+    }
+
+    private function roundedRect(\GdImage $img, float $x1, float $y1, float $x2, float $y2, float $r, int $color): void
+    {
+        imagefilledrectangle($img, (int) ($x1 + $r), (int) $y1, (int) ($x2 - $r), (int) $y2, $color);
+        imagefilledrectangle($img, (int) $x1, (int) ($y1 + $r), (int) $x2, (int) ($y2 - $r), $color);
+        foreach ([[$x1 + $r, $y1 + $r], [$x2 - $r, $y1 + $r], [$x1 + $r, $y2 - $r], [$x2 - $r, $y2 - $r]] as [$cx, $cy]) {
+            imagefilledellipse($img, (int) $cx, (int) $cy, (int) (2 * $r), (int) (2 * $r), $color);
+        }
+    }
+
+    /**
+     * favicon.ico z osadzonymi PNG-ami (format obsługiwany przez wszystkie
+     * współczesne przeglądarki) — GD nie zapisuje ICO, a nagłówek jest prosty.
+     *
+     * @param  array<int, int>  $sizes
+     */
+    private function writeIco(string $path, array $sizes): void
+    {
+        $images = [];
+        foreach ($sizes as $size) {
+            ob_start();
+            imagepng($this->render($size));
+            $images[$size] = ob_get_clean();
+        }
+
+        $header = pack('vvv', 0, 1, count($images));
+        $offset = 6 + 16 * count($images);
+        $entries = '';
+        foreach ($images as $size => $png) {
+            $entries .= pack('CCCCvvVV', $size % 256, $size % 256, 0, 0, 1, 32, strlen($png), $offset);
+            $offset += strlen($png);
+        }
+
+        file_put_contents($path, $header.$entries.implode('', $images));
     }
 }

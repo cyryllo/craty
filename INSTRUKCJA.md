@@ -116,13 +116,29 @@ wydruku.
 
 ## Wypożyczenia
 
-Z karty przedmiotu — "Wypożycz", z **obowiązkowym** polem komu
-(imię/nazwisko albo osoba spoza systemu) i opcjonalnym terminem zwrotu. W
-historii przedmiotu zapisuje się, komu go wypożyczono (i do kiedy), a przy
-zwrocie — od kogo wrócił. Przeterminowane wypożyczenia widać
-na Panelu; opcjonalnie appka wysyła codzienne e-mailowe podsumowanie
-przeterminowanych wypożyczeń do wszystkich aktywnych kont (Ustawienia →
-Powiadomienia).
+Wypożyczasz z karty przedmiotu, w ramce „Wypożyczenie”:
+
+- **Komu**: wybierasz kontakt z listy albo „+ Nowy kontakt” i wpisujesz nazwę (oraz opcjonalnie telefon i e-mail). Nowy kontakt zapisuje się sam, więc następnym razem jest już na liście. Przy wyłączonym module Kontakty pole „komu” to zwykły tekst, jak wcześniej.
+- **Termin zwrotu** i **uwagi** (np. „z ładowarką i walizką”) są opcjonalne. Uwagi drukują się na protokole wydania.
+- Przedmiot dostaje status „Wypożyczony”, a Craty zapamiętuje jego stan techniczny w chwili wydania i to, kto z obsługi go wydał.
+
+Przy wypożyczonym przedmiocie w tej samej ramce jest link **„Protokół wydania (PDF)”**: dokument do wydrukowania i podpisania przez obie strony, z danymi wypożyczającego (z kontaktu: telefon, e-mail, adres), przedmiotu (numer ewidencyjny, numer seryjny, wartość, stan), datami i uwagami.
+
+**Zwrot**: pod danymi wypożyczenia wybierasz stan przy zwrocie (domyślnie dotychczasowy) i opcjonalnie wpisujesz uwagi, np. uszkodzenia, potem „Zarejestruj zwrot”. Jeśli stan się zmienił, zmienia się też w kartotece przedmiotu (i zapisuje w historii). Na **protokole zwrotu** widać stan przy wydaniu i przy zwrocie obok siebie, z wyraźnym oznaczeniem zmiany.
+
+Ostatnie zakończone wypożyczenia są wymienione pod formularzem, z linkami do obu protokołów. Protokoły generują się na bieżąco z zapisanych danych, nie trzeba ich nigdzie zapisywać.
+
+W historii przedmiotu zapisuje się, komu go wypożyczono (i do kiedy), a przy zwrocie, od kogo wrócił. Przeterminowane wypożyczenia widać na Panelu; opcjonalnie appka wysyła codzienne e-mailowe podsumowanie przeterminowanych wypożyczeń do wszystkich aktywnych kont (Ustawienia → Powiadomienia).
+
+## Kontakty (moduł opcjonalny)
+
+Zakładka **Kontakty** w menu to lista osób, firm i serwisów, którym wypożyczasz sprzęt. Każdy kontakt ma nazwę, typ (osoba, firma, serwis), telefon, e-mail, adres (drukowany na protokołach) i notatkę. Listę można przeszukiwać po nazwie, telefonie i e-mailu oraz filtrować po typie; przy każdym kontakcie widać liczbę wypożyczeń i to, ile rzeczy ma u siebie teraz.
+
+Karta kontaktu pokazuje całą **historię jego wypożyczeń**: co, kiedy, czy wróciło (albo czy jest po terminie), z linkami do protokołów. Kontakty typu „serwis” przydadzą się w planowanym module Serwis (wysyłka sprzętu do naprawy).
+
+Usunięcie kontaktu nie kasuje jego wypożyczeń: zostają w historii pod tą samą nazwą. Po aktualizacji do wersji z Kontaktami dotychczasowe wpisy „komu” z wcześniejszych wypożyczeń zamieniły się w kontakty automatycznie (te same imiona i nazwy połączone w jeden kontakt), więc ich historia jest od razu kompletna.
+
+Moduł można wyłączyć w Ustawienia → Moduły: znika wtedy zakładka Kontakty, a „komu” przy wypożyczeniu znów wpisuje się zwykłym tekstem. Protokoły PDF działają w obu przypadkach.
 
 ## Sprzedaż (moduł opcjonalny)
 
@@ -221,7 +237,7 @@ miejscu:
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego
   resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń.
 - **Moduły** *(tylko Administrator)* — włącz/wyłącz opcjonalne części
-  appki (dziś: Sprzedaż).
+  appki (dziś: Sprzedaż i Kontakty).
 - **Aktualizacje** *(tylko Administrator)* — samodzielna aktualizacja
   appki przez wgranie paczki `.zip`, bez SSH/Composera. Zawsze rób kopię
   plików i bazy danych przed wgraniem nowej wersji. W wersji z obrazu

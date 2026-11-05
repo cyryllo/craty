@@ -122,25 +122,83 @@
             </div>
 
             @if (auth()->user()->isMagazynier())
+                @php($contactsEnabled = \App\Support\Modules::isEnabled('contacts'))
+                @php($field = 'w-full rounded-md border-gray-300 text-sm dark:border-gray-600')
                 <div class="bg-white rounded-lg shadow p-5 space-y-3 dark:bg-gray-800">
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Loan') }}</h3>
-                    @if ($item->currentLoan)
-                        <p class="text-sm text-gray-800 dark:text-gray-200">{{ __('Loaned to') }}: <b>{{ $item->currentLoan->borrowerLabel() }}</b></p>
-                        @if ($item->currentLoan->due_at)
-                            <p class="text-sm {{ $item->currentLoan->isOverdue() ? 'text-red-600' : 'text-gray-500' }}">{{ __('Due date') }}: {{ $item->currentLoan->due_at->format('d.m.Y') }}</p>
+                    @if ($loan = $item->currentLoan)
+                        <p class="text-sm text-gray-800 dark:text-gray-200">{{ __('Loaned to') }}:
+                            @if ($contactsEnabled && $loan->contact)
+                                <a href="{{ route('contacts.show', $loan->contact) }}" class="font-bold hover:underline">{{ $loan->borrowerLabel() }}</a>
+                            @else
+                                <b>{{ $loan->borrowerLabel() }}</b>
+                            @endif
+                        </p>
+                        @if ($loan->due_at)
+                            <p class="text-sm {{ $loan->isOverdue() ? 'text-red-600' : 'text-gray-500' }}">{{ __('Due date') }}: {{ $loan->due_at->format('d.m.Y') }}</p>
                         @endif
-                        <form method="POST" action="{{ route('loans.return', $item->currentLoan) }}">
+                        <a href="{{ route('loans.protocol.issue', $loan) }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-indigo-600 hover:underline dark:text-indigo-400">📄 {{ __('Issue protocol (PDF)') }}</a>
+
+                        <form method="POST" action="{{ route('loans.return', $loan) }}" class="space-y-2 pt-3 border-t border-gray-100 dark:border-gray-700">
                             @csrf
-                            <button class="w-full mt-1 px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('Register return') }}</button>
+                            <label for="condition_in" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Condition when returned') }}</label>
+                            <select id="condition_in" name="condition_in" class="{{ $field }}">
+                                @foreach (\App\Models\Item::CONDITIONS as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('condition_in', $item->condition) === $value)>{{ __($label) }}</option>
+                                @endforeach
+                            </select>
+                            <textarea name="return_notes" rows="2" placeholder="{{ __('Notes on return, e.g. damage (optional)') }}" aria-label="{{ __('Notes on return') }}" class="{{ $field }}">{{ old('return_notes') }}</textarea>
+                            <x-input-error :messages="$errors->get('return_notes')" />
+                            <button class="w-full px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('Register return') }}</button>
                         </form>
                     @else
-                        <form method="POST" action="{{ route('items.loans.store', $item) }}" class="space-y-2">
+                        <form method="POST" action="{{ route('items.loans.store', $item) }}" class="space-y-2"
+                              x-data="{ contact: '{{ old('contact_id', $contacts->isEmpty() ? 'new' : '') }}' }">
                             @csrf
-                            <input type="text" name="borrower_name" placeholder="{{ __('Loaned to whom') }} *" aria-label="{{ __('Loaned to whom') }}" value="{{ old('borrower_name') }}" required class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
-                            <x-input-error :messages="$errors->get('borrower_name')" />
-                            <input type="date" name="due_at" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                            @if ($contactsEnabled)
+                                <select name="contact_id" x-model="contact" aria-label="{{ __('Loaned to whom') }}" required class="{{ $field }}">
+                                    <option value="" disabled>{{ __('Loaned to whom') }} *</option>
+                                    <option value="new">+ {{ __('New contact') }}</option>
+                                    @foreach ($contacts as $option)
+                                        <option value="{{ $option->id }}">{{ $option->name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('contact_id')" />
+                                <div x-show="contact === 'new'" x-cloak class="space-y-2 ps-3 border-s-2 border-indigo-200 dark:border-indigo-800">
+                                    <input type="text" name="new_contact_name" placeholder="{{ __('Name (person or company)') }} *" aria-label="{{ __('Name (person or company)') }}" value="{{ old('new_contact_name') }}" x-bind:required="contact === 'new'" class="{{ $field }}">
+                                    <x-input-error :messages="$errors->get('new_contact_name')" />
+                                    <input type="tel" name="new_contact_phone" placeholder="{{ __('Phone') }}" aria-label="{{ __('Phone') }}" value="{{ old('new_contact_phone') }}" class="{{ $field }}">
+                                    <input type="email" name="new_contact_email" placeholder="{{ __('Email') }}" aria-label="{{ __('Email') }}" value="{{ old('new_contact_email') }}" class="{{ $field }}">
+                                    <x-input-error :messages="$errors->get('new_contact_email')" />
+                                </div>
+                            @else
+                                <input type="text" name="borrower_name" placeholder="{{ __('Loaned to whom') }} *" aria-label="{{ __('Loaned to whom') }}" value="{{ old('borrower_name') }}" required class="{{ $field }}">
+                                <x-input-error :messages="$errors->get('borrower_name')" />
+                            @endif
+                            <label for="due_at" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Due date (optional)') }}</label>
+                            <input type="date" id="due_at" name="due_at" value="{{ old('due_at') }}" class="{{ $field }}">
+                            <x-input-error :messages="$errors->get('due_at')" />
+                            <textarea name="notes" rows="2" placeholder="{{ __('Notes, printed on the protocol (optional)') }}" aria-label="{{ __('Notes') }}" class="{{ $field }}">{{ old('notes') }}</textarea>
                             <button class="w-full px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700">{{ __('Loan out') }}</button>
                         </form>
+                    @endif
+
+                    @if ($pastLoans->isNotEmpty())
+                        <div class="pt-3 border-t border-gray-100 dark:border-gray-700">
+                            <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2 dark:text-gray-400">{{ __('Previous loans') }}</h4>
+                            <ul class="space-y-1.5 text-sm">
+                                @foreach ($pastLoans as $past)
+                                    <li class="text-gray-700 dark:text-gray-300">
+                                        {{ $past->borrowerLabel() }}
+                                        <span class="text-xs text-gray-400 dark:text-gray-500">{{ $past->borrowed_at->format('d.m') }}–{{ $past->returned_at->format('d.m.Y') }}</span>
+                                        <span class="block text-xs space-x-2">
+                                            <a href="{{ route('loans.protocol.issue', $past) }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('issue protocol') }}</a>
+                                            <a href="{{ route('loans.protocol.return', $past) }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('return protocol') }}</a>
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     @endif
                 </div>
 

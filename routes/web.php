@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\AppSettingController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemImportController;
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\LoanProtocolController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MailSettingController;
 use App\Http\Controllers\MarketplaceController;
@@ -67,6 +69,15 @@ Route::middleware('auth')->group(function () {
 
         Route::post('items/{item}/loans', [LoanController::class, 'store'])->name('items.loans.store');
         Route::post('loans/{loan}/return', [LoanController::class, 'returnLoan'])->name('loans.return');
+        // Protokoły PDF działają też bez modułu Kontakty (wtedy z samą nazwą "komu").
+        Route::get('loans/{loan}/protokol-wydania.pdf', [LoanProtocolController::class, 'issue'])->name('loans.protocol.issue');
+        Route::get('loans/{loan}/protokol-zwrotu.pdf', [LoanProtocolController::class, 'returned'])->name('loans.protocol.return');
+
+        // Moduł "Kontakty" — tak jak Sprzedaż: 404 przy wyłączonym module,
+        // dołożone na role:admin,magazynier.
+        Route::middleware('module:contacts')->group(function () {
+            Route::resource('contacts', ContactController::class);
+        });
 
         // Moduł "Sprzedaż" (App\Support\Modules) — wyłączenie w Ustawieniach →
         // Moduły chowa tę grupę tras za 404, niezależnie od roli. `module:sales`

@@ -20,7 +20,7 @@ class AppSetting extends Model
         'mail_from_address', 'mail_from_name',
         'public_contact_email', 'public_contact_phone',
         'shop_description', 'privacy_policy', 'terms',
-        'module_sales_enabled',
+        'module_sales_enabled', 'module_contacts_enabled',
         'password_reset_enabled', 'loan_due_notifications_enabled',
     ];
 
@@ -29,6 +29,7 @@ class AppSetting extends Model
         // reszta AppSetting to jawne, nieszyfrowane dane (nazwa, logo...).
         'mail_password' => 'encrypted',
         'module_sales_enabled' => 'boolean',
+        'module_contacts_enabled' => 'boolean',
         'password_reset_enabled' => 'boolean',
         'loan_due_notifications_enabled' => 'boolean',
     ];
@@ -38,6 +39,7 @@ class AppSetting extends Model
     // wartości domyślnej z migracji, dopóki ktoś raz nie zapisałby ustawień.
     protected $attributes = [
         'module_sales_enabled' => true,
+        'module_contacts_enabled' => true,
         'password_reset_enabled' => true,
         'loan_due_notifications_enabled' => false,
     ];

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Models\Category;
+use App\Models\Contact;
 use App\Models\Item;
 use App\Models\ItemAttachment;
 use App\Models\ItemPhoto;
@@ -14,6 +15,7 @@ use App\Models\Warehouse;
 use App\Services\InventoryNumberGenerator;
 use App\Services\QrCodeGenerator;
 use App\Support\ItemLabelTemplates;
+use App\Support\Modules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -89,9 +91,14 @@ class ItemController extends Controller
 
     public function show(Item $item)
     {
-        $item->load(['category', 'storageLocation.warehouse', 'storageLocation.room', 'photos', 'attachments', 'histories.user', 'currentLoan.borrower', 'saleListings', 'activeSaleListing', 'draftSaleListing']);
+        $item->load(['category', 'storageLocation.warehouse', 'storageLocation.room', 'photos', 'attachments', 'histories.user', 'currentLoan.borrower', 'currentLoan.contact', 'saleListings', 'activeSaleListing', 'draftSaleListing']);
 
-        return view('items.show', ['item' => $item]);
+        // Zakończone wypożyczenia (z linkami do protokołów) i lista kontaktów do
+        // formularza wypożyczenia — to drugie tylko z włączonym modułem Kontakty.
+        $pastLoans = $item->loans()->whereNotNull('returned_at')->with(['contact', 'borrower'])->latest('returned_at')->limit(5)->get();
+        $contacts = Modules::isEnabled('contacts') ? Contact::orderBy('name')->get(['id', 'name']) : collect();
+
+        return view('items.show', compact('item', 'pastLoans', 'contacts'));
     }
 
     public function edit(Item $item)
