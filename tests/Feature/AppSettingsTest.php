@@ -37,7 +37,7 @@ class AppSettingsTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
 
         // Domyślnie ikona aplikacji, także na publicznej stronie głównej.
-        $this->get('/')->assertSee('<link rel="icon" href="/pwa-icons/icon-192.png">', false);
+        $this->get('/')->assertSee('<link rel="icon" href="'.\App\Support\PwaIcons::url(192).'">', false);
 
         $this->actingAs($admin)->post(route('settings.app.update'), [
             'favicon' => UploadedFile::fake()->image('favicon.png', 64, 64),

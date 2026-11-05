@@ -3,7 +3,7 @@
      zarejestrowane niezależnie od tego, czy ktoś jest już zalogowany. --}}
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#111827">
-<link rel="apple-touch-icon" href="/pwa-icons/icon-192.png">
+<link rel="apple-touch-icon" href="{{ \App\Support\PwaIcons::url(192) }}">
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));

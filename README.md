@@ -196,18 +196,16 @@ Zgłaszać można po polsku albo po angielsku.
 
 ## Plany na przyszłość
 
-Craty rozwija się dalej, głównie przez **moduły rozszerzające**, które
-będzie można włączyć w ustawieniach, gdy są potrzebne, i wyłączyć, gdy
-nie są. W planie są między innymi:
+Craty rozwija się etapami. Nowe większe funkcje trafiają do **modułów**, które włączasz w Ustawieniach, gdy są potrzebne, i wyłączasz, gdy nie są. Kolejność ułożona jest tak, żeby każdy etap korzystał z poprzedniego:
 
-- **Materiały eksploatacyjne**: rzeczy liczone w sztukach, metrach czy
-  litrach, z ostrzeżeniem, gdy zaczyna ich brakować.
+1. **v1.4, wygoda na co dzień**: sortowanie listy przedmiotów i zapisane filtry, przypomnienia e-mailem o zbliżających się przeglądach i kończących się gwarancjach, ikona aplikacji z własnego logo.
+2. **v1.5, wydawanie sprzętu**: skanowanie kilku kodów pod rząd, wypożyczanie zestawów (kilka przedmiotów, jeden protokół) i rezerwacje na przyszły termin.
+3. **v1.6, stan magazynu**: inwentaryzacja (skanujesz regał, program pokazuje braki i rzeczy nie na swoim miejscu) oraz moduł materiałów eksploatacyjnych liczonych w sztukach, metrach czy litrach, z ostrzeżeniem, gdy się kończą.
+4. **v1.7, bezpieczeństwo danych**: kopie zapasowe z panelu (także na hostingach bez dostępu do konsoli), dziennik aktywności (logowania, zmiany kont i ustawień) i ulepszony import oraz eksport CSV.
 
-Kolejność i szczegóły nie są jeszcze ustalone. **Masz pomysł albo
-potrzebę, której Craty dziś nie spełnia?** Opisz ją w
-[zgłoszeniach na GitHubie](https://github.com/cyryllo/craty/issues).
-Każdą fajną funkcję rozważę, o ile pasuje do założeń projektu (program
-magazynowy, nie sklep).
+Dalej, do decyzji: obsługa wielu niezależnych pracowni w jednej instalacji z API dla innych narzędzi, a aplikacja na Androida tylko wtedy, gdyby wersja instalowana z przeglądarki się nie sprawdziła.
+
+**Masz pomysł albo potrzebę, której Craty dziś nie spełnia?** Opisz ją w [zgłoszeniach na GitHubie](https://github.com/cyryllo/craty/issues). Każdą fajną funkcję rozważę, o ile pasuje do założeń projektu (program magazynowy, nie sklep).
 
 ## Dokumentacja
 

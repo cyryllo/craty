@@ -95,7 +95,7 @@ class AppSetting extends Model
     {
         $path = $this->favicon_path ?: $this->logo_path;
 
-        return $path ? Storage::disk('public')->url($path) : '/pwa-icons/icon-192.png';
+        return $path ? Storage::disk('public')->url($path) : \App\Support\PwaIcons::url(192);
     }
 
     /**

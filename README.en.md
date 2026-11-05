@@ -200,18 +200,16 @@ Issues can be written in Polish or English.
 
 ## Plans
 
-Craty keeps growing, mainly through **optional modules** you can switch on
-in the settings when you need them and off when you don't. Planned, among
-others:
+Craty grows in stages. Bigger features land as **modules** you switch on in the settings when you need them and off when you don't. The order is chosen so that each stage builds on the previous one:
 
-- **Consumables**: things counted in pieces, metres or litres, with a
-  warning when you're running low.
+1. **v1.4, everyday comfort**: sorting the item list and saved filters, email reminders about upcoming inspections and ending warranties, an app icon made from your own logo.
+2. **v1.5, handing out equipment**: scanning several codes in a row, lending kits (several items, one protocol) and reservations for a future date.
+3. **v1.6, stock**: stocktaking (scan a rack, Craty shows what's missing or in the wrong place) and a consumables module for things counted in pieces, metres or litres, with a warning when you're running low.
+4. **v1.7, data safety**: backups from the panel (also on hosting without console access), an activity log (logins, account and settings changes) and improved CSV import and export.
 
-Order and details aren't settled yet. **Have an idea or a need Craty
-doesn't cover today?** Describe it in the
-[GitHub issues](https://github.com/cyryllo/craty/issues). Every good idea
-will be considered, as long as it fits the project's scope (an inventory
-app, not a shop).
+Later, to be decided: several independent workshops in one installation with an API for other tools, and an Android app only if the version installed from the browser turns out not to be enough.
+
+**Have an idea or a need Craty doesn't cover today?** Describe it in the [GitHub issues](https://github.com/cyryllo/craty/issues). Every good idea will be considered, as long as it fits the project's scope (an inventory app, not a shop).
 
 ## Documentation
 
