@@ -3,6 +3,24 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-05 (1.3.2)
+
+Zbiorczo wersje 1.3.0, 1.3.1 i 1.3.2:
+
+- Moduł Kontakty (domyślnie włączony): osoby, firmy i serwisy z historią
+  wypożyczeń; przy wypożyczeniu wybór kontaktu albo dodanie nowego w
+  locie; dotychczasowe wpisy „komu” zamienione w kontakty automatycznie.
+- Protokoły wydania i zwrotu w PDF, z danymi wypożyczającego i
+  przedmiotu, porównaniem stanu przy wydaniu i zwrocie oraz miejscami na
+  podpisy.
+- Zwrot ze stanem technicznym i uwagami; zmieniony stan trafia do
+  kartoteki przedmiotu.
+- Moduł Serwis (domyślnie wyłączony): naprawy z kosztami, przeglądy
+  okresowe z automatycznym następnym terminem, daty gwarancji;
+  przypomnienia na stronie Serwis i na pulpicie.
+- Nowa ikona aplikacji, favicon i logo: skrzynka na ciemnym tle.
+- Formularze wypożyczenia i zwrotu zwinięte na karcie przedmiotu.
+
 ## 2026-11-05 (1.2.6)
 
 - Gotowy obraz Docker `ghcr.io/cyryllo/craty`: aplikacja i baza MariaDB w

@@ -116,7 +116,7 @@ wydruku.
 
 ## Wypożyczenia
 
-Wypożyczasz z karty przedmiotu, w ramce „Wypożyczenie”:
+Wypożyczasz z karty przedmiotu, w ramce „Wypożyczenie”: kliknij „Wypożycz”, żeby rozwinąć formularz (zwrot rozwija się tak samo, przyciskiem „Zarejestruj zwrot”).
 
 - **Komu**: wybierasz kontakt z listy albo „+ Nowy kontakt” i wpisujesz nazwę (oraz opcjonalnie telefon i e-mail). Nowy kontakt zapisuje się sam, więc następnym razem jest już na liście. Przy wyłączonym module Kontakty pole „komu” to zwykły tekst, jak wcześniej.
 - **Termin zwrotu** i **uwagi** (np. „z ładowarką i walizką”) są opcjonalne. Uwagi drukują się na protokole wydania.
