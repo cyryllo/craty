@@ -3,6 +3,26 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-05 (1.2.6)
+
+- Gotowy obraz Docker `ghcr.io/cyryllo/craty`: aplikacja i baza MariaDB w
+  jednym kontenerze, wszystkie dane w jednym wolumenie, uruchomienie
+  jednym poleceniem. Instalator w tej wersji nie pyta o bazę, a
+  aktualizacja to pobranie nowego obrazu (migracje wykonują się same przy
+  starcie). Obraz dla x86 i ARM, publikowany automatycznie przy tagach.
+- Czcionka Figtree serwowana z własnego serwera zamiast z
+  `fonts.bunny.net`.
+- Nagłówek HSTS przy połączeniu HTTPS (także za serwerem pośredniczącym).
+- Test poczty w Ustawieniach działa tylko ze standardowymi portami
+  (25, 465, 587, 2525).
+- Formularz oferty bez pola platformy: serwis (OLX, Allegro, Allegro
+  Lokalnie, Vinted) rozpoznawany z linku do ogłoszenia; nowe rozpoznawanie
+  linków Allegro Lokalnie.
+- Strona oferty: przycisk do ogłoszenia i kontakt zaraz pod stanem
+  technicznym, opis na końcu.
+- Ikona koszyka w górnym pasku panelu prowadzi na pchli targ (przy
+  włączonym module Sprzedaż); uzupełnione brakujące tłumaczenia.
+
 ## 2026-10-09 (1.2.3)
 
 Poprawki po lokalnym teście penetracyjnym (ręczne ataki, OWASP ZAP,

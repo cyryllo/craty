@@ -160,7 +160,9 @@ pokazuje tylko informację, że nic nie jest wystawione. W prawym górnym
 rogu jest **kłódka** prowadząca do logowania (dla zalogowanych przycisk
 "Panel"), a zainstalowana na telefonie aplikacja i tak otwiera się od razu
 na panelu. Obok zakładek Sprzedaży jest odnośnik "🛒 Pchli targ", który
-otwiera stronę główną w tej samej karcie.
+otwiera stronę główną w tej samej karcie, a w górnym pasku panelu (obok
+przełącznika motywu, także na telefonie) ikonka koszyka prowadzi w to samo
+miejsce.
 
 Na liście pchlego targu każda oferta to tylko zdjęcie (z liczbą zdjęć,
 jeśli jest ich więcej), nazwa, cena i stan techniczny, plus przycisk
@@ -214,14 +216,19 @@ miejscu:
   dezaktywacja. Wyłączone konto nie może się zalogować, a jeśli ktoś był
   akurat zalogowany, zostaje wylogowany przy następnym kliknięciu.
 - **Poczta** *(tylko Administrator)* — własne SMTP zamiast domyślnej
-  konfiguracji serwera.
+  konfiguracji serwera. Przycisk wysłania testowej wiadomości działa tylko
+  ze standardowymi portami poczty (25, 465, 587, 2525).
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego
   resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń.
 - **Moduły** *(tylko Administrator)* — włącz/wyłącz opcjonalne części
   appki (dziś: Sprzedaż).
 - **Aktualizacje** *(tylko Administrator)* — samodzielna aktualizacja
   appki przez wgranie paczki `.zip`, bez SSH/Composera. Zawsze rób kopię
-  plików i bazy danych przed wgraniem nowej wersji.
+  plików i bazy danych przed wgraniem nowej wersji. W wersji z obrazu
+  Docker paczek się nie wgrywa: aktualizacja to pobranie nowego obrazu
+  (`docker compose pull`, potem `docker compose up -d`), a strona
+  Aktualizacje tylko to podpowiada. Dane zostają w wolumenie Dockera, a
+  zmiany w bazie wprowadzają się same przy starcie kontenera.
 
 Każdy może też zmienić własny język i hasło w Profilu (menu użytkownika w
 prawym górnym rogu), a jasny/ciemny motyw przełącza się przyciskiem w

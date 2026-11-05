@@ -417,6 +417,7 @@
     "The response is not a view.": "Odpowiedź nie jest widokiem.",
     "The scanned code doesn't match any item yet. Fill in what you can now — category, location, condition and description are all optional here, and anything left blank can be completed later from the item's own edit form.": "Zeskanowany kod nie pasuje jeszcze do żadnego przedmiotu. Uzupełnij, co się da — kategoria, lokalizacja, stan i opis są tu opcjonalne, a to, co pominiesz, uzupełnisz później z poziomu edycji przedmiotu.",
     "The selected room does not belong to the chosen warehouse.": "Wybrane pomieszczenie nie należy do wskazanego magazynu.",
+    "The test only works with standard mail ports: :ports.": "Test działa tylko ze standardowymi portami poczty: :ports.",
     "The update manifest is invalid.": "Manifest aktualizacji jest nieprawidłowy.",
     "The upload was rejected before it reached the application — the package is most likely larger than this server currently allows (:limit). Ask your hosting provider to raise upload_max_filesize/post_max_size in php.ini, or check the limit shown on this page.": "Upload został odrzucony, zanim dotarł do aplikacji — paczka najprawdopodobniej jest większa niż obecnie pozwala ten serwer (:limit). Poproś dostawcę hostingu o podniesienie upload_max_filesize/post_max_size w php.ini albo sprawdź limit pokazany na tej stronie.",
     "The uploaded file does not match the expected checksum.": "Wgrany plik nie zgadza się z oczekiwaną sumą kontrolną.",

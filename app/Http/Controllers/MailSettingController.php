@@ -11,6 +11,9 @@ use Illuminate\Validation\Rule;
 
 class MailSettingController extends Controller
 {
+    /** Standardowe porty poczty (SMTP, SMTPS, submission i zapasowy 2525 popularny u dostawców). */
+    public const TEST_PORTS = [25, 465, 587, 2525];
+
     public function edit()
     {
         return view('settings.mail', ['setting' => AppSetting::current()]);
@@ -36,7 +39,14 @@ class MailSettingController extends Controller
     public function test(Request $request, MailSettingsApplier $applier)
     {
         $data = $this->validated($request, requirePassword: false);
-        $request->validate(['test_email' => ['required', 'email']]);
+        $request->validate([
+            'test_email' => ['required', 'email'],
+            // Test od razu łączy serwer z podanym adresem, więc bez tego dałoby
+            // się nim sprawdzać, które porty są otwarte w sieci serwera.
+            'mail_port' => [Rule::in(self::TEST_PORTS)],
+        ], [
+            'mail_port.in' => __('The test only works with standard mail ports: :ports.', ['ports' => implode(', ', self::TEST_PORTS)]),
+        ]);
 
         // Testujemy dokładnie to, co jest w formularzu teraz — nie to, co
         // ewentualnie już zapisane w bazie.

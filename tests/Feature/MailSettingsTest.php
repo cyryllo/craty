@@ -92,4 +92,24 @@ class MailSettingsTest extends TestCase
         $response->assertRedirect();
         Mail::assertSent(TestMail::class);
     }
+
+    /** Test SMTP łączy serwer z podanym adresem od razu, więc nie może służyć do skanowania portów. */
+    public function test_test_email_only_allows_standard_mail_ports(): void
+    {
+        Mail::fake();
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        foreach ([22, 3306, 6379, 8080] as $port) {
+            $this->actingAs($admin)->post(route('settings.mail.test'), [
+                'mail_host' => '10.0.0.5',
+                'mail_port' => $port,
+                'mail_encryption' => 'tls',
+                'mail_from_address' => 'noreply@example.com',
+                'mail_from_name' => 'Craty',
+                'test_email' => 'someone@example.com',
+            ])->assertSessionHasErrors('mail_port');
+        }
+
+        Mail::assertNothingSent();
+    }
 }

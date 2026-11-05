@@ -28,6 +28,13 @@ class AddSecurityHeaders
         'Cross-Origin-Opener-Policy' => 'same-origin',
     ];
 
+    /**
+     * Przeglądarka, która raz zobaczy ten nagłówek, przez rok łączy się z tą
+     * domeną wyłącznie po HTTPS (nawet po wpisaniu http://). Bez
+     * includeSubDomains: nie wiemy, co jeszcze stoi na subdomenach właściciela.
+     */
+    public const HSTS = 'max-age=31536000';
+
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
@@ -38,6 +45,23 @@ class AddSecurityHeaders
             }
         }
 
+        if ($this->servedOverHttps($request) && ! $response->headers->has('Strict-Transport-Security')) {
+            $response->headers->set('Strict-Transport-Security', self::HSTS);
+        }
+
         return $response;
+    }
+
+    /**
+     * Na hostingu HTTPS często kończy się na serwerze pośredniczącym (nginx
+     * przed Apache), więc samo isSecure() widzi zwykłe HTTP. Stąd też
+     * X-Forwarded-Proto i adres aplikacji z instalatora. Fałszywy nagłówek
+     * niczego nie psuje: przeglądarki ignorują HSTS otrzymany po zwykłym HTTP.
+     */
+    private function servedOverHttps(Request $request): bool
+    {
+        return $request->isSecure()
+            || strtolower((string) $request->headers->get('X-Forwarded-Proto')) === 'https'
+            || str_starts_with((string) config('app.url'), 'https://');
     }
 }

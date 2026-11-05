@@ -41,6 +41,25 @@ class SecurityTest extends TestCase
         }
     }
 
+    public function test_hsts_is_sent_only_over_https(): void
+    {
+        config(['app.url' => 'http://localhost']);
+
+        $this->get('http://localhost/login')->assertHeaderMissing('Strict-Transport-Security');
+        $this->get('https://localhost/login')->assertHeader('Strict-Transport-Security', AddSecurityHeaders::HSTS);
+        // HTTPS zakończone na serwerze pośredniczącym (nginx przed Apache).
+        $this->get('http://localhost/login', ['X-Forwarded-Proto' => 'https'])
+            ->assertHeader('Strict-Transport-Security', AddSecurityHeaders::HSTS);
+    }
+
+    /** Czcionka z własnego serwera: odwiedzający nie łączą się z obcymi serwerami. */
+    public function test_pages_do_not_load_fonts_from_external_servers(): void
+    {
+        foreach (['/', '/login'] as $url) {
+            $this->get($url)->assertDontSee('fonts.bunny.net', false)->assertDontSee('fonts.googleapis.com', false);
+        }
+    }
+
     // ---------- wgrywanie plików ----------
 
     /** Załącznik .php w publicznym /storage/ mógłby zostać uruchomiony na serwerze. */

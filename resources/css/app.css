@@ -1,3 +1,10 @@
+/* Czcionka Figtree z własnego serwera (pakiet @fontsource/figtree), nie z
+   fonts.bunny.net: odwiedzający nie łączą się z obcym serwerem, a przejęty
+   serwer czcionek nie mógłby podmienić stylów (uwaga z pentestu OWASP ZAP). */
+@import '@fontsource/figtree/400.css';
+@import '@fontsource/figtree/500.css';
+@import '@fontsource/figtree/600.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
