@@ -3,6 +3,28 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-20 (1.4.0)
+
+Zbiorczo wersje 1.3.3 i 1.4.0:
+
+- Lista przedmiotów: sortowanie kliknięciem w nagłówek kolumny (w kafelkach
+  z listy „Sortuj”), ostatnie wyszukiwanie, filtry i sortowanie
+  zapamiętywane, z paskiem „Wyczyść filtry”.
+- Seria skanów: kolejne kody na listę (kamera, wpisany kod albo ręczny
+  czytnik), z listy wypożyczenie zestawu albo druk etykiet.
+- Zestawy: kilka przedmiotów dla jednej osoby, jeden protokół PDF, zwrot
+  całości albo części; „Wypożycz zaznaczone” na liście przedmiotów.
+- Rezerwacje na przyszły termin, z ostrzeżeniem przy wypożyczeniu i
+  przyciskiem „Wydaj teraz”; nowa zakładka Wypożyczenia.
+- Inwentaryzacja miejsca: skanowanie z zapisem na bieżąco, raport braków i
+  rzeczy nie na swoim miejscu z „Przenieś tutaj”.
+- Moduł Materiały eksploatacyjne (domyślnie wyłączony): ilości w
+  jednostkach, stan minimalny, historia ruchów, ostrzeżenie na pulpicie.
+- Cotygodniowe przypomnienie e-mailem z modułu Serwis.
+- Opcja ikony aplikacji z własnego logo; manifest aplikacji generowany
+  przez Craty pod `/manifest.webmanifest`.
+- Poprawiona instalacja aplikacji na telefonie i odświeżanie ikony.
+
 ## 2026-11-05 (1.3.2)
 
 Zbiorczo wersje 1.3.0, 1.3.1 i 1.3.2:
