@@ -2,30 +2,68 @@
 # Zewnętrzny przegląd bezpieczeństwa działającej instalacji Craty.
 #
 #   ./security-check https://twoja-domena.pl
+#   ./security-check --yes https://twoja-domena.pl   (bez pytania, np. w skrypcie)
 #
 # Wykonuje WYŁĄCZNIE zapytania GET bez logowania (niczego nie zapisuje, nie
-# wysyła formularzy, nie zgaduje haseł), więc można go bezpiecznie puszczać
-# na produkcji, np. po każdej aktualizacji. Sprawdza to, co widzi ktoś z
+# wysyła formularzy, nie zgaduje haseł). Sprawdza to, co widzi ktoś z
 # zewnątrz: czy nie da się pobrać plików z kodem/hasłami, czy nie ma
 # listingu katalogów, czy panel wymaga logowania, nagłówki, ciasteczka i HTTPS.
 # Kod wyjścia 1, jeśli cokolwiek wymaga poprawy.
+#
+# UWAGA: pytania o /.env, /.git/HEAD, vendor/ itp. wyglądają dla zapory
+# hostingu jak skaner włamań. 2026-11-20 dwa przebiegi pod rząd skończyły się
+# banem adresu IP, z którego go puszczono (403 z nginx na cały serwer, przez
+# kilkanaście minut opóźnienia). Dlatego przed serwerem innym niż lokalny
+# skrypt pyta o potwierdzenie i robi odstęp między zapytaniami (domyślnie 2 s,
+# zmiana: CHECK_DELAY=5 ./security-check ...). Puszczaj go rzadko, najlepiej
+# z innego łącza niż to, z którego na co dzień pracujesz.
 
 set -u
+YES=0
+if [[ "${1:-}" == "--yes" ]]; then
+    YES=1
+    shift
+fi
 BASE="${1:-}"
 if [[ -z "$BASE" ]]; then
-    echo "Użycie: $0 https://twoja-domena.pl" >&2
+    echo "Użycie: $0 [--yes] https://twoja-domena.pl" >&2
     exit 2
 fi
 BASE="${BASE%/}"
+
+LOCAL=0
+[[ "$BASE" =~ ^https?://(localhost|127\.[0-9.]+|\[::1\])(:[0-9]+)?$ ]] && LOCAL=1
+DELAY="${CHECK_DELAY:-$([[ $LOCAL -eq 1 ]] && echo 0 || echo 2)}"
+UA="Craty-security-check (wlasny test bezpieczenstwa)"
+
+if [[ $LOCAL -eq 0 && $YES -eq 0 ]]; then
+    echo "Za chwilę około 50 zapytań do $BASE, co ${DELAY} s (razem około $((50 * DELAY / 60 + 1)) min)."
+    echo "Część z nich (/.env, /.git, vendor/) zapora hostingu może uznać za atak"
+    echo "i zablokować Twój adres IP na cały serwer."
+    if [[ ! -t 0 ]]; then
+        echo "Brak terminala do potwierdzenia: uruchom z --yes, jeśli na pewno." >&2
+        exit 2
+    fi
+    read -r -p "Kontynuować? [t/N] " answer
+    [[ "$answer" =~ ^[tTyY] ]] || { echo "Przerwano."; exit 2; }
+fi
+
+# Każde zapytanie przechodzi przez req(), żeby odstęp i User-Agent były wszędzie.
+req() {
+    curl -s -A "$UA" --max-time 20 "$@"
+    local status=$?
+    [[ "$DELAY" != "0" ]] && sleep "$DELAY"
+    return $status
+}
 
 FAILS=0
 WARNS=0
 ok()   { printf '  \033[32m✔\033[0m %s\n' "$1"; }
 fail() { printf '  \033[31m✘\033[0m %s\n' "$1"; FAILS=$((FAILS + 1)); }
 warn() { printf '  \033[33m!\033[0m %s\n' "$1"; WARNS=$((WARNS + 1)); }
-code() { curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$1"; }
+code() { req -o /dev/null -w '%{http_code}' "$1"; }
 
-echo "Craty: przegląd bezpieczeństwa $BASE"
+echo "Craty: przegląd bezpieczeństwa $BASE (odstęp między zapytaniami: ${DELAY} s)"
 
 echo
 echo "1. Pliki, których nie wolno pobrać"
@@ -45,7 +83,7 @@ done
 echo
 echo "2. Listing katalogów"
 for path in /storage/ /storage/items/ /storage/qr/ /build/ /pwa-icons/; do
-    if curl -s --max-time 20 "$BASE$path" | grep -qi 'Index of'; then
+    if req "$BASE$path" | grep -qi 'Index of'; then
         fail "$path pokazuje listę plików"
     else
         ok "$path bez listy plików"
@@ -68,7 +106,7 @@ if [[ "$c" == "200" ]]; then fail "/install (instalator) jest dostępny po insta
 
 echo
 echo "4. Strona błędu"
-if curl -s --max-time 20 "$BASE/offer/999999999?x=$RANDOM" | grep -qiE 'stack trace|whoops|vendor/laravel|Illuminate\\|APP_KEY|DB_PASSWORD'; then
+if req "$BASE/offer/999999999?x=$RANDOM" | grep -qiE 'stack trace|whoops|vendor/laravel|Illuminate\\|APP_KEY|DB_PASSWORD'; then
     fail "Strona błędu pokazuje szczegóły techniczne (APP_DEBUG włączony?)"
 else
     ok "Strona błędu nie zdradza szczegółów technicznych"
@@ -76,7 +114,7 @@ fi
 
 echo
 echo "5. Nagłówki i ciasteczka"
-HEADERS=$(curl -s -D - -o /dev/null --max-time 20 "$BASE/")
+HEADERS=$(req -D - -o /dev/null "$BASE/")
 for h in X-Content-Type-Options X-Frame-Options Referrer-Policy Permissions-Policy; do
     if grep -qi "^$h:" <<<"$HEADERS"; then ok "$h obecny"; else fail "Brak nagłówka $h"; fi
 done
@@ -100,7 +138,7 @@ if [[ "$BASE" == https://* ]]; then
     echo
     echo "6. HTTPS"
     HTTP_URL="http://${BASE#https://}/"
-    LOCATION=$(curl -s -o /dev/null -w '%{redirect_url}' --max-time 20 "$HTTP_URL")
+    LOCATION=$(req -o /dev/null -w '%{redirect_url}' "$HTTP_URL")
     if [[ "$LOCATION" == https://* ]]; then ok "HTTP przekierowuje na HTTPS"; else fail "HTTP nie przekierowuje na HTTPS"; fi
     if grep -qi '^strict-transport-security:' <<<"$HEADERS"; then ok "HSTS włączone"; else warn "Brak HSTS (Strict-Transport-Security), opcjonalnie do włączenia w panelu hostingu"; fi
 fi
