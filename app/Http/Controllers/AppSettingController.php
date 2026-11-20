@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AppSetting;
+use App\Services\AppIconFromLogo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -14,12 +15,13 @@ class AppSettingController extends Controller
         return view('settings.app', ['setting' => AppSetting::current()]);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, AppIconFromLogo $icons)
     {
         $data = $request->validate([
             'name' => ['nullable', 'string', 'max:255'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'remove_logo' => ['nullable', 'boolean'],
+            'logo_as_app_icon' => ['nullable', 'boolean'],
             // .ico nie przechodzi reguły "image", więc jawna lista; mały plik, to ikonka karty
             // przeglądarki. Bez .svg: SVG może zawierać skrypt, a leży w publicznym /storage/.
             'favicon' => ['nullable', 'file', 'mimes:png,ico,jpg,jpeg,webp,gif', 'max:512'],
@@ -51,7 +53,15 @@ class AppSettingController extends Controller
 
         $setting->name = ($data['name'] ?? null) ?: null;
         $setting->locale = ($data['locale'] ?? null) ?: null;
+        $setting->logo_as_app_icon = $request->boolean('logo_as_app_icon');
         $setting->save();
+
+        // Ikona aplikacji z logo: tworzona od razu przy zapisie (i usuwana, gdy
+        // opcja albo logo znikną), żeby manifest zawsze wskazywał gotowy plik.
+        if (! $icons->sync($setting)) {
+            return back()->with('status', __('App settings saved.'))
+                ->withErrors(['logo_as_app_icon' => __('The logo could not be turned into an app icon. Try a PNG or JPG file.')]);
+        }
 
         return back()->with('status', __('App settings saved.'));
     }

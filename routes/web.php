@@ -11,6 +11,7 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\LoanProtocolController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MailSettingController;
+use App\Http\Controllers\ManifestController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\ModuleSettingController;
 use App\Http\Controllers\NotificationSettingController;
@@ -35,6 +36,10 @@ use Illuminate\Support\Facades\Route;
 // logowania w nagłówku); strona pojedynczej oferty daje wtedy 404.
 Route::get('/', [MarketplaceController::class, 'index'])->name('marketplace.index');
 Route::get('offer/{listing}', [MarketplaceController::class, 'show'])->name('marketplace.show');
+
+// Manifest PWA (instalacja aplikacji na telefonie) — publiczny, przeglądarka
+// pobiera go jeszcze przed zalogowaniem. Patrz ManifestController.
+Route::get('manifest.webmanifest', ManifestController::class)->name('pwa.manifest');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

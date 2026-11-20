@@ -1,7 +1,7 @@
 {{-- Instalowalność jako PWA — bez trybu offline, patrz TODO.md "PWA". Współdzielone
      między layouts/app i layouts/guest, żeby manifest/service worker były
      zarejestrowane niezależnie od tego, czy ktoś jest już zalogowany. --}}
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="{{ route('pwa.manifest', [], false) }}">
 <meta name="theme-color" content="#111827">
 <link rel="apple-touch-icon" href="{{ \App\Support\PwaIcons::url(192) }}">
 <script>

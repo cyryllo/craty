@@ -27,8 +27,17 @@
                 <span class="text-gray-500 dark:text-gray-400">{{ __('Location') }}:</span>
                 <span class="inline-flex items-center gap-2 rounded-full bg-indigo-50 border border-indigo-200 px-3 py-1 text-indigo-800 dark:bg-indigo-950 dark:border-indigo-800 dark:text-indigo-300">
                     {{ $locationFilter }}
-                    <a href="{{ request()->fullUrlWithoutQuery(['storage_location_id', 'warehouse_id', 'room_id', 'rack', 'shelf', 'page']) }}" class="font-semibold hover:text-indigo-950 dark:hover:text-white" aria-label="{{ __('Clear location filter') }}">&times;</a>
+                    <a href="{{ $clearLocationUrl }}" class="font-semibold hover:text-indigo-950 dark:hover:text-white" aria-label="{{ __('Clear location filter') }}">&times;</a>
                 </span>
+            </div>
+        @endif
+
+        @if ($hasActiveFilters)
+            {{-- Filtry są zapamiętywane (wracają po wejściu na listę z menu), więc
+                 zawsze widać, że są włączone, i da się je wyczyścić jednym kliknięciem. --}}
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md bg-amber-50 border border-amber-200 px-4 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-200">
+                <span>🔎 {{ __('Filters are on and are remembered until you clear them.') }}</span>
+                <a href="{{ route('items.index', ['clear' => 1]) }}" class="font-medium underline hover:no-underline">{{ __('Clear filters') }}</a>
             </div>
         @endif
 
@@ -39,6 +48,10 @@
                 @endif
             @endforeach
             <input type="hidden" name="view" value="{{ $view }}">
+            {{-- "f": jawne użycie filtrów, nadpisuje zapamiętane (ItemController::index). --}}
+            <input type="hidden" name="f" value="1">
+            <input type="hidden" name="sort" value="{{ $sort }}">
+            <input type="hidden" name="dir" value="{{ $dir }}">
             <a href="{{ route('scan.show') }}" title="{{ __('Scan') }}" class="inline-flex items-center justify-center w-9 h-9 shrink-0 rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700">
                 <x-icon name="scan" class="w-4 h-4" />
             </a>
@@ -66,8 +79,20 @@
                 </select>
             </div>
             <button class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">{{ __('Filter') }}</button>
-            @if (array_filter($filters))
-                <a href="{{ route('items.index', ['view' => $view]) }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('clear') }}</a>
+            @if ($hasActiveFilters)
+                <a href="{{ route('items.index', ['clear' => 1]) }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('clear') }}</a>
+            @endif
+
+            @if ($view === 'grid')
+                {{-- W kafelkach nie ma nagłówków kolumn, więc sortowanie z listy. --}}
+                <div class="min-w-[160px]">
+                    <label for="grid-sort" class="block text-xs font-medium text-gray-500 mb-1 dark:text-gray-400">{{ __('Sort') }}</label>
+                    <select id="grid-sort" onchange="window.location = this.value" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">
+                        @foreach ([['created', 'desc', __('Newest first')], ['created', 'asc', __('Oldest first')], ['name', 'asc', __('Name A–Z')], ['name', 'desc', __('Name Z–A')], ['value', 'desc', __('Highest value')], ['value', 'asc', __('Lowest value')]] as [$column, $direction, $label])
+                            <option value="{{ \App\Http\Controllers\ItemController::sortLink($column, $direction) }}" @selected($sort === $column && $dir === $direction)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
             @endif
 
             <div class="ms-auto flex rounded-md border border-gray-300 overflow-hidden shrink-0 dark:border-gray-600" role="group" aria-label="{{ __('List view') }}">
@@ -112,12 +137,12 @@
                         <tr>
                             <th class="px-4 py-3 w-8"></th>
                             <th class="px-4 py-3"></th>
-                            <th class="text-left px-4 py-3">{{ __('Item name') }}</th>
-                            <th class="text-left px-4 py-3">{{ __('Inventory no.') }}</th>
-                            <th class="text-left px-4 py-3">{{ __('Category') }}</th>
-                            <th class="text-left px-4 py-3">{{ __('Location') }}</th>
-                            <th class="text-left px-4 py-3">{{ __('Value') }}</th>
-                            <th class="text-left px-4 py-3">{{ __('Status') }}</th>
+                            <th class="text-left px-4 py-3">@include('items._sort-header', ['column' => 'name', 'label' => __('Item name')])</th>
+                            <th class="text-left px-4 py-3">@include('items._sort-header', ['column' => 'inventory_no', 'label' => __('Inventory no.')])</th>
+                            <th class="text-left px-4 py-3">@include('items._sort-header', ['column' => 'category', 'label' => __('Category')])</th>
+                            <th class="text-left px-4 py-3">@include('items._sort-header', ['column' => 'location', 'label' => __('Location')])</th>
+                            <th class="text-left px-4 py-3">@include('items._sort-header', ['column' => 'value', 'label' => __('Value')])</th>
+                            <th class="text-left px-4 py-3">@include('items._sort-header', ['column' => 'status', 'label' => __('Status')])</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">

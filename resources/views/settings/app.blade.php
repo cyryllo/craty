@@ -34,6 +34,24 @@
                         {{ __('Remove the current logo and revert to the default') }}
                     </label>
                 @endif
+                <div class="mt-3 flex items-start gap-2">
+                    <input type="hidden" name="logo_as_app_icon" value="0">
+                    <input type="checkbox" id="logo_as_app_icon" name="logo_as_app_icon" value="1"
+                           @checked(old('logo_as_app_icon', $setting->logo_as_app_icon)) class="mt-1 rounded border-gray-300 dark:border-gray-600">
+                    <label for="logo_as_app_icon" class="text-sm text-gray-700 dark:text-gray-300">
+                        {{ __('Use the logo as the app icon on phones') }}
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">{{ __('The logo is placed on a white square. Works best with a square or round logo; a wide one (e.g. just lettering) gets small. Without this, the default crate icon is used. A phone that already has the app installed may keep the old icon until the app is added again.') }}</span>
+                    </label>
+                </div>
+                @if ($iconPath = \App\Services\AppIconFromLogo::path($setting, 192))
+                    @if (\Illuminate\Support\Facades\Storage::disk('public')->exists($iconPath))
+                        <div class="mt-2 flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($iconPath) }}" alt="" class="w-12 h-12 rounded-xl shadow">
+                            {{ __('App icon preview') }}
+                        </div>
+                    @endif
+                @endif
+                <x-input-error :messages="$errors->get('logo_as_app_icon')" class="mt-1" />
             </div>
 
             <div>

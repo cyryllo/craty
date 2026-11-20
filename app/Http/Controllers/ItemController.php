@@ -22,6 +22,17 @@ use Illuminate\Validation\Rule;
 
 class ItemController extends Controller
 {
+    /** Parametry listy zapamiętywane w sesji ("pamiętaj ostatnie filtry"). */
+    private const LIST_PARAMS = ['q', 'category_id', 'status', 'sort', 'dir', 'storage_location_id', 'warehouse_id', 'room_id', 'rack', 'shelf'];
+
+    private const LOCATION_PARAMS = ['storage_location_id', 'warehouse_id', 'room_id', 'rack', 'shelf'];
+
+    /**
+     * Sortowanie listy: klucz => kolumna albo podzapytanie. "created" to
+     * dotychczasowa domyślna kolejność (najnowsze na górze).
+     */
+    public const SORTS = ['created', 'name', 'inventory_no', 'category', 'location', 'value', 'status'];
+
     public function index(Request $request)
     {
         // Widok kafelkowy albo lista — wybór zapamiętywany w sesji, żeby nie
@@ -32,6 +43,24 @@ class ItemController extends Controller
         } else {
             $view = session('items_view', 'grid');
         }
+
+        // Ostatnie wyszukiwanie, filtry i sortowanie też są pamiętane: wejście
+        // na samo /items (np. z menu) przywraca je przekierowaniem, żeby adres,
+        // paginacja i linki sortowania zawierały pełny stan. Każde jawne użycie
+        // filtrów (formularz, link sortowania, link ze Struktury magazynu) ma
+        // któryś z parametrów albo znacznik "f" i nadpisuje zapamiętany stan.
+        if ($request->boolean('clear')) {
+            session()->forget('items_filters');
+
+            return redirect()->route('items.index');
+        }
+        if ($request->hasAny([...self::LIST_PARAMS, 'f'])) {
+            session(['items_filters' => array_filter($request->only(self::LIST_PARAMS), fn ($v) => $v !== null && $v !== '')]);
+        } elseif ($saved = session('items_filters')) {
+            return redirect()->route('items.index', [...$saved, 'f' => 1]);
+        }
+
+        [$sort, $dir] = $this->listSort($request);
 
         $items = Item::query()
             ->with(['category', 'storageLocation.warehouse', 'storageLocation.room', 'primaryPhoto'])
@@ -47,18 +76,65 @@ class ItemController extends Controller
             // Bez filtra statusu lista pokazuje tylko to, co jest w magazynie
             // — sprzedane/wycofane tylko po jawnym wybraniu ich filtra.
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')), fn ($q) => $q->inStock())
-            ->latest()
+            ->tap(fn ($q) => $this->applySort($q, $sort, $dir))
             ->paginate(24)
             ->withQueryString();
+
+        $filters = $request->only(['q', 'category_id', 'status']);
 
         return view('items.index', [
             'items' => $items,
             'view' => $view,
             'categories' => Category::orderBy('name')->get(),
-            'filters' => $request->only(['q', 'category_id', 'status']),
+            'filters' => $filters,
+            'sort' => $sort,
+            'dir' => $dir,
+            'hasActiveFilters' => (bool) array_filter($filters) || $request->hasAny(self::LOCATION_PARAMS),
             'locationFilter' => $this->locationFilterLabel($request),
             'locationBackUrl' => $this->locationBackUrl($request),
+            'clearLocationUrl' => route('items.index', [...$request->except([...self::LOCATION_PARAMS, 'page', 'f']), 'f' => 1]),
         ]);
+    }
+
+    /**
+     * Link do posortowania listy po kolumnie: pierwsze kliknięcie rosnąco
+     * (data dodania: od najnowszych), kolejne odwraca kierunek.
+     */
+    public static function sortUrl(string $column, string $currentSort, string $currentDir): string
+    {
+        $default = $column === 'created' ? 'desc' : 'asc';
+        $dir = $column === $currentSort ? ($currentDir === 'asc' ? 'desc' : 'asc') : $default;
+
+        return route('items.index', [...request()->except(['sort', 'dir', 'page', 'f']), 'sort' => $column, 'dir' => $dir, 'f' => 1]);
+    }
+
+    /** Link do konkretnego sortowania (lista wyboru w widoku kafelków). */
+    public static function sortLink(string $column, string $dir): string
+    {
+        return route('items.index', [...request()->except(['sort', 'dir', 'page', 'f']), 'sort' => $column, 'dir' => $dir, 'f' => 1]);
+    }
+
+    /** @return array{0: string, 1: string} */
+    private function listSort(Request $request): array
+    {
+        $sort = in_array($request->input('sort'), self::SORTS, true) ? $request->input('sort') : 'created';
+        $dir = in_array($request->input('dir'), ['asc', 'desc'], true) ? $request->input('dir') : ($sort === 'created' ? 'desc' : 'asc');
+
+        return [$sort, $dir];
+    }
+
+    private function applySort($query, string $sort, string $dir): void
+    {
+        match ($sort) {
+            'category' => $query->orderBy(Category::select('name')->whereColumn('categories.id', 'items.category_id'), $dir),
+            'location' => $query->orderBy(StorageLocation::select('code')->whereColumn('storage_locations.id', 'items.storage_location_id'), $dir),
+            'name', 'inventory_no', 'value', 'status' => $query->orderBy($sort, $dir),
+            default => $query->orderBy('created_at', $dir),
+        };
+
+        // Stała kolejność przy równych wartościach (np. ta sama kategoria),
+        // żeby paginacja nie gubiła ani nie dublowała przedmiotów.
+        $query->orderBy('id', $sort === 'created' ? $dir : 'asc');
     }
 
     public function create()

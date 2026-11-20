@@ -40,6 +40,7 @@ class RouteAccessTest extends TestCase
         'GET install/done',
         'POST install/done/cleanup',
         'GET up', // health check Laravela
+        'GET manifest.webmanifest', // manifest PWA, przeglądarka pobiera go przed zalogowaniem
     ];
 
     /** @return array<string, Route> */

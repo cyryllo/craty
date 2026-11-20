@@ -2,14 +2,20 @@
 
 namespace App\Support;
 
+use App\Models\AppSetting;
+use App\Services\AppIconFromLogo;
+use Illuminate\Support\Facades\Storage;
+
 /**
- * Adresy ikon aplikacji (PWA, apple-touch-icon, domyślny favicon) z numerem
- * wersji. Telefony i przeglądarki trzymają ikonę po adresie: bez zmiany
- * adresu po przerysowaniu ikon (`php artisan pwa:icons`) dalej pokazują
- * starą (zgłoszone 2026-11-05 po zmianie ikony na skrzynkę).
+ * Adresy ikon aplikacji (manifest PWA, apple-touch-icon, domyślny favicon).
  *
- * Po każdej zmianie ikon: podbij VERSION i ten sam numer w manifest.json
- * (statyczny plik, pilnuje tego PwaTest).
+ * Domyślne ikony (skrzynka, `php artisan pwa:icons`) mają w adresie numer
+ * wersji: telefony i przeglądarki trzymają ikonę po adresie, więc po
+ * przerysowaniu ikon bez zmiany adresu dalej pokazywały starą (zgłoszone
+ * 2026-11-05). Po każdej zmianie domyślnych ikon podbij VERSION.
+ *
+ * Gdy admin zaznaczy "Użyj logo jako ikony aplikacji", adres wskazuje ikonę
+ * zrobioną z logo (AppIconFromLogo); jej nazwa zmienia się razem z logo.
  */
 class PwaIcons
 {
@@ -17,6 +23,11 @@ class PwaIcons
 
     public static function url(int $size): string
     {
+        $custom = AppIconFromLogo::path(AppSetting::current(), $size);
+        if ($custom && Storage::disk('public')->exists($custom)) {
+            return Storage::disk('public')->url($custom);
+        }
+
         return "/pwa-icons/icon-{$size}.png?v=".self::VERSION;
     }
 }

@@ -34,6 +34,20 @@
                 </label>
             </div>
 
+            @if (\App\Support\Modules::isEnabled('service'))
+                <div class="flex items-start gap-2 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <input type="hidden" name="service_reminders_enabled" value="0">
+                    <input type="checkbox" id="service_reminders_enabled" name="service_reminders_enabled" value="1"
+                           @checked(old('service_reminders_enabled', $setting->service_reminders_enabled)) class="mt-1 rounded border-gray-300 dark:border-gray-600">
+                    <label for="service_reminders_enabled" class="text-sm text-gray-700 dark:text-gray-300">
+                        {{ __('Email a weekly service reminder') }}
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">
+                            {{ __('Every Monday morning: inspections that are overdue or due within 14 days, warranties ending within 30 days and repairs past their expected return. Sent to every active user, only when there is something on the list. Requires the hosting\'s cron to actually run the Laravel scheduler.') }}
+                        </span>
+                    </label>
+                </div>
+            @endif
+
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                 <a href="{{ route('settings.index') }}" class="text-sm text-gray-500 hover:underline dark:text-gray-400">{{ __('Cancel') }}</a>
                 <x-primary-button>{{ __('Save') }}</x-primary-button>

@@ -22,6 +22,7 @@ class AppSetting extends Model
         'shop_description', 'privacy_policy', 'terms',
         'module_sales_enabled', 'module_contacts_enabled', 'module_service_enabled',
         'password_reset_enabled', 'loan_due_notifications_enabled',
+        'service_reminders_enabled', 'logo_as_app_icon',
     ];
 
     protected $casts = [
@@ -33,6 +34,8 @@ class AppSetting extends Model
         'module_service_enabled' => 'boolean',
         'password_reset_enabled' => 'boolean',
         'loan_due_notifications_enabled' => 'boolean',
+        'service_reminders_enabled' => 'boolean',
+        'logo_as_app_icon' => 'boolean',
     ];
 
     // Tak jak w User (rola/active) — bez tego świeży, jeszcze niezapisany
@@ -44,6 +47,8 @@ class AppSetting extends Model
         'module_service_enabled' => false,
         'password_reset_enabled' => true,
         'loan_due_notifications_enabled' => false,
+        'service_reminders_enabled' => false,
+        'logo_as_app_icon' => false,
     ];
 
     public const LOCALES = [

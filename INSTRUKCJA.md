@@ -105,6 +105,8 @@ wartości przedmiotów na Panelu — domyślna opcja filtra statusu to
 "Sprzedany" albo "Wycofany". Nic nie jest kasowane: przedmiot zostaje w
 bazie razem z historią, a jego karta (i kod QR z naklejki) dalej działa.
 
+**Sortowanie i zapamiętane filtry**: w widoku listy kliknij nagłówek kolumny (nazwa, numer ewidencyjny, kategoria, lokalizacja, wartość, status), żeby posortować; drugie kliknięcie odwraca kolejność, a strzałka pokazuje, po czym jest posortowane. W widoku kafelków sortowanie wybierasz z listy „Sortuj” (najnowsze, najstarsze, nazwa, wartość). Wyszukiwanie, filtry i sortowanie są zapamiętywane: po powrocie na listę przedmiotów (np. z menu) widzisz to samo co ostatnio. Gdy jakiś filtr jest włączony, nad listą widać żółty pasek z przyciskiem „Wyczyść filtry”, który przywraca pełną listę.
+
 **Historia zmian**: każda edycja kluczowych pól (nazwa, wartość, stan,
 status, kategoria, lokalizacja) zapisuje się w historii widocznej na karcie
 przedmiotu, razem z tym, kto i kiedy ją zrobił.
@@ -239,7 +241,7 @@ miejscu:
 - **Ustawienia aplikacji** *(tylko Administrator)*: nazwa, logo i
   favicon (ikonka karty przeglądarki w PNG albo ICO; bez własnej używane
   jest logo) oraz
-  domyślny język (PL/EN).
+  domyślny język (PL/EN). Opcja „Użyj logo jako ikony aplikacji na telefonie” robi z logo ikonę aplikacji instalowanej na telefonie (logo na białym kwadracie, z podglądem). Najlepiej wygląda logo kwadratowe albo okrągłe. Bez tej opcji ikoną jest skrzynka Craty. Telefon z już zainstalowaną aplikacją może pokazywać starą ikonę, dopóki aplikacji nie doda się ponownie.
 - **Opcje sprzedaży** *(tylko Administrator, przy włączonej Sprzedaży)*:
   opis sprzedaży, kontakt, polityka prywatności i regulamin, opisane wyżej.
 - **Użytkownicy** *(tylko Administrator)*: konta, role, aktywacja i
@@ -249,7 +251,7 @@ miejscu:
   konfiguracji serwera. Przycisk wysłania testowej wiadomości działa tylko
   ze standardowymi portami poczty (25, 465, 587, 2525).
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego
-  resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń.
+  resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń. Przy włączonym module Serwis dochodzi cotygodniowe przypomnienie serwisowe: w każdy poniedziałek rano e-mail z przeglądami po terminie i w ciągu 14 dni, gwarancjami kończącymi się w ciągu 30 dni i naprawami po planowanym powrocie (tylko gdy coś jest na liście). Oba e-maile wymagają, żeby hosting uruchamiał harmonogram zadań (cron); w wersji Docker działa to samo.
 - **Moduły** *(tylko Administrator)* — włącz/wyłącz opcjonalne części
   appki (dziś: Sprzedaż, Kontakty i Serwis).
 - **Aktualizacje** *(tylko Administrator)* — samodzielna aktualizacja

@@ -80,12 +80,12 @@ class BuildReleasePackageTest extends TestCase
 
         // vendor/ i skompilowane assety muszą być w środku — cel to appka
         // bez composera/npm na docelowym hostingu. Appka nie ma osobnego
-        // public/ — index.php, manifest.json (PWA) i inne statyczne pliki
+        // public/ — index.php, sw.js (PWA) i inne statyczne pliki
         // leżą wprost w korzeniu.
         $this->assertNotFalse($zip->locateName('vendor/autoload.php'));
         $this->assertNotFalse($zip->locateName('artisan'));
         $this->assertNotFalse($zip->locateName('index.php'));
-        $this->assertNotFalse($zip->locateName('manifest.json'));
+        $this->assertNotFalse($zip->locateName('sw.js'));
         $this->assertFalse($zip->locateName('public/'), 'Appka nie ma już osobnego katalogu public/.');
 
         // Regresja: composer.json wyglądał na czysto deweloperski plik i
