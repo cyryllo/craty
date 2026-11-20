@@ -3,6 +3,15 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-20 (1.4.1)
+
+- Poprawka bezpieczeństwa: w formularzach wypożyczenia, rezerwacji, naprawy
+  i zestawu wartość pola kontaktu po błędzie walidacji nie może już zostać
+  wykonana jako kod na stronie.
+- Testy bezpieczeństwa dla funkcji z wersji 1.3 i 1.4 (kontakty, serwis,
+  zestawy, rezerwacje, inwentaryzacja, materiały, seria skanów);
+  `security-check` sprawdza też nowe strony.
+
 ## 2026-11-20 (1.4.0)
 
 Zbiorczo wersje 1.3.3 i 1.4.0:

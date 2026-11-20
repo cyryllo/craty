@@ -6,7 +6,7 @@
     @php($field = 'w-full rounded-md border-gray-300 text-sm dark:border-gray-600')
     <div class="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <form method="POST" action="{{ route('loan-groups.store') }}" class="space-y-6"
-              x-data="{ contact: '{{ old('contact_id', $contacts->isEmpty() ? 'new' : '') }}' }">
+              x-data="{ contact: @js(old('contact_id', $contacts->isEmpty() ? 'new' : '')) }">
             @csrf
             <div class="bg-white rounded-lg shadow dark:bg-gray-800">
                 <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">

@@ -178,7 +178,7 @@
                         <details @if ($errors->hasAny(['contact_id', 'new_contact_name', 'new_contact_email', 'borrower_name', 'due_at', 'notes'])) open @endif>
                         <summary class="cursor-pointer text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Loan out') }}</summary>
                         <form method="POST" action="{{ route('items.loans.store', $item) }}" class="space-y-2 mt-2"
-                              x-data="{ contact: '{{ old('contact_id', $contacts->isEmpty() ? 'new' : '') }}' }">
+                              x-data="{ contact: @js(old('contact_id', $contacts->isEmpty() ? 'new' : '')) }">
                             @csrf
                             @include('loans._borrower-fields')
                             <label for="due_at" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Due date (optional)') }}</label>
@@ -222,7 +222,7 @@
                             <details @if ($errors->hasAny(['starts_on', 'ends_on'])) open @endif>
                                 <summary class="cursor-pointer text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Reserve') }}</summary>
                                 <form method="POST" action="{{ route('items.reservations.store', $item) }}" class="space-y-2 mt-2"
-                                      x-data="{ contact: '{{ old('contact_id', $contacts->isEmpty() ? 'new' : '') }}' }">
+                                      x-data="{ contact: @js(old('contact_id', $contacts->isEmpty() ? 'new' : '')) }">
                                     @csrf
                                     @include('loans._borrower-fields', ['label' => __('Reserved for')])
                                     <div class="grid grid-cols-2 gap-2">
@@ -305,7 +305,7 @@
                             <details @if ($errors->hasAny(['fault_description', 'sent_at', 'expected_at', 'service_name'])) open @endif>
                                 <summary class="{{ $summary }}">{{ __('Send for repair') }}</summary>
                                 <form method="POST" action="{{ route('items.repairs.store', $item) }}" class="space-y-2 mt-2"
-                                      x-data="{ contact: '{{ old('contact_id', '') }}' }">
+                                      x-data="{ contact: @js(old('contact_id', '')) }">
                                     @csrf
                                     @if ($service['serviceContacts']->isNotEmpty())
                                         <select name="contact_id" x-model="contact" aria-label="{{ __('Repair service') }}" class="w-full rounded-md border-gray-300 text-sm dark:border-gray-600">

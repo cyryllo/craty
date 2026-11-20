@@ -54,7 +54,8 @@ done
 
 echo
 echo "3. Dostęp bez logowania"
-for path in /dashboard /items /ustawienia /users /ustawienia/aktualizacje /sales; do
+for path in /dashboard /items /ustawienia /users /ustawienia/aktualizacje /sales /loans /contacts /service \
+            /stocktakes /consumables /scan/batch /loan-groups/create "/scan/resolve?code=1"; do
     c=$(code "$BASE$path")
     if [[ "$c" == "302" || "$c" == "401" || "$c" == "403" || "$c" == "404" ]]; then
         ok "$path wymaga logowania (HTTP $c)"
