@@ -8,7 +8,9 @@
 <meta property="og:title" content="Craty: porządek w gratach">
 <meta property="og:description" content="Darmowy program do ogarnięcia warsztatu, magazynu i domowych gratów. Wiesz, co masz i gdzie to leży.">
 <meta property="og:image" content="app.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%234f46e5'/%3E%3Cg transform='translate(4 4) scale(.75)' fill='none' stroke='white' stroke-width='2.4'%3E%3Crect x='4' y='4' width='24' height='24' rx='2'/%3E%3Cpath d='M4 12h24M4 20h24'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="alternate" hreflang="pl" href="https://cyryllo.github.io/craty/">
+<link rel="alternate" hreflang="en" href="https://cyryllo.github.io/craty/en/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111827'/%3E%3Cg fill='none' stroke='%23fbbf24' stroke-width='3'%3E%3Crect x='7' y='7' width='18' height='18' rx='2'/%3E%3Cpath d='M9 23 23 9' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -89,9 +91,10 @@ h3 { font-size: 19px; font-weight: 700; }
 .brand svg { width: 34px; height: 34px; color: var(--accent); }
 .top nav { display: flex; align-items: center; gap: 22px; font-size: 15px; font-weight: 500; }
 .top nav a:not(.btn) { color: var(--muted); text-decoration: none; }
+.top nav a.lang { font-weight: 700; border: 1px solid var(--line); border-radius: 8px; padding: 4px 9px; font-size: 13px; }
 .top nav a:not(.btn):hover { color: var(--ink); }
 .top nav .btn { min-height: 40px; padding: 0 16px; font-size: 15px; }
-@media (max-width: 720px) { .top nav a:not(.btn) { display: none; } }
+@media (max-width: 720px) { .top nav a:not(.btn):not(.lang) { display: none; } }
 
 /* ---------- hero ---------- */
 .hero { padding: 72px 0 40px; text-align: center; }
@@ -199,14 +202,9 @@ footer p { margin: 0; max-width: 620px; }
     <div class="wrap">
         <a class="brand" href="#">
             <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                <rect x="4" y="4" width="24" height="24" rx="2" stroke="currentColor" stroke-width="2"/>
-                <line x1="4" y1="12" x2="28" y2="12" stroke="currentColor" stroke-width="2"/>
-                <line x1="4" y1="20" x2="28" y2="20" stroke="currentColor" stroke-width="2"/>
-                <rect x="7" y="6.5" width="5" height="5" fill="currentColor"/>
-                <rect x="16.5" y="7.5" width="4" height="4" fill="currentColor"/>
-                <rect x="7" y="14.5" width="14" height="5" fill="currentColor"/>
-                <rect x="7" y="22.5" width="4" height="4" fill="currentColor"/>
-                <rect x="14" y="21.5" width="7" height="5.5" fill="currentColor"/>
+                <rect x="4" y="4" width="24" height="24" rx="2.5" fill="none" stroke="currentColor" stroke-width="3"/>
+                <path d="M5.5 13.3h21M5.5 18.7h21" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+                <path d="M6 26 26 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
             </svg>
             Craty
         </a>
@@ -215,6 +213,7 @@ footer p { margin: 0; max-width: 620px; }
             <a href="#funkcje">Co potrafi</a>
             <a href="#start">Jak zacząć</a>
             <a href="#pomoc">Jak pomóc</a>
+            <a class="lang" href="en/" hreflang="en" lang="en" title="English version">EN</a>
             <a class="btn btn-primary" href="https://github.com/cyryllo/craty">GitHub</a>
         </nav>
     </div>
@@ -282,15 +281,15 @@ footer p { margin: 0; max-width: 620px; }
         <span class="eyebrow">Co potrafi</span>
         <h2>Wszystko, co trzeba. Nic ponad to.</h2>
         <div class="features">
-            <div class="feature"><span class="num">01</span><h3>Każda rzecz ma swoje miejsce</h3><p>Magazyn, pomieszczenie, regał, półka, pojemnik. Całość w jednym czytelnym drzewie, a po najechaniu na półkę widzisz, co na niej leży.</p></div>
+            <div class="feature"><span class="num">01</span><h3>Każda rzecz ma swoje miejsce</h3><p>Magazyn, pomieszczenie, regał, półka, pojemnik. Całość w jednym czytelnym drzewie, a inwentaryzacja pokazuje, czego na regale brakuje i co leży nie na swoim miejscu.</p></div>
             <div class="feature"><span class="num">02</span><h3>Naklejki z kodem QR</h3><p>Każda rzecz dostaje numer i kod QR. Drukujesz naklejkę na zwykłej drukarce etykiet, w kilku rozmiarach do wyboru.</p></div>
-            <div class="feature"><span class="num">03</span><h3>Skanowanie telefonem</h3><p>Craty instaluje się na telefonie jak aplikacja. Skanujesz naklejkę albo kod kreskowy z opakowania i od razu widzisz kartę rzeczy.</p></div>
-            <div class="feature"><span class="num">04</span><h3>Wypożyczenia</h3><p>Komu, kiedy i do kiedy, z bazą kontaktów i gotowymi protokołami wydania i zwrotu w PDF do podpisu. Przeterminowane widać na pulpicie, a jeśli chcesz, Craty codziennie przypomni o nich e-mailem.</p></div>
+            <div class="feature"><span class="num">03</span><h3>Skanowanie telefonem</h3><p>Craty instaluje się na telefonie jak aplikacja. Skanujesz naklejkę albo kod kreskowy z opakowania i od razu widzisz kartę rzeczy, a serią skanów zbierasz kilka rzeczy naraz.</p></div>
+            <div class="feature"><span class="num">04</span><h3>Wypożyczenia</h3><p>Komu, kiedy i do kiedy, pojedynczo albo całe zestawy, z rezerwacjami, bazą kontaktów i gotowymi protokołami wydania i zwrotu w PDF do podpisu. Przeterminowane widać na pulpicie, a Craty może przypomnieć o nich e-mailem.</p></div>
             <div class="feature"><span class="num">05</span><h3>Zdjęcia i dokumenty</h3><p>Zdjęcia, faktury, instrukcje i gwarancje przy każdej rzeczy. Numer seryjny i wartość też, w razie kradzieży czy szkody.</p></div>
             <div class="feature"><span class="num">06</span><h3>Historia i serwis</h3><p>Kto, kiedy i co zmienił: przeniesienia, statusy, wypożyczenia. Do tego opcjonalny moduł Serwis: naprawy z kosztami, przeglądy okresowe i gwarancje z przypomnieniem, zanim minie termin.</p></div>
             <div class="feature"><span class="num">07</span><h3>Pchli targ</h3><p>Masz coś niepotrzebnego? Wystaw to na publicznej stronie z opisem, zdjęciami i kontaktem do Ciebie, z linkiem do ogłoszenia na OLX, Allegro albo Vinted.</p></div>
-            <div class="feature"><span class="num">08</span><h3>Wygodnie na co dzień</h3><p>Polski i angielski, jasny i ciemny motyw, import z arkusza CSV, kilka kont z różnymi uprawnieniami.</p></div>
-            <div class="feature"><span class="num">09</span><h3>Aktualizacje jednym kliknięciem</h3><p>Nowa wersja to paczka wgrywana z panelu. Bez SSH, bez terminala, bez dzwonienia do informatyka.</p></div>
+            <div class="feature"><span class="num">08</span><h3>Wygodnie na co dzień</h3><p>Polski i angielski, jasny i ciemny motyw, import z arkusza CSV, kilka kont z różnymi uprawnieniami. Opcjonalnie materiały eksploatacyjne liczone w sztukach czy metrach, z ostrzeżeniem, gdy się kończą.</p></div>
+            <div class="feature"><span class="num">09</span><h3>Aktualizacje jednym kliknięciem</h3><p>Nowa wersja to paczka wgrywana z panelu. Bez SSH, bez terminala, bez dzwonienia do informatyka. W Dockerze wystarczy pobrać nowy obraz.</p></div>
         </div>
     </div>
 </section>
