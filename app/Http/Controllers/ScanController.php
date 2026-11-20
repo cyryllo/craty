@@ -26,6 +26,45 @@ class ScanController extends Controller
     }
 
     /** AJAX pod skaner — szuka DOKŁADNEGO dopasowania (nie "like") po EAN/numerze seryjnym. */
+    /** Seria skanów: kolejne kody trafiają na listę, z której wypożycza się zestaw albo drukuje etykiety. */
+    public function batch()
+    {
+        return view('scan.batch');
+    }
+
+    /**
+     * Rozpoznanie kodu w serii skanów: własny QR z etykiety (adres karty
+     * przedmiotu, bierzemy z niego numer) albo kod producenta, numer
+     * seryjny lub numer ewidencyjny (dokładne dopasowanie, jak w lookup()).
+     */
+    public function resolve(Request $request)
+    {
+        $code = trim((string) $request->query('code', ''));
+        $item = null;
+
+        if (preg_match('#/items/(\d+)(?:[/?\#]|$)#', $code, $match)) {
+            $item = Item::find((int) $match[1]);
+        } elseif ($code !== '') {
+            $item = Item::query()->where('ean', $code)->orWhere('serial_number', $code)->orWhere('inventory_no', $code)->first();
+        }
+
+        if (! $item) {
+            return response()->json(['found' => false]);
+        }
+
+        $item->load('storageLocation.warehouse');
+
+        return response()->json(['found' => true, 'item' => [
+            'id' => $item->id,
+            'name' => $item->name,
+            'inventory_no' => $item->inventory_no,
+            'status' => $item->statusLabel(),
+            'location' => $item->storageLocation?->label(),
+            'url' => route('items.show', $item),
+            'unavailable' => $item->unavailableReason(),
+        ]]);
+    }
+
     public function lookup(Request $request)
     {
         $code = trim((string) $request->query('code', ''));

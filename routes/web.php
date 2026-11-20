@@ -2,13 +2,16 @@
 
 use App\Http\Controllers\AppSettingController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ConsumableController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemImportController;
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\LoanGroupController;
 use App\Http\Controllers\LoanProtocolController;
+use App\Http\Controllers\LoansOverviewController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MailSettingController;
 use App\Http\Controllers\ManifestController;
@@ -17,12 +20,14 @@ use App\Http\Controllers\ModuleSettingController;
 use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RepairController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SaleListingController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ShopSettingController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\StocktakeController;
 use App\Http\Controllers\StorageLocationController;
 use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\UserController;
@@ -81,10 +86,28 @@ Route::middleware('auth')->group(function () {
         Route::get('loans/{loan}/protokol-wydania.pdf', [LoanProtocolController::class, 'issue'])->name('loans.protocol.issue');
         Route::get('loans/{loan}/protokol-zwrotu.pdf', [LoanProtocolController::class, 'returned'])->name('loans.protocol.return');
 
+        // Strona "Wypożyczenia", zestawy (kilka przedmiotów, jeden protokół) i rezerwacje.
+        Route::get('loans', [LoansOverviewController::class, 'index'])->name('loans.index');
+        Route::get('loan-groups/create', [LoanGroupController::class, 'create'])->name('loan-groups.create');
+        Route::post('loan-groups', [LoanGroupController::class, 'store'])->name('loan-groups.store');
+        Route::get('loan-groups/{group}', [LoanGroupController::class, 'show'])->name('loan-groups.show');
+        Route::post('loan-groups/{group}/return', [LoanGroupController::class, 'returnItems'])->name('loan-groups.return');
+        Route::get('loan-groups/{group}/protokol-wydania.pdf', [LoanProtocolController::class, 'groupIssue'])->name('loan-groups.protocol.issue');
+        Route::get('loan-groups/{group}/protokol-zwrotu.pdf', [LoanProtocolController::class, 'groupReturned'])->name('loan-groups.protocol.return');
+        Route::post('items/{item}/reservations', [ReservationController::class, 'store'])->name('items.reservations.store');
+        Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+        Route::post('reservations/{reservation}/issue', [ReservationController::class, 'issue'])->name('reservations.issue');
+
         // Moduł "Kontakty" — tak jak Sprzedaż: 404 przy wyłączonym module,
         // dołożone na role:admin,magazynier.
         Route::middleware('module:contacts')->group(function () {
             Route::resource('contacts', ContactController::class);
+        });
+
+        // Moduł "Materiały eksploatacyjne" (domyślnie wyłączony).
+        Route::middleware('module:consumables')->group(function () {
+            Route::resource('consumables', ConsumableController::class);
+            Route::post('consumables/{consumable}/adjust', [ConsumableController::class, 'adjust'])->name('consumables.adjust');
         });
 
         // Moduł "Serwis": naprawy, przeglądy okresowe, gwarancje (domyślnie wyłączony).
@@ -118,6 +141,15 @@ Route::middleware('auth')->group(function () {
         Route::resource('rooms', RoomController::class)->except('show');
         Route::resource('storage-locations', StorageLocationController::class)->except('show');
 
+        // Inwentaryzacja (skan miejsca, raport braków i rzeczy nie na miejscu).
+        Route::get('stocktakes', [StocktakeController::class, 'index'])->name('stocktakes.index');
+        Route::post('stocktakes', [StocktakeController::class, 'store'])->name('stocktakes.store');
+        Route::get('stocktakes/{stocktake}', [StocktakeController::class, 'show'])->name('stocktakes.show');
+        Route::post('stocktakes/{stocktake}/scan', [StocktakeController::class, 'scan'])->name('stocktakes.scan');
+        Route::post('stocktakes/{stocktake}/finish', [StocktakeController::class, 'finish'])->name('stocktakes.finish');
+        Route::post('stocktakes/{stocktake}/move/{item}', [StocktakeController::class, 'move'])->name('stocktakes.move');
+        Route::delete('stocktakes/{stocktake}', [StocktakeController::class, 'destroy'])->name('stocktakes.destroy');
+
         // "Szybkie dodawanie" po nietrafionym skanie kodu kreskowego — mutuje
         // stan magazynu, więc te dwie trasy zostają w grupie admin/magazynier,
         // w przeciwieństwie do samego skanowania/podglądu niżej.
@@ -135,6 +167,9 @@ Route::middleware('auth')->group(function () {
     // samo jak sam podgląd przedmiotu po zeskanowaniu własnego QR z etykiety.
     Route::get('scan', [ScanController::class, 'show'])->name('scan.show');
     Route::get('scan/lookup', [ScanController::class, 'lookup'])->name('scan.lookup');
+    // Seria skanów: kolejne kody trafiają na listę (np. pod wypożyczenie zestawu).
+    Route::get('scan/batch', [ScanController::class, 'batch'])->name('scan.batch');
+    Route::get('scan/resolve', [ScanController::class, 'resolve'])->name('scan.resolve');
 
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', UserController::class)->except('show');

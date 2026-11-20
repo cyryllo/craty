@@ -43,6 +43,40 @@
             </div>
         @endif
 
+        @if ($lowConsumables->isNotEmpty())
+            <div class="bg-white rounded-lg shadow dark:bg-gray-800">
+                <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between dark:border-gray-700">
+                    <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Consumables running low') }}</h3>
+                    <a href="{{ route('consumables.index', ['low' => 1]) }}" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Consumables') }} →</a>
+                </div>
+                <ul class="divide-y divide-gray-100 dark:divide-gray-700">
+                    @foreach ($lowConsumables->take(8) as $consumable)
+                        <li class="px-5 py-3 flex items-center justify-between gap-3 text-sm">
+                            <a href="{{ route('consumables.show', $consumable) }}" class="text-gray-900 hover:underline dark:text-gray-100">{{ $consumable->name }}</a>
+                            <span class="text-red-600 whitespace-nowrap dark:text-red-400">{{ \App\Models\Consumable::formatQuantity($consumable->quantity) }} / {{ __('min.') }} {{ \App\Models\Consumable::formatQuantity($consumable->min_quantity) }} {{ $consumable->unitLabel() }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        @if ($upcomingReservations->isNotEmpty())
+            <div class="bg-white rounded-lg shadow dark:bg-gray-800">
+                <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between dark:border-gray-700">
+                    <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Reservations to hand out today and tomorrow') }}</h3>
+                    <a href="{{ route('loans.index') }}" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Loans') }} →</a>
+                </div>
+                <ul class="divide-y divide-gray-100 dark:divide-gray-700">
+                    @foreach ($upcomingReservations as $reservation)
+                        <li class="px-5 py-3 flex items-center justify-between gap-3 text-sm">
+                            <a href="{{ route('items.show', $reservation->item) }}" class="text-gray-900 hover:underline dark:text-gray-100">{{ $reservation->item->name }}</a>
+                            <span class="text-gray-500 dark:text-gray-400">{{ $reservation->borrowerLabel() }} · {{ $reservation->starts_on->format('d.m') }}–{{ $reservation->ends_on->format('d.m.Y') }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         @if ($service && ($service['openRepairs']->isNotEmpty() || $service['inspectionsDue']->isNotEmpty() || $service['warrantiesEnding']->isNotEmpty()))
             <div class="space-y-2">
                 <div class="flex items-center justify-between">

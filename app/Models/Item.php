@@ -195,4 +195,24 @@ class Item extends Model
 
         return $this->next_inspection_at->lte(today()->addDays(self::INSPECTION_WARNING_DAYS)) ? 'soon' : null;
     }
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class)->orderBy('starts_on');
+    }
+
+    /**
+     * Dlaczego przedmiotu nie da się teraz wydać (null = da się). Wspólne
+     * dla zestawów i wydania z rezerwacji; pojedyncze wypożyczenie z karty
+     * przedmiotu sprawdza to samo w LoanController.
+     */
+    public function unavailableReason(): ?string
+    {
+        return match (true) {
+            in_array($this->status, self::OUT_OF_STOCK_STATUSES, true) => __('sold or retired'),
+            $this->currentLoan()->exists() => __('already on loan'),
+            $this->openRepair()->exists() => __('under repair'),
+            default => null,
+        };
+    }
 }

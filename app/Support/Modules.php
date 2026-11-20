@@ -38,6 +38,10 @@ class Modules
             'label' => 'Service',
             'description' => 'Repairs (sending items to a repair service or your own workshop), periodic inspections and warranty dates, with reminders on the dashboard.',
         ],
+        'consumables' => [
+            'label' => 'Consumables',
+            'description' => 'Things counted by quantity (screws, glue, cable) on their own list, with a minimum stock level, a warning when running low and a history of who took what.',
+        ],
     ];
 
     public static function isEnabled(string $key): bool

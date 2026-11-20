@@ -29,6 +29,16 @@
                     {{ $locationFilter }}
                     <a href="{{ $clearLocationUrl }}" class="font-semibold hover:text-indigo-950 dark:hover:text-white" aria-label="{{ __('Clear location filter') }}">&times;</a>
                 </span>
+                @if (auth()->user()->isMagazynier())
+                    {{-- Inwentaryzacja dokładnie tego miejsca, które filtruje lista (te same parametry, LocationScope). --}}
+                    <form method="POST" action="{{ route('stocktakes.store') }}">
+                        @csrf
+                        @foreach ($locationParams as $param => $value)
+                            <input type="hidden" name="{{ $param }}" value="{{ $value }}">
+                        @endforeach
+                        <button class="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-1 font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">📋 {{ __('Count this place') }}</button>
+                    </form>
+                @endif
             </div>
         @endif
 
@@ -125,9 +135,18 @@
                     <input type="checkbox" onclick="document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = this.checked)">
                     {{ __('Select all') }}
                 </label>
-                <button type="submit" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
-                    🏷️ {{ __('Print labels') }}
-                </button>
+                <div class="flex flex-wrap items-center gap-2">
+                    @if (auth()->user()->isMagazynier())
+                        {{-- Ten sam formularz co druk etykiet, inny cel: zaznaczone przedmioty jako zestaw. --}}
+                        <button type="submit" formaction="{{ route('loan-groups.create') }}" formmethod="GET" formtarget="_self"
+                                class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                            📦 {{ __('Loan out selected') }}
+                        </button>
+                    @endif
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                        🏷️ {{ __('Print labels') }}
+                    </button>
+                </div>
             </div>
 
         @if ($view === 'list')

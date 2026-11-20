@@ -106,6 +106,23 @@
         </svg>
         @break
 
+    @case('loans')
+        {{-- pudełko ze strzałką na zewnątrz: Wypożyczenia --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>
+            <path d="M3 7.5 10 4l7 3.5v7L10 18l-7-3.5z" stroke-linejoin="round"/>
+            <path d="M3 7.5 10 11l7-3.5M10 11v7" stroke-linejoin="round"/>
+        </svg>
+        @break
+
+    @case('consumables')
+        {{-- szpula / rolka: Materiały eksploatacyjne --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>
+            <ellipse cx="10" cy="5" rx="6" ry="2.2"/>
+            <path d="M4 5v10c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2V5"/>
+            <path d="M4 10c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2" opacity=".6"/>
+        </svg>
+        @break
+
     @case('branding')
         {{-- ramka ze zdjęciem: Ustawienia aplikacji --}}
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" {{ $attributes }}>

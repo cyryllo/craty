@@ -132,6 +132,42 @@ Ostatnie zakończone wypożyczenia są wymienione pod formularzem, z linkami do 
 
 W historii przedmiotu zapisuje się, komu go wypożyczono (i do kiedy), a przy zwrocie, od kogo wrócił. Przeterminowane wypożyczenia widać na Panelu; opcjonalnie appka wysyła codzienne e-mailowe podsumowanie przeterminowanych wypożyczeń do wszystkich aktywnych kont (Ustawienia → Powiadomienia).
 
+### Zestawy (kilka przedmiotów naraz)
+
+Gdy jedna osoba bierze kilka rzeczy (np. komplet na wyjazd), wypożycz je jako **zestaw**: jeden formularz, jedna osoba, jeden wspólny protokół wydania z listą wszystkich przedmiotów. Przedmioty do zestawu wybierasz na dwa sposoby:
+- **Skanuj serię** (Skanuj → „Skanuj serię”, albo przycisk „Wypożycz zestaw” na stronie Wypożyczenia): skanujesz kody po kolei, każdy trafia na listę, potem „Wypożycz jako zestaw”.
+- **Lista przedmiotów**: zaznacz przedmioty checkboxami i kliknij „Wypożycz zaznaczone”.
+
+Przedmioty, których nie da się teraz wypożyczyć (już wypożyczone, w naprawie, sprzedane), są oznaczone i pomijane. Strona zestawu pokazuje wszystkie rzeczy; **zwrot** zaznaczasz przy każdej osobno (ze stanem i uwagami), więc można zarejestrować zwrot całości albo tylko tego, co wróciło. Resztę da się zwrócić później, na stronie zestawu albo zwykłym zwrotem z karty przedmiotu. Protokół zwrotu zestawu obejmuje to, co już wróciło. Na karcie przedmiotu z zestawu widać numer zestawu (np. „Z7/2026”) z linkiem.
+
+### Rezerwacje
+
+Na karcie przedmiotu, w ramce „Wypożyczenie”, sekcja **Rezerwacje**: „Zarezerwuj” zapisuje, dla kogo i w jakie dni (od–do) przedmiot jest zaklepany. Dwie rezerwacje tego samego przedmiotu na zachodzące terminy nie przejdą. Gdy rezerwacja trwa, nad formularzem wypożyczenia pojawia się żółta informacja, dla kogo jest zarezerwowany; wypożyczyć komuś innemu nadal się da, decyzja należy do obsługi. Przycisk **„Wydaj teraz”** zamienia trwającą rezerwację w zwykłe wypożyczenie dla tej samej osoby, z terminem zwrotu równym końcowi rezerwacji. Rezerwacje na dziś i jutro widać na Panelu.
+
+### Strona Wypożyczenia
+
+Zakładka **Wypożyczenia** w menu zbiera w jednym miejscu: co jest teraz wypożyczone (z zaznaczeniem po terminie), wypożyczone zestawy (ile rzeczy jeszcze nie wróciło) i nadchodzące rezerwacje.
+
+## Inwentaryzacja
+
+Struktura magazynu → **„Inwentaryzacja”** (albo na liście przedmiotów przefiltrowanej po miejscu przycisk **„Inwentaryzacja tego miejsca”**). Wybierasz miejsce do przeliczenia; magazyn, pomieszczenie, regał albo półka obejmuje wszystko, co jest pod nim. Potem skanujesz serią to, co faktycznie tam leży (aparatem, wpisując kod albo ręcznym czytnikiem kodów). Każdy skan zapisuje się od razu, więc można przerwać i dokończyć później, także na innym telefonie.
+
+Po „Zakończ i pokaż raport” widać:
+- **Brakuje**: przedmioty, które według kartoteki powinny tam być, a nie zostały zeskanowane. Craty niczego z nimi sam nie robi, to lista do sprawdzenia.
+- **Znalezione tutaj, ale zapisane gdzie indziej**: przy każdym przycisk **„Przenieś tutaj”**, który poprawia lokalizację w kartotece (zmiana trafia do historii przedmiotu).
+- **Wypożyczone albo w naprawie**: rzeczy z tego miejsca, które są teraz poza magazynem, więc nie liczą się jako braki.
+- **Na miejscu**: wszystko, co się zgadza.
+
+Raporty zostają na liście inwentaryzacji; sprzedane i wycofane przedmioty nie są brane pod uwagę.
+
+## Materiały eksploatacyjne (moduł opcjonalny, domyślnie wyłączony)
+
+Włączasz go w Ustawienia → Moduły; w menu pojawia się zakładka **Materiały**. To osobna lista na rzeczy liczone ilością (śrubki, klej, kabel, taśma), bez numerów ewidencyjnych i wypożyczeń. Każdy materiał ma jednostkę (szt., opak., m, l, kg), lokalizację, kategorię i **stan minimalny**.
+
+Ilość zmieniasz na trzy sposoby: **„Pobierz”** (także szybko z samej listy), **„Uzupełnij”** po zakupie i **„Ustaw policzony stan”** po przeliczeniu na półce (zapisuje się jako korekta). Każda zmiana ma wpis w historii: kiedy, kto, o ile i z jaką uwagą. Edycja materiału nie zmienia ilości, tylko jego dane. Stan nie schodzi poniżej zera.
+
+Gdy ilość spadnie do minimum albo niżej, materiał jest oznaczony na czerwono, filtr „Tylko kończące się” pokazuje wszystkie takie pozycje, a lista kończących się materiałów pojawia się na Panelu.
+
 ## Kontakty (moduł opcjonalny)
 
 Zakładka **Kontakty** w menu to lista osób, firm i serwisów, którym wypożyczasz sprzęt. Każdy kontakt ma nazwę, typ (osoba, firma, serwis), telefon, e-mail, adres (drukowany na protokołach) i notatkę. Listę można przeszukiwać po nazwie, telefonie i e-mailu oraz filtrować po typie; przy każdym kontakcie widać liczbę wypożyczeń i to, ile rzeczy ma u siebie teraz.
@@ -231,6 +267,8 @@ przeglądarce — Chrome/Android pokazuje to sam, wymaga HTTPS). Strona
   uzupełnienia później — przedmiot dostaje wtedy ikonkę 📱 na liście, jako
   przypomnienie, że warto go jeszcze dokończyć).
 
+**Skanuj serię** (link na stronie Skanuj) nie otwiera karty po pierwszym kodzie, tylko zbiera kolejne zeskanowane przedmioty na liście; z niej wypożyczasz zestaw albo drukujesz etykiety. Kod można też wpisać ręcznie albo użyć ręcznego czytnika kodów kreskowych podpiętego jak klawiatura. Lista zostaje zapamiętana po odświeżeniu strony.
+
 ## Ustawienia
 
 Rozdzielnik Ustawień (link w prawym górnym rogu) grupuje wszystko w jednym
@@ -253,7 +291,7 @@ miejscu:
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego
   resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń. Przy włączonym module Serwis dochodzi cotygodniowe przypomnienie serwisowe: w każdy poniedziałek rano e-mail z przeglądami po terminie i w ciągu 14 dni, gwarancjami kończącymi się w ciągu 30 dni i naprawami po planowanym powrocie (tylko gdy coś jest na liście). Oba e-maile wymagają, żeby hosting uruchamiał harmonogram zadań (cron); w wersji Docker działa to samo.
 - **Moduły** *(tylko Administrator)* — włącz/wyłącz opcjonalne części
-  appki (dziś: Sprzedaż, Kontakty i Serwis).
+  appki (dziś: Sprzedaż, Kontakty, Serwis i Materiały eksploatacyjne).
 - **Aktualizacje** *(tylko Administrator)* — samodzielna aktualizacja
   appki przez wgranie paczki `.zip`, bez SSH/Composera. Zawsze rób kopię
   plików i bazy danych przed wgraniem nowej wersji. W wersji z obrazu

@@ -141,7 +141,13 @@
                         @if ($loan->due_at)
                             <p class="text-sm {{ $loan->isOverdue() ? 'text-red-600' : 'text-gray-500' }}">{{ __('Due date') }}: {{ $loan->due_at->format('d.m.Y') }}</p>
                         @endif
-                        <a href="{{ route('loans.protocol.issue', $loan) }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-indigo-600 hover:underline dark:text-indigo-400">📄 {{ __('Issue protocol (PDF)') }}</a>
+                        @if ($loan->group)
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                {{ __('Part of a kit') }}:
+                                <a href="{{ route('loan-groups.show', $loan->group) }}" class="font-medium text-indigo-600 hover:underline dark:text-indigo-400">{{ $loan->group->protocolNumber() }} ({{ trans_choice(':count item|:count items', $loan->group->loans->count()) }})</a>
+                            </p>
+                        @endif
+                        <a href="{{ $loan->issueProtocolUrl() }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-indigo-600 hover:underline dark:text-indigo-400">📄 {{ __('Issue protocol (PDF)') }}</a>
 
                         <details class="pt-3 border-t border-gray-100 dark:border-gray-700" @if ($errors->hasAny(['condition_in', 'return_notes'])) open @endif>
                         <summary class="cursor-pointer text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Register return') }}</summary>
@@ -162,32 +168,19 @@
                         {{-- Moduł Serwis: przedmiotu w naprawie nie da się wypożyczyć. --}}
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('This item is under repair. Complete the repair first.') }}</p>
                     @else
+                        @if ($today = $reservations->first(fn ($r) => $r->isCurrent()))
+                            {{-- Rezerwacja tylko ostrzega, nie blokuje (decyzja właściciela). --}}
+                            <p class="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-200">
+                                {{ __('Reserved for :name until :date.', ['name' => $today->borrowerLabel(), 'date' => $today->ends_on->format('d.m.Y')]) }}
+                            </p>
+                        @endif
                         {{-- Zwinięte domyślnie (prośba właściciela), rozwija się samo po błędzie walidacji. --}}
                         <details @if ($errors->hasAny(['contact_id', 'new_contact_name', 'new_contact_email', 'borrower_name', 'due_at', 'notes'])) open @endif>
                         <summary class="cursor-pointer text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Loan out') }}</summary>
                         <form method="POST" action="{{ route('items.loans.store', $item) }}" class="space-y-2 mt-2"
                               x-data="{ contact: '{{ old('contact_id', $contacts->isEmpty() ? 'new' : '') }}' }">
                             @csrf
-                            @if ($contactsEnabled)
-                                <select name="contact_id" x-model="contact" aria-label="{{ __('Loaned to whom') }}" required class="{{ $field }}">
-                                    <option value="" disabled>{{ __('Loaned to whom') }} *</option>
-                                    <option value="new">+ {{ __('New contact') }}</option>
-                                    @foreach ($contacts as $option)
-                                        <option value="{{ $option->id }}">{{ $option->name }}</option>
-                                    @endforeach
-                                </select>
-                                <x-input-error :messages="$errors->get('contact_id')" />
-                                <div x-show="contact === 'new'" x-cloak class="space-y-2 ps-3 border-s-2 border-indigo-200 dark:border-indigo-800">
-                                    <input type="text" name="new_contact_name" placeholder="{{ __('Name (person or company)') }} *" aria-label="{{ __('Name (person or company)') }}" value="{{ old('new_contact_name') }}" x-bind:required="contact === 'new'" class="{{ $field }}">
-                                    <x-input-error :messages="$errors->get('new_contact_name')" />
-                                    <input type="tel" name="new_contact_phone" placeholder="{{ __('Phone') }}" aria-label="{{ __('Phone') }}" value="{{ old('new_contact_phone') }}" class="{{ $field }}">
-                                    <input type="email" name="new_contact_email" placeholder="{{ __('Email') }}" aria-label="{{ __('Email') }}" value="{{ old('new_contact_email') }}" class="{{ $field }}">
-                                    <x-input-error :messages="$errors->get('new_contact_email')" />
-                                </div>
-                            @else
-                                <input type="text" name="borrower_name" placeholder="{{ __('Loaned to whom') }} *" aria-label="{{ __('Loaned to whom') }}" value="{{ old('borrower_name') }}" required class="{{ $field }}">
-                                <x-input-error :messages="$errors->get('borrower_name')" />
-                            @endif
+                            @include('loans._borrower-fields')
                             <label for="due_at" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Due date (optional)') }}</label>
                             <input type="date" id="due_at" name="due_at" value="{{ old('due_at') }}" class="{{ $field }}">
                             <x-input-error :messages="$errors->get('due_at')" />
@@ -196,6 +189,60 @@
                         </form>
                         </details>
                     @endif
+
+                    {{-- Rezerwacje na przyszłe terminy (ReservationController). --}}
+                    <div class="pt-3 border-t border-gray-100 dark:border-gray-700 space-y-2">
+                        <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide dark:text-gray-400">{{ __('Reservations') }}</h4>
+                        <x-input-error :messages="$errors->get('reservation')" />
+                        @forelse ($reservations as $reservation)
+                            <div class="text-sm">
+                                <p class="text-gray-800 dark:text-gray-200">
+                                    {{ $reservation->starts_on->format('d.m') }}–{{ $reservation->ends_on->format('d.m.Y') }} · <b>{{ $reservation->borrowerLabel() }}</b>
+                                </p>
+                                @if ($reservation->notes)
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $reservation->notes }}</p>
+                                @endif
+                                <div class="flex gap-3 text-xs mt-0.5">
+                                    @if ($reservation->isCurrent() && ! $item->currentLoan)
+                                        <form method="POST" action="{{ route('reservations.issue', $reservation) }}">
+                                            @csrf
+                                            <button class="font-medium text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Loan out now') }}</button>
+                                        </form>
+                                    @endif
+                                    <form method="POST" action="{{ route('reservations.destroy', $reservation) }}" onsubmit="return confirm('{{ __('Cancel this reservation?') }}');">
+                                        @csrf @method('DELETE')
+                                        <button class="text-red-600 hover:underline dark:text-red-400">{{ __('Cancel reservation') }}</button>
+                                    </form>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-sm text-gray-400 dark:text-gray-500">{{ __('No upcoming reservations.') }}</p>
+                        @endforelse
+                        @unless (in_array($item->status, \App\Models\Item::OUT_OF_STOCK_STATUSES, true))
+                            <details @if ($errors->hasAny(['starts_on', 'ends_on'])) open @endif>
+                                <summary class="cursor-pointer text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Reserve') }}</summary>
+                                <form method="POST" action="{{ route('items.reservations.store', $item) }}" class="space-y-2 mt-2"
+                                      x-data="{ contact: '{{ old('contact_id', $contacts->isEmpty() ? 'new' : '') }}' }">
+                                    @csrf
+                                    @include('loans._borrower-fields', ['label' => __('Reserved for')])
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label for="starts_on" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('From') }}</label>
+                                            <input type="date" id="starts_on" name="starts_on" value="{{ old('starts_on') }}" min="{{ today()->format('Y-m-d') }}" required class="{{ $field }}">
+                                        </div>
+                                        <div>
+                                            <label for="ends_on" class="block text-xs text-gray-500 dark:text-gray-400">{{ __('To') }}</label>
+                                            <input type="date" id="ends_on" name="ends_on" value="{{ old('ends_on') }}" min="{{ today()->format('Y-m-d') }}" required class="{{ $field }}">
+                                        </div>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('starts_on')" />
+                                    <x-input-error :messages="$errors->get('ends_on')" />
+                                    <textarea name="reservation_notes" rows="2" placeholder="{{ __('Notes (optional)') }}" aria-label="{{ __('Notes') }}" class="{{ $field }}">{{ old('reservation_notes') }}</textarea>
+                                    <button class="w-full px-3 py-2 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700">{{ __('Save reservation') }}</button>
+                                </form>
+                            </details>
+                        @endunless
+                    </div>
 
                     @if ($pastLoans->isNotEmpty())
                         <div class="pt-3 border-t border-gray-100 dark:border-gray-700">
@@ -206,8 +253,8 @@
                                         {{ $past->borrowerLabel() }}
                                         <span class="text-xs text-gray-400 dark:text-gray-500">{{ $past->borrowed_at->format('d.m') }}–{{ $past->returned_at->format('d.m.Y') }}</span>
                                         <span class="block text-xs space-x-2">
-                                            <a href="{{ route('loans.protocol.issue', $past) }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('issue protocol') }}</a>
-                                            <a href="{{ route('loans.protocol.return', $past) }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('return protocol') }}</a>
+                                            <a href="{{ $past->issueProtocolUrl() }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('issue protocol') }}</a>
+                                            <a href="{{ $past->returnProtocolUrl() }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('return protocol') }}</a>
                                         </span>
                                     </li>
                                 @endforeach

@@ -15,6 +15,7 @@ use App\Models\Warehouse;
 use App\Services\InventoryNumberGenerator;
 use App\Services\QrCodeGenerator;
 use App\Support\ItemLabelTemplates;
+use App\Support\LocationScope;
 use App\Support\Modules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -25,7 +26,7 @@ class ItemController extends Controller
     /** Parametry listy zapamiętywane w sesji ("pamiętaj ostatnie filtry"). */
     private const LIST_PARAMS = ['q', 'category_id', 'status', 'sort', 'dir', 'storage_location_id', 'warehouse_id', 'room_id', 'rack', 'shelf'];
 
-    private const LOCATION_PARAMS = ['storage_location_id', 'warehouse_id', 'room_id', 'rack', 'shelf'];
+    private const LOCATION_PARAMS = LocationScope::PARAMS;
 
     /**
      * Sortowanie listy: klucz => kolumna albo podzapytanie. "created" to
@@ -61,6 +62,7 @@ class ItemController extends Controller
         }
 
         [$sort, $dir] = $this->listSort($request);
+        $location = LocationScope::fromArray($request->query());
 
         $items = Item::query()
             ->with(['category', 'storageLocation.warehouse', 'storageLocation.room', 'primaryPhoto'])
@@ -72,7 +74,7 @@ class ItemController extends Controller
                     ->orWhere('ean', 'like', $term);
             }))
             ->when($request->filled('category_id'), fn ($q) => $q->where('category_id', $request->integer('category_id')))
-            ->tap(fn ($q) => $this->applyLocationFilter($q, $request))
+            ->tap(fn ($q) => $location->apply($q))
             // Bez filtra statusu lista pokazuje tylko to, co jest w magazynie
             // — sprzedane/wycofane tylko po jawnym wybraniu ich filtra.
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')), fn ($q) => $q->inStock())
@@ -90,8 +92,9 @@ class ItemController extends Controller
             'sort' => $sort,
             'dir' => $dir,
             'hasActiveFilters' => (bool) array_filter($filters) || $request->hasAny(self::LOCATION_PARAMS),
-            'locationFilter' => $this->locationFilterLabel($request),
-            'locationBackUrl' => $this->locationBackUrl($request),
+            'locationFilter' => $location->label(),
+            'locationBackUrl' => ($warehouseId = $location->warehouseId()) ? route('warehouse-structure.index').'#warehouse-'.$warehouseId : null,
+            'locationParams' => $location->params,
             'clearLocationUrl' => route('items.index', [...$request->except([...self::LOCATION_PARAMS, 'page', 'f']), 'f' => 1]),
         ]);
     }
@@ -167,11 +170,12 @@ class ItemController extends Controller
 
     public function show(Item $item)
     {
-        $item->load(['category', 'storageLocation.warehouse', 'storageLocation.room', 'photos', 'attachments', 'histories.user', 'currentLoan.borrower', 'currentLoan.contact', 'saleListings', 'activeSaleListing', 'draftSaleListing']);
+        $item->load(['category', 'storageLocation.warehouse', 'storageLocation.room', 'photos', 'attachments', 'histories.user', 'currentLoan.borrower', 'currentLoan.contact', 'currentLoan.group.loans', 'saleListings', 'activeSaleListing', 'draftSaleListing']);
 
         // Zakończone wypożyczenia (z linkami do protokołów) i lista kontaktów do
         // formularza wypożyczenia — to drugie tylko z włączonym modułem Kontakty.
         $pastLoans = $item->loans()->whereNotNull('returned_at')->with(['contact', 'borrower'])->latest('returned_at')->limit(5)->get();
+        $reservations = $item->reservations()->active()->with('contact')->get();
         $contacts = Modules::isEnabled('contacts') ? Contact::orderBy('name')->get(['id', 'name']) : collect();
 
         // Moduł Serwis: naprawa w toku, ostatnie naprawy i przeglądy, serwisy z Kontaktów.
@@ -184,7 +188,7 @@ class ItemController extends Controller
                 : collect(),
         ] : null;
 
-        return view('items.show', compact('item', 'pastLoans', 'contacts', 'service'));
+        return view('items.show', compact('item', 'pastLoans', 'contacts', 'service', 'reservations'));
     }
 
     public function edit(Item $item)
@@ -400,80 +404,5 @@ class ItemController extends Controller
         return StorageLocation::with(['warehouse', 'room'])->get()
             ->sortBy(fn (StorageLocation $l) => $l->label(), SORT_NATURAL)
             ->values();
-    }
-
-    /**
-     * Filtr miejsca z liczb w Strukturze magazynu: albo dokładna lokalizacja
-     * (storage_location_id — pojemnik, "cały magazyn/pomieszczenie"), albo
-     * gałąź drzewa (warehouse_id + opcjonalnie room_id — id albo "none" dla
-     * regałów bez pomieszczenia — rack, shelf), łącznie z tym, co niżej.
-     */
-    private function applyLocationFilter($query, Request $request): void
-    {
-        if ($request->filled('storage_location_id')) {
-            $query->where('storage_location_id', $request->integer('storage_location_id'));
-
-            return;
-        }
-
-        if (! $request->filled('warehouse_id')) {
-            return;
-        }
-
-        $query->whereHas('storageLocation', function ($q) use ($request) {
-            $q->where('warehouse_id', $request->integer('warehouse_id'));
-
-            if ($request->input('room_id') === 'none') {
-                $q->whereNull('room_id');
-            } elseif ($request->filled('room_id')) {
-                $q->where('room_id', $request->integer('room_id'));
-            }
-
-            foreach (['rack', 'shelf'] as $field) {
-                if ($request->filled($field)) {
-                    $q->where($field, $request->string($field));
-                }
-            }
-        });
-    }
-
-    /** Czytelny opis aktywnego filtra miejsca do znacznika nad listą (null = brak filtra). */
-    private function locationFilterLabel(Request $request): ?string
-    {
-        if ($request->filled('storage_location_id')) {
-            return StorageLocation::with(['warehouse', 'room'])->find($request->integer('storage_location_id'))?->label();
-        }
-
-        if (! $request->filled('warehouse_id') || ! ($warehouse = Warehouse::find($request->integer('warehouse_id')))) {
-            return null;
-        }
-
-        $parts = [$warehouse->name];
-        if ($request->input('room_id') === 'none') {
-            $parts[] = __('no room');
-        } elseif ($request->filled('room_id')) {
-            $parts[] = Room::find($request->integer('room_id'))?->name;
-        }
-        if ($request->filled('rack')) {
-            $parts[] = __('Rack').' '.$request->string('rack');
-        }
-        if ($request->filled('shelf')) {
-            $parts[] = __('Shelf').' '.$request->string('shelf');
-        }
-
-        return implode(' › ', array_filter($parts));
-    }
-
-    /**
-     * Szybki powrót z listy otwartej z liczby w Strukturze magazynu — prosto
-     * do sekcji tego magazynu (kotwica #warehouse-{id}), nie na górę strony.
-     */
-    private function locationBackUrl(Request $request): ?string
-    {
-        $warehouseId = $request->filled('storage_location_id')
-            ? StorageLocation::find($request->integer('storage_location_id'))?->warehouse_id
-            : ($request->filled('warehouse_id') ? $request->integer('warehouse_id') : null);
-
-        return $warehouseId ? route('warehouse-structure.index').'#warehouse-'.$warehouseId : null;
     }
 }

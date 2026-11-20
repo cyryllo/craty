@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Consumable;
 use App\Models\Item;
 use App\Models\Loan;
+use App\Models\Reservation;
 use App\Support\Modules;
 
 class DashboardController extends Controller
@@ -27,6 +29,10 @@ class DashboardController extends Controller
             // Nazwa jedyne, co pokazuje widok (patrz dashboard.blade.php) — bez
             // eager-loadów category/storageLocation, których już nie wyświetla.
             'recentItems' => Item::inStock()->latest()->take(8)->get(),
+            // Moduł Materiały: to, czego jest na minimum albo mniej.
+            'lowConsumables' => Modules::isEnabled('consumables') ? Consumable::low()->orderBy('name')->get() : collect(),
+            // Rezerwacje do wydania dziś i jutro.
+            'upcomingReservations' => Reservation::active()->whereDate('starts_on', '<=', today()->addDay())->with(['item', 'contact'])->orderBy('starts_on')->get(),
             'needsCompletionItems' => Item::inStock()->where('needs_completion', true)->latest()->take(8)->get(),
             // Moduł Serwis: naprawy w toku, przeglądy i gwarancje wymagające uwagi.
             'service' => Modules::isEnabled('service') && auth()->user()->isMagazynier() ? ServiceController::overview() : null,

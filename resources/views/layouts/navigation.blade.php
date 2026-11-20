@@ -56,6 +56,12 @@
                         <x-icon name="items" class="w-4 h-4 me-1.5" />
                         {{ __('Items') }}
                     </x-nav-link>
+                    @if (auth()->user()->isMagazynier())
+                        <x-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*', 'loan-groups.*')">
+                            <x-icon name="loans" class="w-4 h-4 me-1.5" />
+                            {{ __('Loans') }}
+                        </x-nav-link>
+                    @endif
                     @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('sales'))
                         <x-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
                             <x-icon name="sale" class="w-4 h-4 me-1.5" />
@@ -66,6 +72,12 @@
                         <x-nav-link :href="route('contacts.index')" :active="request()->routeIs('contacts.*')">
                             <x-icon name="contacts" class="w-4 h-4 me-1.5" />
                             {{ __('Contacts') }}
+                        </x-nav-link>
+                    @endif
+                    @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('consumables'))
+                        <x-nav-link :href="route('consumables.index')" :active="request()->routeIs('consumables.*')">
+                            <x-icon name="consumables" class="w-4 h-4 me-1.5" />
+                            {{ __('Consumables') }}
                         </x-nav-link>
                     @endif
                     @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('service'))
@@ -158,6 +170,14 @@
                     {{ __('Items') }}
                 </span>
             </x-responsive-nav-link>
+            @if (auth()->user()->isMagazynier())
+                <x-responsive-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*', 'loan-groups.*')">
+                    <span class="inline-flex items-center gap-2">
+                        <x-icon name="loans" class="w-4 h-4" />
+                        {{ __('Loans') }}
+                    </span>
+                </x-responsive-nav-link>
+            @endif
             @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('sales'))
                 <x-responsive-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
                     <span class="inline-flex items-center gap-2">
@@ -171,6 +191,14 @@
                     <span class="inline-flex items-center gap-2">
                         <x-icon name="contacts" class="w-4 h-4" />
                         {{ __('Contacts') }}
+                    </span>
+                </x-responsive-nav-link>
+            @endif
+            @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('consumables'))
+                <x-responsive-nav-link :href="route('consumables.index')" :active="request()->routeIs('consumables.*')">
+                    <span class="inline-flex items-center gap-2">
+                        <x-icon name="consumables" class="w-4 h-4" />
+                        {{ __('Consumables') }}
                     </span>
                 </x-responsive-nav-link>
             @endif
