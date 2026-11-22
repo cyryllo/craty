@@ -20,6 +20,8 @@ class UpdateItemRequest extends FormRequest
         if ($this->has('item_name')) {
             $this->merge(['name' => $this->input('item_name')]);
         }
+        // Checkbox: niezaznaczony nie przychodzi wcale, więc jawne false.
+        $this->merge(['stationary' => $this->boolean('stationary')]);
     }
 
     public function rules(): array
@@ -40,6 +42,7 @@ class UpdateItemRequest extends FormRequest
             'value' => ['nullable', 'numeric', 'min:0'],
             'purchased_at' => ['nullable', 'date'],
             'condition' => ['required', Rule::in(array_keys(Item::CONDITIONS))],
+            'stationary' => ['boolean'],
             'status' => ['required', Rule::in(array_keys(Item::STATUSES))],
             'category_id' => ['nullable', 'exists:categories,id'],
             'storage_location_id' => ['nullable', 'exists:storage_locations,id'],

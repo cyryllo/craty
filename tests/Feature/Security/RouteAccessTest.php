@@ -122,6 +122,51 @@ class RouteAccessTest extends TestCase
         }
     }
 
+    /** Trasy bez sprawdzania roli, które rola Użytkownik może otworzyć: własne konto i Panel (przekierowuje do grafiku). */
+    private const MEMBER_REACHABLE_WITHOUT_ROLE = [
+        'GET dashboard', 'GET profile', 'PATCH profile', 'DELETE profile', 'PUT password', 'POST locale', 'POST logout',
+        'GET confirm-password', 'POST confirm-password', 'GET verify-email', 'GET verify-email/{id}/{hash}',
+        'POST email/verification-notification',
+    ];
+
+    private function roles(Route $route): ?array
+    {
+        $role = collect($route->gatherMiddleware())->first(fn ($m) => is_string($m) && str_starts_with($m, 'role:'));
+
+        return $role ? explode(',', substr($role, 5)) : null;
+    }
+
+    public function test_member_role_only_reaches_machine_booking_and_its_own_account(): void
+    {
+        $leaks = collect($this->routes())
+            ->filter(fn (Route $route) => $this->hasMiddleware($route, 'auth'))
+            ->reject(function (Route $route, string $key) {
+                $roles = $this->roles($route);
+                if ($roles === null) {
+                    return in_array($key, self::MEMBER_REACHABLE_WITHOUT_ROLE, true);
+                }
+
+                return ! in_array('uzytkownik', $roles, true) || str_starts_with($route->uri(), 'bookings');
+            })
+            ->keys()->all();
+
+        $this->assertSame([], $leaks, 'Te trasy są dostępne dla roli Użytkownik. Jeśli to celowe, dopisz je tutaj; jeśli nie, dodaj role:admin,magazynier.');
+    }
+
+    public function test_member_gets_403_on_every_staff_page(): void
+    {
+        $member = User::factory()->create(['role' => 'uzytkownik']);
+
+        foreach ($this->routes() as $key => $route) {
+            $roles = $this->roles($route);
+            if (! str_starts_with($key, 'GET ') || str_contains($route->uri(), '{') || $roles === null || in_array('uzytkownik', $roles, true)) {
+                continue;
+            }
+
+            $this->actingAs($member)->get('/'.$route->uri())->assertForbidden();
+        }
+    }
+
     public function test_installer_finish_pages_need_the_just_installed_session_flag(): void
     {
         $this->get(route('install.done'))->assertRedirect();

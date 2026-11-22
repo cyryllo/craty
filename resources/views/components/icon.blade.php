@@ -114,6 +114,16 @@
         </svg>
         @break
 
+    @case('bookings')
+        {{-- kalendarz z zegarem: Rezerwacje maszyn --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>
+            <rect x="3" y="4" width="11" height="11" rx="1.5"/>
+            <path d="M3 7.5h11M6.5 2.5v3M10.5 2.5v3" stroke-linecap="round"/>
+            <circle cx="14" cy="14" r="3.6" fill="white" class="dark:fill-gray-800"/>
+            <path d="M14 12.4V14l1.1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        @break
+
     @case('consumables')
         {{-- szpula / rolka: Materiały eksploatacyjne --}}
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>

@@ -13,6 +13,7 @@ use App\Http\Controllers\LoanGroupController;
 use App\Http\Controllers\LoanProtocolController;
 use App\Http\Controllers\LoansOverviewController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\MachineBookingController;
 use App\Http\Controllers\MailSettingController;
 use App\Http\Controllers\ManifestController;
 use App\Http\Controllers\MarketplaceController;
@@ -157,19 +158,30 @@ Route::middleware('auth')->group(function () {
         Route::post('scan/quick-add', [ScanController::class, 'quickAddStore'])->name('scan.quick-add.store');
     });
 
-    // Ewidencję przedmiotów widzi każdy zalogowany, niezależnie od roli.
-    Route::get('items', [ItemController::class, 'index'])->name('items.index');
-    Route::get('items/{item}/label', [ItemController::class, 'label'])->name('items.label');
-    Route::post('items/etykiety', [ItemController::class, 'printLabels'])->name('items.labels.print');
-    Route::get('items/{item}', [ItemController::class, 'show'])->name('items.show');
+    // Ewidencja przedmiotów i skanowanie: cała obsługa (admin, magazynier),
+    // ale nie rola Użytkownik, która widzi tylko rezerwacje maszyn. Kiedyś
+    // "każdy zalogowany", co przy samej obsłudze znaczyło to samo.
+    Route::middleware('role:admin,magazynier')->group(function () {
+        Route::get('items', [ItemController::class, 'index'])->name('items.index');
+        Route::get('items/{item}/label', [ItemController::class, 'label'])->name('items.label');
+        Route::post('items/etykiety', [ItemController::class, 'printLabels'])->name('items.labels.print');
+        Route::get('items/{item}', [ItemController::class, 'show'])->name('items.show');
 
-    // Skanowanie kamerą (patrz TODO.md "PWA") — dostępne dla każdej roli, tak
-    // samo jak sam podgląd przedmiotu po zeskanowaniu własnego QR z etykiety.
-    Route::get('scan', [ScanController::class, 'show'])->name('scan.show');
-    Route::get('scan/lookup', [ScanController::class, 'lookup'])->name('scan.lookup');
-    // Seria skanów: kolejne kody trafiają na listę (np. pod wypożyczenie zestawu).
-    Route::get('scan/batch', [ScanController::class, 'batch'])->name('scan.batch');
-    Route::get('scan/resolve', [ScanController::class, 'resolve'])->name('scan.resolve');
+        // Skanowanie kamerą (patrz TODO.md "PWA"), tak samo jak sam podgląd
+        // przedmiotu po zeskanowaniu własnego QR z etykiety.
+        Route::get('scan', [ScanController::class, 'show'])->name('scan.show');
+        Route::get('scan/lookup', [ScanController::class, 'lookup'])->name('scan.lookup');
+        // Seria skanów: kolejne kody trafiają na listę (np. pod wypożyczenie zestawu).
+        Route::get('scan/batch', [ScanController::class, 'batch'])->name('scan.batch');
+        Route::get('scan/resolve', [ScanController::class, 'resolve'])->name('scan.resolve');
+    });
+
+    // Moduł "Rezerwacje maszyn": jedyne, co poza profilem widzi rola Użytkownik.
+    Route::middleware(['role:admin,magazynier,uzytkownik', 'module:bookings'])->group(function () {
+        Route::get('bookings', [MachineBookingController::class, 'index'])->name('bookings.index');
+        Route::post('bookings', [MachineBookingController::class, 'store'])->name('bookings.store');
+        Route::delete('bookings/{booking}', [MachineBookingController::class, 'destroy'])->name('bookings.destroy');
+    });
 
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', UserController::class)->except('show');

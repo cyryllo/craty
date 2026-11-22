@@ -59,7 +59,7 @@
                     </div>
                     <div>
                         <dt class="text-gray-500 dark:text-gray-400">{{ __('Status') }}</dt>
-                        <dd class="text-gray-900 dark:text-gray-100">{{ $item->statusLabel() }}</dd>
+                        <dd class="text-gray-900 dark:text-gray-100">{{ $item->statusLabel() }}@if ($item->stationary) <span class="ms-1 text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200">{{ __('stationary') }}</span>@endif</dd>
                     </div>
                 </dl>
 
@@ -164,6 +164,9 @@
                             <button class="w-full px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">{{ __('Register return') }}</button>
                         </form>
                         </details>
+                    @elseif ($item->stationary)
+                        {{-- Maszyna na stałe w pracowni: nie wypożycza się, rezerwuje się na niej czas. --}}
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Stationary item: it stays in the workshop and isn\'t loaned out.') }}@if ($bookings !== null) {{ __('Book time on it below.') }}@endif</p>
                     @elseif ($service && $service['openRepair'])
                         {{-- Moduł Serwis: przedmiotu w naprawie nie da się wypożyczyć. --}}
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('This item is under repair. Complete the repair first.') }}</p>
@@ -190,6 +193,7 @@
                         </details>
                     @endif
 
+                    @unless ($item->stationary)
                     {{-- Rezerwacje na przyszłe terminy (ReservationController). --}}
                     <div class="pt-3 border-t border-gray-100 dark:border-gray-700 space-y-2">
                         <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide dark:text-gray-400">{{ __('Reservations') }}</h4>
@@ -243,6 +247,7 @@
                             </details>
                         @endunless
                     </div>
+                    @endunless
 
                     @if ($pastLoans->isNotEmpty())
                         <div class="pt-3 border-t border-gray-100 dark:border-gray-700">
@@ -262,6 +267,27 @@
                         </div>
                     @endif
                 </div>
+
+                @if ($bookings !== null)
+                    {{-- Moduł Rezerwacje maszyn: czas zarezerwowany na tej maszynie. --}}
+                    <div class="bg-white rounded-lg shadow p-5 space-y-3 dark:bg-gray-800">
+                        <div class="flex items-center justify-between gap-2">
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Machine bookings') }}</h3>
+                            <a href="{{ route('bookings.index', ['item' => $item->id]) }}" class="text-xs text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Weekly calendar') }} →</a>
+                        </div>
+                        @forelse ($bookings as $booking)
+                            @include('bookings._entry', ['booking' => $booking, 'showItem' => false])
+                        @empty
+                            <p class="text-sm text-gray-400 dark:text-gray-500">{{ __('No upcoming bookings.') }}</p>
+                        @endforelse
+                        <details @if ($errors->hasAny(['item_id', 'date', 'from', 'to', 'purpose', 'description'])) open @endif>
+                            <summary class="cursor-pointer text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Book time') }}</summary>
+                            <div class="mt-2">
+                                @include('bookings._form', ['machines' => collect([$item]), 'purposes' => $bookingPurposes, 'back' => true, 'compact' => true])
+                            </div>
+                        </details>
+                    </div>
+                @endif
 
                 @if ($service)
                     @php($badge = 'text-xs font-medium px-2 py-0.5 rounded-full')

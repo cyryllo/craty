@@ -7,82 +7,104 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
                         <x-application-logo class="block h-9 w-9 fill-current text-gray-800 dark:text-gray-200" />
-                        <span class="hidden sm:block font-semibold text-gray-800 tracking-tight dark:text-gray-200">{{ \App\Models\AppSetting::current()->effectiveName() }}</span>
+                        <span class="hidden md:block font-semibold text-gray-800 tracking-tight dark:text-gray-200">{{ \App\Models\AppSetting::current()->effectiveName() }}</span>
                     </a>
                 </div>
 
                 <!-- Ikony pozycji menu obok loga — tylko mobile, żeby dotrzeć do
                      Panelu/Przedmiotów/Sprzedaży bez otwierania rozwijanego
-                     menu z hamburgera. Ten sam zestaw co "Navigation Links"
+                     menu z hamburgera. Widoczne poniżej xl (1280 px): przy
+                     wszystkich modułach włączonych siedem napisów nie mieści
+                     się w węższym oknie i nachodziło na ikony po prawej. Ten sam zestaw co "Navigation Links"
                      niżej (pełne linki tekstowe na desktopie) i co pierwsza
                      sekcja rozwijanego menu mobilnego niżej — trzy miejsca
                      celowo, nie pętla, bo mają zupełnie różny markup. -->
-                <div class="flex items-center gap-1 sm:hidden">
-                    <a href="{{ route('dashboard') }}" title="{{ __('Panel') }}"
-                       @class(['flex items-center justify-center w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('dashboard'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('dashboard')])>
-                        <x-icon name="panel" class="w-5 h-5" />
-                    </a>
-                    <a href="{{ route('items.index') }}" title="{{ __('Items') }}"
-                       @class(['flex items-center justify-center w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('items.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('items.*')])>
-                        <x-icon name="items" class="w-5 h-5" />
-                    </a>
+                <div class="flex items-center gap-1 ms-2 xl:hidden">
+                    @unless (auth()->user()->isMember())
+                        <a href="{{ route('dashboard') }}" title="{{ __('Panel') }}"
+                           @class(['flex items-center justify-center w-8 sm:w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('dashboard'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('dashboard')])>
+                            <x-icon name="panel" class="w-5 h-5" />
+                        </a>
+                        <a href="{{ route('items.index') }}" title="{{ __('Items') }}"
+                           @class(['flex items-center justify-center w-8 sm:w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('items.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('items.*')])>
+                            <x-icon name="items" class="w-5 h-5" />
+                        </a>
+                    @endunless
+                    @if (auth()->user()->isMagazynier())
+                        <a href="{{ route('loans.index') }}" title="{{ __('Loans') }}"
+                           @class(['hidden sm:flex items-center justify-center w-8 sm:w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('loans.*', 'loan-groups.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('loans.*', 'loan-groups.*')])>
+                            <x-icon name="loans" class="w-5 h-5" />
+                        </a>
+                    @endif
+                    @if (\App\Support\Modules::isEnabled('bookings'))
+                        <a href="{{ route('bookings.index') }}" title="{{ __('Machines') }}"
+                           @class(['items-center justify-center w-8 sm:w-9 h-9 rounded-md', 'flex' => auth()->user()->isMember(), 'hidden sm:flex' => ! auth()->user()->isMember(), 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('bookings.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('bookings.*')])>
+                            <x-icon name="bookings" class="w-5 h-5" />
+                        </a>
+                    @endif
                     @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('sales'))
                         <a href="{{ route('sale-listings.index') }}" title="{{ __('Sale') }}"
-                           @class(['flex items-center justify-center w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('sale-listings.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('sale-listings.*')])>
+                           @class(['flex items-center justify-center w-8 sm:w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('sale-listings.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('sale-listings.*')])>
                             <x-icon name="sale" class="w-5 h-5" />
                         </a>
                     @endif
                     @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('contacts'))
                         <a href="{{ route('contacts.index') }}" title="{{ __('Contacts') }}"
-                           @class(['flex items-center justify-center w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('contacts.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('contacts.*')])>
+                           @class(['flex items-center justify-center w-8 sm:w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('contacts.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('contacts.*')])>
                             <x-icon name="contacts" class="w-5 h-5" />
+                        </a>
+                    @endif
+                    @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('consumables'))
+                        <a href="{{ route('consumables.index') }}" title="{{ __('Consumables') }}"
+                           @class(['hidden sm:flex items-center justify-center w-8 sm:w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('consumables.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('consumables.*')])>
+                            <x-icon name="consumables" class="w-5 h-5" />
                         </a>
                     @endif
                     @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('service'))
                         <a href="{{ route('service.index') }}" title="{{ __('Service') }}"
-                           @class(['flex items-center justify-center w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('service.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('service.*')])>
+                           @class(['flex items-center justify-center w-8 sm:w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('service.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('service.*')])>
                             <x-icon name="service" class="w-5 h-5" />
                         </a>
                     @endif
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        <x-icon name="panel" class="w-4 h-4 me-1.5" />
-                        {{ __('Panel') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
-                        <x-icon name="items" class="w-4 h-4 me-1.5" />
-                        {{ __('Items') }}
-                    </x-nav-link>
+                <div class="hidden space-x-6 xl:-my-px xl:ms-8 xl:flex">
+                    @unless (auth()->user()->isMember())
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Panel') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
+                            {{ __('Items') }}
+                        </x-nav-link>
+                    @endunless
                     @if (auth()->user()->isMagazynier())
                         <x-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*', 'loan-groups.*')">
-                            <x-icon name="loans" class="w-4 h-4 me-1.5" />
                             {{ __('Loans') }}
+                        </x-nav-link>
+                    @endif
+                    @if (\App\Support\Modules::isEnabled('bookings'))
+                        <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.*')">
+                            {{ __('Machines') }}
                         </x-nav-link>
                     @endif
                     @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('sales'))
                         <x-nav-link :href="route('sale-listings.index')" :active="request()->routeIs('sale-listings.*')">
-                            <x-icon name="sale" class="w-4 h-4 me-1.5" />
                             {{ __('Sale') }}
                         </x-nav-link>
                     @endif
                     @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('contacts'))
                         <x-nav-link :href="route('contacts.index')" :active="request()->routeIs('contacts.*')">
-                            <x-icon name="contacts" class="w-4 h-4 me-1.5" />
                             {{ __('Contacts') }}
                         </x-nav-link>
                     @endif
                     @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('consumables'))
                         <x-nav-link :href="route('consumables.index')" :active="request()->routeIs('consumables.*')">
-                            <x-icon name="consumables" class="w-4 h-4 me-1.5" />
                             {{ __('Consumables') }}
                         </x-nav-link>
                     @endif
                     @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('service'))
                         <x-nav-link :href="route('service.index')" :active="request()->routeIs('service.*')">
-                            <x-icon name="service" class="w-4 h-4 me-1.5" />
                             {{ __('Service') }}
                         </x-nav-link>
                     @endif
@@ -90,7 +112,7 @@
             </div>
 
             <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-1">
+            <div class="hidden xl:flex xl:items-center xl:ms-4 gap-1">
                 @include('layouts._marketplace-link')
                 @include('layouts._theme-toggle')
 
@@ -141,7 +163,7 @@
             </div>
 
             <!-- Hamburger -->
-            <div class="-me-2 flex items-center gap-1 sm:hidden">
+            <div class="-me-2 flex items-center gap-1 xl:hidden">
                 @include('layouts._marketplace-link')
                 @include('layouts._theme-toggle')
 
@@ -156,25 +178,35 @@
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden xl:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                <span class="inline-flex items-center gap-2">
-                    <x-icon name="panel" class="w-4 h-4" />
-                    {{ __('Panel') }}
-                </span>
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
-                <span class="inline-flex items-center gap-2">
-                    <x-icon name="items" class="w-4 h-4" />
-                    {{ __('Items') }}
-                </span>
-            </x-responsive-nav-link>
+            @unless (auth()->user()->isMember())
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <span class="inline-flex items-center gap-2">
+                        <x-icon name="panel" class="w-4 h-4" />
+                        {{ __('Panel') }}
+                    </span>
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
+                    <span class="inline-flex items-center gap-2">
+                        <x-icon name="items" class="w-4 h-4" />
+                        {{ __('Items') }}
+                    </span>
+                </x-responsive-nav-link>
+            @endunless
             @if (auth()->user()->isMagazynier())
                 <x-responsive-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*', 'loan-groups.*')">
                     <span class="inline-flex items-center gap-2">
                         <x-icon name="loans" class="w-4 h-4" />
                         {{ __('Loans') }}
+                    </span>
+                </x-responsive-nav-link>
+            @endif
+            @if (\App\Support\Modules::isEnabled('bookings'))
+                <x-responsive-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.*')">
+                    <span class="inline-flex items-center gap-2">
+                        <x-icon name="bookings" class="w-4 h-4" />
+                        {{ __('Machines') }}
                     </span>
                 </x-responsive-nav-link>
             @endif

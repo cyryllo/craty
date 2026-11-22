@@ -188,7 +188,13 @@ class ItemController extends Controller
                 : collect(),
         ] : null;
 
-        return view('items.show', compact('item', 'pastLoans', 'contacts', 'service', 'reservations'));
+        // Moduł Rezerwacje maszyn: najbliższe rezerwacje maszyny (tylko przedmiot stacjonarny).
+        $bookings = Modules::isEnabled('bookings') && $item->stationary
+            ? $item->machineBookings()->upcoming()->orderBy('starts_at')->limit(8)->get()
+            : null;
+        $bookingPurposes = MachineBookingController::purposesFor(true);
+
+        return view('items.show', compact('item', 'pastLoans', 'contacts', 'service', 'reservations', 'bookings', 'bookingPurposes'));
     }
 
     public function edit(Item $item)

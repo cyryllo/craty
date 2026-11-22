@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Consumable;
 use App\Models\Item;
 use App\Models\Loan;
+use App\Models\MachineBooking;
 use App\Models\Reservation;
 use App\Support\Modules;
 
@@ -12,6 +13,12 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Rola Użytkownik nie ma Panelu: od razu grafik maszyn (albo informacja,
+        // że moduł jest wyłączony, zamiast 404 zaraz po zalogowaniu).
+        if (auth()->user()->isMember()) {
+            return Modules::isEnabled('bookings') ? redirect()->route('bookings.index') : view('bookings.unavailable');
+        }
+
         $statusCounts = Item::query()
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
@@ -36,6 +43,10 @@ class DashboardController extends Controller
             'needsCompletionItems' => Item::inStock()->where('needs_completion', true)->latest()->take(8)->get(),
             // Moduł Serwis: naprawy w toku, przeglądy i gwarancje wymagające uwagi.
             'service' => Modules::isEnabled('service') && auth()->user()->isMagazynier() ? ServiceController::overview() : null,
+            // Moduł Rezerwacje maszyn: kto dziś korzysta z maszyn.
+            'todayBookings' => Modules::isEnabled('bookings')
+                ? MachineBooking::with('item')->overlapping(today()->startOfDay(), today()->endOfDay())->orderBy('starts_at')->get()
+                : collect(),
         ]);
     }
 }

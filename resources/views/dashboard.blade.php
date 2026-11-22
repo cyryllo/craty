@@ -77,6 +77,26 @@
             </div>
         @endif
 
+        @if ($todayBookings->isNotEmpty())
+            <div class="bg-white rounded-lg shadow dark:bg-gray-800">
+                <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between dark:border-gray-700">
+                    <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Machines booked today') }}</h3>
+                    <a href="{{ route('bookings.index') }}" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Machines') }} →</a>
+                </div>
+                <ul class="divide-y divide-gray-100 dark:divide-gray-700">
+                    @foreach ($todayBookings as $booking)
+                        <li class="px-5 py-3 flex items-center justify-between gap-3 text-sm">
+                            <a href="{{ route('items.show', $booking->item) }}" class="text-gray-900 hover:underline dark:text-gray-100">{{ $booking->item->name }}</a>
+                            <span class="text-gray-500 text-right dark:text-gray-400">
+                                <span class="tabular-nums">{{ $booking->timeRange() }}</span> · {{ $booking->user_name }} · {{ $booking->purposeLabel() }}
+                                @if ($booking->isNow())<span class="ms-1 text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">{{ __('now') }}</span>@endif
+                            </span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         @if ($service && ($service['openRepairs']->isNotEmpty() || $service['inspectionsDue']->isNotEmpty() || $service['warrantiesEnding']->isNotEmpty()))
             <div class="space-y-2">
                 <div class="flex items-center justify-between">

@@ -20,6 +20,8 @@ class Item extends Model
         'storage_location_id', 'created_by', 'qr_path',
         // Moduł Serwis.
         'warranty_until', 'inspection_interval_months', 'next_inspection_at',
+        // Maszyna na stałe w pracowni: nie wypożycza się (patrz unavailableReason()).
+        'stationary',
         // 'needs_completion' celowo pominięte — ustawia je tylko
         // ScanController::quickAddStore() (przez forceFill), nigdy zwykły
         // formularz, tak samo jak 'protected' na User.
@@ -32,6 +34,7 @@ class Item extends Model
         'inspection_interval_months' => 'integer',
         'value' => 'decimal:2',
         'needs_completion' => 'boolean',
+        'stationary' => 'boolean',
     ];
 
     // Wartości to teksty źródłowe do __() (klucze angielskie) — patrz statusLabel()/conditionLabel().
@@ -165,6 +168,12 @@ class Item extends Model
         return $this->hasOne(Repair::class)->whereNull('returned_at')->latestOfMany();
     }
 
+    /** Moduł "Rezerwacje maszyn": czas zarezerwowany na przedmiocie stacjonarnym. */
+    public function machineBookings(): HasMany
+    {
+        return $this->hasMany(MachineBooking::class);
+    }
+
     public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class)->latest('performed_at')->latest('id');
@@ -210,6 +219,7 @@ class Item extends Model
     {
         return match (true) {
             in_array($this->status, self::OUT_OF_STOCK_STATUSES, true) => __('sold or retired'),
+            (bool) $this->stationary => __('stationary, not for loan'),
             $this->currentLoan()->exists() => __('already on loan'),
             $this->openRepair()->exists() => __('under repair'),
             default => null,

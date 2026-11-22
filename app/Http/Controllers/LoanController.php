@@ -18,6 +18,10 @@ class LoanController extends Controller
      */
     public function store(Request $request, Item $item)
     {
+        // Przedmiot stacjonarny (maszyna w pracowni) nie wychodzi; rezerwuje się na nim czas.
+        if ($item->stationary) {
+            return back()->withErrors(['loan' => __('This item is stationary and can\'t be loaned out.')]);
+        }
         // Przedmiotu w naprawie (moduł Serwis) nie da się wypożyczyć.
         if ($item->openRepair()->exists()) {
             return back()->withErrors(['loan' => __('This item is under repair. Complete the repair first.')]);

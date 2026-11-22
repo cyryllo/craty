@@ -22,6 +22,9 @@ class ReservationController extends Controller
         if (in_array($item->status, Item::OUT_OF_STOCK_STATUSES, true)) {
             return back()->withErrors(['reservation' => __('Sold or retired items can\'t be reserved.')]);
         }
+        if ($item->stationary) {
+            return back()->withErrors(['reservation' => __('This item is stationary and can\'t be loaned out.')]);
+        }
 
         $data = $request->validate([
             'starts_on' => ['required', 'date', 'after_or_equal:today'],

@@ -82,6 +82,16 @@
                     </select>
                 </div>
 
+                <div class="sm:col-span-2">
+                    <label class="inline-flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                        <input type="checkbox" name="stationary" value="1" @checked(old('stationary', $item->stationary)) class="mt-0.5 rounded border-gray-300 dark:border-gray-600">
+                        <span>
+                            <span class="font-medium">{{ __('Stationary') }}</span>
+                            <span class="block text-xs text-gray-500 dark:text-gray-400">{{ __('A machine that stays in the workshop (3D printer, laser cutter): it can\'t be loaned out or reserved for days. With the Machine booking module people book time on it instead.') }}</span>
+                        </span>
+                    </label>
+                </div>
+
                 @if (\App\Support\Modules::isEnabled('service'))
                     {{-- Moduł Serwis: gwarancja i przeglądy okresowe. --}}
                     <div class="sm:col-span-2 grid sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">

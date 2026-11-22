@@ -83,7 +83,17 @@ class User extends Authenticatable
     public const ROLES = [
         'admin' => 'Administrator',
         'magazynier' => 'Warehouse worker',
+        'uzytkownik' => 'Member',
     ];
+
+    /**
+     * Rola "uzytkownik" (np. członek makerspace'u): tylko rezerwacje maszyn
+     * i własny profil. Dostęp pilnują trasy (role:...), nie ten helper.
+     */
+    public function isMember(): bool
+    {
+        return $this->role === 'uzytkownik';
+    }
 
     public function roleLabel(): string
     {

@@ -3,6 +3,22 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-22 (1.5.0)
+
+- Przedmioty stacjonarne: pole „Stacjonarny” w formularzu przedmiotu; takiej
+  maszyny nie da się wypożyczyć, zarezerwować na dni ani dodać do zestawu.
+- Moduł Rezerwacje maszyn (domyślnie wyłączony): tygodniowy grafik
+  przedmiotów stacjonarnych, rezerwacje godzinowe (co 15 minut) z rodzajem
+  użycia i opisem, blokada nakładających się terminów, „Dziś na maszynach”
+  na Panelu.
+- Nowa rola Użytkownik: widzi tylko grafik maszyn i swój profil, rezerwuje
+  i odwołuje swoje rezerwacje.
+- Menu przy wielu włączonych modułach: poniżej 1280 px rząd ikon i menu
+  rozwijane zamiast nachodzących na siebie napisów; brakujące ikony
+  Wypożyczeń i Materiałów.
+- Instrukcja użytkownika z przykładami i zrzutami ekranu na stronie
+  projektu (cyryllo.github.io/craty/instrukcja).
+
 ## 2026-11-20 (1.4.1)
 
 - Poprawka bezpieczeństwa: w formularzach wypożyczenia, rezerwacji, naprawy

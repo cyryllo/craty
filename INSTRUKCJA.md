@@ -4,9 +4,13 @@ Krótki, praktyczny przewodnik po głównych funkcjach Craty — bez żargonu
 technicznego. Jeśli szukasz instrukcji instalacji/wdrożenia, zobacz
 [README.md](README.md); historia zmian jest w [CHANGELOG.md](CHANGELOG.md).
 
+**Pełna instrukcja z przykładami krok po kroku i zrzutami ekranu:**
+[cyryllo.github.io/craty/instrukcja](https://cyryllo.github.io/craty/instrukcja/)
+(źródło w [docs/instrukcja/](docs/instrukcja/index.html)).
+
 ## Role i uprawnienia
 
-Są dwie role: **Administrator** i **Magazynier**. Magazynier ma dostęp do
+Są trzy role: **Administrator**, **Magazynier** i **Użytkownik** (tylko rezerwacje maszyn, opis niżej). Magazynier ma dostęp do
 całej codziennej pracy z ewidencją (przedmioty, wypożyczenia, sprzedaż,
 struktura magazynowa) — różnica względem Administratora to tylko dostęp do
 "Ustawień zaawansowanych" (użytkownicy, poczta, powiadomienia, moduły,
@@ -147,6 +151,19 @@ Na karcie przedmiotu, w ramce „Wypożyczenie”, sekcja **Rezerwacje**: „Zar
 ### Strona Wypożyczenia
 
 Zakładka **Wypożyczenia** w menu zbiera w jednym miejscu: co jest teraz wypożyczone (z zaznaczeniem po terminie), wypożyczone zestawy (ile rzeczy jeszcze nie wróciło) i nadchodzące rezerwacje.
+
+## Przedmioty stacjonarne i rezerwacje maszyn
+
+**Przedmiot stacjonarny** to maszyna, która zostaje w pracowni (drukarka 3D, ploter laserowy, stanowisko lutownicze). Zaznaczasz go polem „Stacjonarny” w formularzu przedmiotu. Takiego przedmiotu nie da się wypożyczyć, zarezerwować na dni ani dodać do zestawu; na karcie przedmiotu zamiast formularza wypożyczenia jest informacja, że zostaje w pracowni.
+
+**Rezerwacje maszyn** (moduł opcjonalny, domyślnie wyłączony, Ustawienia → Moduły) pozwalają rezerwować czas na przedmiotach stacjonarnych, np. w makerspace: kto i kiedy korzysta z drukarki albo plotera. W menu pojawia się zakładka **Maszyny** z grafikiem tygodnia: wiersze to maszyny, kolumny to dni, a każda rezerwacja ma godziny, osobę i kolor rodzaju użycia. Kliknięcie rezerwacji pokazuje jej opis. Na telefonie grafik jest listą dzień po dniu.
+
+- **Nowa rezerwacja**: maszyna, dzień, godziny od–do (co 15 minut), rodzaj użycia (użytek prywatny, zajęcia, warsztaty; obsługa może też zablokować maszynę na konserwację) i opcjonalny opis, np. nazwa projektu. Rezerwacja jest ważna od razu. Nakładające się rezerwacje tej samej maszyny nie przejdą, Craty pokaże, kto ma już ten termin.
+- **Karta maszyny** pokazuje najbliższe rezerwacje i pozwala od razu zarezerwować czas.
+- **Odwołanie**: każdy odwołuje swoje nadchodzące rezerwacje (lista „Moje rezerwacje”), a obsługa także cudze.
+- Na Panelu obsługi jest lista „Dziś na maszynach”.
+
+**Rola Użytkownik** jest dla osób, które tylko rezerwują maszyny (np. członkowie makerspace'u). Konto zakłada administrator w Ustawienia → Użytkownicy. Użytkownik po zalogowaniu widzi wyłącznie grafik maszyn i swój profil: nie widzi magazynu, wypożyczeń, kontaktów ani ustawień. Gdy moduł jest wyłączony, zobaczy tylko informację, że rezerwacje są chwilowo niedostępne.
 
 ## Inwentaryzacja
 
@@ -291,7 +308,7 @@ miejscu:
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego
   resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń. Przy włączonym module Serwis dochodzi cotygodniowe przypomnienie serwisowe: w każdy poniedziałek rano e-mail z przeglądami po terminie i w ciągu 14 dni, gwarancjami kończącymi się w ciągu 30 dni i naprawami po planowanym powrocie (tylko gdy coś jest na liście). Oba e-maile wymagają, żeby hosting uruchamiał harmonogram zadań (cron); w wersji Docker działa to samo.
 - **Moduły** *(tylko Administrator)* — włącz/wyłącz opcjonalne części
-  appki (dziś: Sprzedaż, Kontakty, Serwis i Materiały eksploatacyjne).
+  appki (dziś: Sprzedaż, Kontakty, Serwis, Materiały eksploatacyjne i Rezerwacje maszyn).
 - **Aktualizacje** *(tylko Administrator)* — samodzielna aktualizacja
   appki przez wgranie paczki `.zip`, bez SSH/Composera. Zawsze rób kopię
   plików i bazy danych przed wgraniem nowej wersji. W wersji z obrazu

@@ -42,6 +42,10 @@ class Modules
             'label' => 'Consumables',
             'description' => 'Things counted by quantity (screws, glue, cable) on their own list, with a minimum stock level, a warning when running low and a history of who took what.',
         ],
+        'bookings' => [
+            'label' => 'Machine booking',
+            'description' => 'Booking time on stationary items (3D printers, laser cutters, workstations) in a weekly calendar. Accounts with the Member role can book on their own and see only this.',
+        ],
     ];
 
     public static function isEnabled(string $key): bool
