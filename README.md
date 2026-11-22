@@ -5,7 +5,7 @@
 Prosta aplikacja do ewidencji sprzętu i magazynu w warsztacie/pracowni:
 kategorie, lokalizacje (magazyn → regał → półka → pojemnik), automatyczne
 numery ewidencyjne z kodami QR, kartoteka przedmiotu (zdjęcia, specyfikacja,
-wartość, stan), wypożyczenia (także zestawy i rezerwacje) z bazą kontaktów i protokołami wydania/zwrotu w PDF, inwentaryzacja, materiały eksploatacyjne, serwis (naprawy, przeglądy okresowe, gwarancje), historia zmian i na razie uproszczony eksport
+wartość, stan), wypożyczenia (także zestawy i rezerwacje) z bazą kontaktów i protokołami wydania/zwrotu w PDF, inwentaryzacja, materiały eksploatacyjne, serwis (naprawy, przeglądy okresowe, gwarancje), rezerwacje maszyn stacjonarnych na godziny (np. drukarek 3D w makerspace, z osobną rolą dla osób, które tylko rezerwują), historia zmian i na razie uproszczony eksport
 ofert sprzedaży do CSV. Do tego publiczna strona „pchli targ” dla wystawionych ofert,
 webowy instalator i moduł samo-aktualizacji przez panel administratora.
 
@@ -198,7 +198,7 @@ Zgłaszać można po polsku albo po angielsku.
 
 Craty rozwija się etapami. Nowe większe funkcje trafiają do **modułów**, które włączasz w Ustawieniach, gdy są potrzebne, i wyłączasz, gdy nie są. Kolejność ułożona jest tak, żeby każdy etap korzystał z poprzedniego:
 
-1. **v1.5, bezpieczeństwo danych**: kopie zapasowe z panelu (także na hostingach bez dostępu do konsoli), dziennik aktywności (logowania, zmiany kont i ustawień) i ulepszony import oraz eksport CSV.
+1. **v1.6, bezpieczeństwo danych**: kopie zapasowe z panelu (także na hostingach bez dostępu do konsoli), dziennik aktywności (logowania, zmiany kont i ustawień) i ulepszony import oraz eksport CSV.
 
 Dalej, do decyzji: obsługa wielu niezależnych pracowni w jednej instalacji z API dla innych narzędzi, a aplikacja na Androida tylko wtedy, gdyby wersja instalowana z przeglądarki się nie sprawdziła.
 

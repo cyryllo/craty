@@ -5,7 +5,7 @@
 A simple inventory/asset management app for a workshop: categories,
 locations (warehouse → rack → shelf → bin), auto-generated inventory
 numbers with QR codes, item records (photos, specs, value, condition),
-loans (including kits and reservations) with a contacts list and PDF issue/return protocols, stocktaking, consumables, service (repairs, periodic inspections, warranties), change history, and (for now) a simplified CSV export of sale
+loans (including kits and reservations) with a contacts list and PDF issue/return protocols, stocktaking, consumables, service (repairs, periodic inspections, warranties), hourly booking of stationary machines (e.g. 3D printers in a makerspace, with a separate role for people who only book), change history, and (for now) a simplified CSV export of sale
 listings. Also includes
 a public "flea market" page for listed items, a web-based installer, and a
 self-update module via the admin panel.
@@ -202,7 +202,7 @@ Issues can be written in Polish or English.
 
 Craty grows in stages. Bigger features land as **modules** you switch on in the settings when you need them and off when you don't. The order is chosen so that each stage builds on the previous one:
 
-1. **v1.5, data safety**: backups from the panel (also on hosting without console access), an activity log (logins, account and settings changes) and improved CSV import and export.
+1. **v1.6, data safety**: backups from the panel (also on hosting without console access), an activity log (logins, account and settings changes) and improved CSV import and export.
 
 Later, to be decided: several independent workshops in one installation with an API for other tools, and an Android app only if the version installed from the browser turns out not to be enough.
 
