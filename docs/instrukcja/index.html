@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instrukcja Craty</title>
+<meta name="description" content="Instrukcja użytkownika Craty: wszystkie funkcje programu krok po kroku, z przykładami i zrzutami ekranu.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111827'/%3E%3Cg fill='none' stroke='%23fbbf24' stroke-linecap='round'%3E%3Crect x='7' y='7' width='18' height='18' rx='1.5' stroke-width='2.4'/%3E%3Cpath d='M8 25 25 8' stroke-width='2.4'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #f6f6f9;
+    --surface: #ffffff;
+    --ink: #111827;
+    --muted: #4b5563;
+    --soft: #6b7280;
+    --line: #e5e7eb;
+    --accent: #4f46e5;
+    --accent-ink: #ffffff;
+    --accent-soft: #eef2ff;
+    --accent-strong: #3730a3;
+    --tip-bg: #fffbeb;
+    --tip-line: #fcd34d;
+    --tip-ink: #78350f;
+    --shadow: 0 1px 2px rgba(17, 24, 39, .06), 0 12px 32px -12px rgba(17, 24, 39, .18);
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0f1117;
+        --surface: #1a1d27;
+        --ink: #f3f4f6;
+        --muted: #c2c7d0;
+        --soft: #9ca3af;
+        --line: #2a2f3c;
+        --accent: #818cf8;
+        --accent-ink: #111827;
+        --accent-soft: #1e1b4b;
+        --accent-strong: #c7d2fe;
+        --tip-bg: #2a2110;
+        --tip-line: #92400e;
+        --tip-ink: #fde68a;
+        --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 12px 32px -12px rgba(0, 0, 0, .6);
+    }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 17px/1.65 Figtree, system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); }
+a:hover { color: var(--accent-strong); }
+img { max-width: 100%; height: auto; display: block; }
+code, kbd { font: 500 .88em/1.4 ui-monospace, "SFMono-Regular", Menlo, monospace; background: var(--accent-soft); color: var(--accent-strong); padding: 1px 6px; border-radius: 5px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+
+/* ---------- nawigacja ---------- */
+.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: var(--ink); text-decoration: none; }
+.brand svg { width: 34px; height: 34px; color: var(--accent); }
+.brand small { font-weight: 600; font-size: 15px; color: var(--soft); }
+.top nav { display: flex; align-items: center; gap: 20px; font-size: 15px; font-weight: 500; }
+.top nav a { color: var(--muted); text-decoration: none; }
+.top nav a:hover { color: var(--ink); }
+.top nav .gh { border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; background: var(--surface); color: var(--ink); }
+@media (max-width: 560px) { .brand small, .top nav .home { display: none; } }
+
+/* ---------- nagłówek ---------- */
+.intro { padding-top: 56px; padding-bottom: 24px; }
+.eyebrow { display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+h1, h2, h3 { line-height: 1.2; letter-spacing: -0.01em; }
+h1 { font-size: clamp(34px, 5.5vw, 52px); font-weight: 800; margin: 0 0 16px; letter-spacing: -0.02em; }
+.lead { font-size: clamp(18px, 2.2vw, 20px); color: var(--muted); max-width: 720px; margin: 0; }
+
+/* ---------- układ ---------- */
+.layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; align-items: start; padding-bottom: 80px; }
+.toc { position: sticky; top: 84px; max-height: calc(100vh - 100px); overflow-y: auto; font-size: 15px; padding-right: 4px; }
+.toc summary { display: none; }
+.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; }
+.toc li { counter-increment: toc; }
+.toc a { display: flex; gap: 10px; padding: 6px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; }
+.toc a::before { content: counter(toc); min-width: 18px; color: var(--soft); font-variant-numeric: tabular-nums; font-weight: 600; }
+.toc a:hover { background: var(--surface); color: var(--ink); }
+.toc a.on { background: var(--accent-soft); color: var(--accent-strong); font-weight: 600; }
+@media (max-width: 980px) {
+    .layout { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .toc { position: static; max-height: none; overflow: visible; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px 8px; }
+    .toc summary { display: block; cursor: pointer; padding: 10px 6px; font-weight: 700; }
+    .toc ol { padding-bottom: 8px; }
+}
+
+/* ---------- treść ---------- */
+article { min-width: 0; max-width: 800px; }
+section { padding-top: 24px; margin-bottom: 40px; border-top: 1px solid var(--line); }
+section:first-child { border-top: 0; padding-top: 0; }
+h2 { font-size: clamp(26px, 3.4vw, 34px); font-weight: 800; margin: 16px 0 12px; }
+h3 { font-size: 21px; font-weight: 700; margin: 32px 0 8px; }
+p, li { color: var(--ink); }
+article p { margin: 0 0 14px; }
+article ul, article ol { margin: 0 0 16px; padding-left: 22px; }
+article li { margin-bottom: 6px; }
+.muted { color: var(--muted); }
+b, strong { font-weight: 700; }
+
+figure { margin: 20px 0 28px; }
+figure a { display: block; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); background: #fff; }
+figure.narrow { max-width: 340px; }
+figure.phone { max-width: 300px; }
+figure.doc { max-width: 520px; }
+figcaption { margin-top: 10px; font-size: 14px; color: var(--soft); }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; align-items: start; margin: 20px 0 28px; }
+.pair figure { margin: 0; }
+
+.example { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 12px; padding: 18px 22px 8px; margin: 22px 0 28px; }
+.example > .tag { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.example h4 { margin: 0 0 10px; font-size: 18px; }
+.example ol { padding-left: 22px; }
+.tip { background: var(--tip-bg); border: 1px solid var(--tip-line); color: var(--tip-ink); border-radius: 12px; padding: 14px 18px; margin: 18px 0 24px; font-size: 16px; }
+.tip p, .tip li { color: var(--tip-ink); margin: 0; }
+.ui { font-weight: 600; white-space: nowrap; }
+.path { font-weight: 600; }
+table.plain { width: 100%; min-width: 520px; border-collapse: collapse; margin: 8px 0 22px; font-size: 16px; }
+table.plain th, table.plain td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.plain th { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--soft); font-weight: 700; }
+.scroll { overflow-x: auto; margin: 8px 0 22px; }
+.scroll table.plain { margin: 0; }
+.numparts { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 18px; font: 600 15px/1 ui-monospace, Menlo, monospace; }
+.numparts span { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px 7px; text-align: center; }
+.numparts small { display: block; margin-top: 6px; font: 500 12px/1.2 Figtree, sans-serif; color: var(--soft); }
+
+footer { border-top: 1px solid var(--line); padding: 28px 0 44px; color: var(--soft); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+    <div class="wrap">
+        <a class="brand" href="../">
+            <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                <rect x="4" y="4" width="24" height="24" rx="2.5" fill="none" stroke="currentColor" stroke-width="3"/>
+                <path d="M5.5 13.3h21M5.5 18.7h21" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+                <path d="M6 26 26 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            Craty <small>instrukcja</small>
+        </a>
+        <nav aria-label="Menu">
+            <a class="home" href="../">Strona projektu</a>
+            <a class="gh" href="https://github.com/cyryllo/craty">GitHub</a>
+        </nav>
+    </div>
+</header>
+
+<div class="wrap intro">
+    <span class="eyebrow">Instrukcja użytkownika</span>
+    <h1>Craty krok po kroku</h1>
+    <p class="lead">Wszystkie funkcje programu na przykładzie jednej pracowni: od dodania pierwszego przedmiotu, przez wypożyczenia i serwis, po inwentaryzację. Instrukcja dotyczy wersji 1.4.</p>
+</div>
+
+<div class="wrap layout">
+    <details class="toc" open>
+        <summary>Spis treści</summary>
+        <nav aria-label="Spis treści">
+            <ol>
+                <li><a href="#start">Na początek</a></li>
+                <li><a href="#panel">Panel</a></li>
+                <li><a href="#struktura">Kategorie i miejsca</a></li>
+                <li><a href="#przedmioty">Przedmioty</a></li>
+                <li><a href="#lista">Lista i wyszukiwanie</a></li>
+                <li><a href="#etykiety">Etykiety z kodem QR</a></li>
+                <li><a href="#wypozyczenia">Wypożyczenia</a></li>
+                <li><a href="#zestawy">Zestawy</a></li>
+                <li><a href="#rezerwacje">Rezerwacje</a></li>
+                <li><a href="#telefon">Telefon i skaner</a></li>
+                <li><a href="#inwentaryzacja">Inwentaryzacja</a></li>
+                <li><a href="#kontakty">Kontakty</a></li>
+                <li><a href="#serwis">Serwis</a></li>
+                <li><a href="#materialy">Materiały</a></li>
+                <li><a href="#sprzedaz">Sprzedaż i pchli targ</a></li>
+                <li><a href="#ustawienia">Ustawienia</a></li>
+                <li><a href="#pytania">Częste pytania</a></li>
+            </ol>
+        </nav>
+    </details>
+
+    <article>
+
+<!-- ============================================================ -->
+<section id="start">
+    <h2>Na początek</h2>
+    <p>Craty to ewidencja rzeczy: każdy przedmiot ma swoje miejsce, numer i naklejkę z kodem QR. Przykłady w tej instrukcji pochodzą z wymyślonej <b>Pracowni Kowalskich</b>: dwa magazyny (główny w hali i garaż), kilkanaście narzędzi i urządzeń, kilka osób i firm, które je pożyczają.</p>
+    <p>W pracowni pracują dwie osoby, i to dobrze pokazuje obie role w Craty:</p>
+    <div class="scroll"><table class="plain">
+        <thead><tr><th>Rola</th><th>Kto w przykładzie</th><th>Co może</th></tr></thead>
+        <tbody>
+            <tr><td><b>Administrator</b></td><td>Ewa Kowalska</td><td>Wszystko, także ustawienia aplikacji, użytkowników, moduły, pocztę i aktualizacje.</td></tr>
+            <tr><td><b>Magazynier</b></td><td>Tomek Wiśniewski</td><td>Całą codzienną pracę: przedmioty, wypożyczenia, serwis, materiały, sprzedaż, kategorie i strukturę magazynu.</td></tr>
+        </tbody>
+    </table></div>
+    <p>Kont nie zakłada się samemu: robi to administrator w <span class="path">Ustawienia → Użytkownicy</span>. Logujesz się e-mailem i hasłem.</p>
+    <figure class="narrow"><a href="img/logowanie.jpg"><img src="img/logowanie.jpg" width="1280" height="860" alt="Ekran logowania Craty z polami e-mail i hasło." loading="lazy"></a><figcaption>Logowanie. Link „Nie pamiętasz hasła?” znika, jeśli administrator wyłączy samodzielny reset hasła.</figcaption></figure>
+
+    <h3>Menu</h3>
+    <p>Na górze są zakładki: <span class="ui">Panel</span>, <span class="ui">Przedmioty</span>, <span class="ui">Wypożyczenia</span>, a dalej te z włączonych modułów (<span class="ui">Sprzedaż</span>, <span class="ui">Kontakty</span>, <span class="ui">Materiały</span>, <span class="ui">Serwis</span>). Po prawej: koszyk (publiczny pchli targ), przełącznik jasnego i ciemnego motywu oraz menu z Twoim imieniem, w którym są <span class="ui">Ustawienia</span>, <span class="ui">Profil</span> i wylogowanie. Na telefonie i w wąskim oknie zakładki zamieniają się w rząd ikon, a resztę znajdziesz pod przyciskiem z trzema kreskami.</p>
+    <div class="tip"><p>Moduły Sprzedaż, Kontakty, Serwis i Materiały eksploatacyjne można włączać i wyłączać w <span class="path">Ustawienia → Moduły</span>. Wyłączony moduł znika z menu, ale jego dane zostają i wracają po ponownym włączeniu.</p></div>
+</section>
+
+<!-- ============================================================ -->
+<section id="panel">
+    <h2>Panel</h2>
+    <p>Panel to pierwsza strona po zalogowaniu. U góry są liczby: ile przedmiotów jest w magazynie, ile są warte razem, ile jest wypożyczonych i ile czeka na sprzedaż. Niżej Craty zbiera wszystko, czym trzeba się zająć:</p>
+    <ul>
+        <li><b>Przeterminowane wypożyczenia</b>: co miało już wrócić i u kogo jest.</li>
+        <li><b>Kończące się materiały</b>: materiały, których jest na minimum albo mniej.</li>
+        <li><b>Rezerwacje do wydania dziś i jutro.</b></li>
+        <li><b>Serwis: wymaga uwagi</b>: rzeczy w naprawie, przeglądy po terminie i zbliżające się, kończące się gwarancje.</li>
+        <li><b>Ostatnio dodane</b> i <b>Dodane z telefonu</b>: te drugie to przedmioty dodane szybko ze skanera, które warto uzupełnić.</li>
+    </ul>
+    <figure><a href="img/panel.jpg"><img src="img/panel.jpg" width="1280" height="1464" alt="Panel Craty: liczniki przedmiotów, przeterminowane wypożyczenie stacji lutowniczej, kończące się materiały, rezerwacja głośnika, sprawy serwisowe i ostatnio dodane przedmioty." loading="lazy"></a><figcaption>Panel Pracowni Kowalskich. Stacja lutownicza miała wrócić od koła robotyki, wkręty i klej się kończą, a drabina jest po terminie przeglądu.</figcaption></figure>
+    <p>Każda pozycja na Panelu jest linkiem: kliknięcie prowadzi prosto do przedmiotu, materiału albo odpowiedniej zakładki.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="struktura">
+    <h2>Kategorie i miejsca</h2>
+    <p>Zanim dodasz pierwsze przedmioty, warto ustalić dwie rzeczy: <b>czym</b> są (kategorie) i <b>gdzie</b> leżą (struktura magazynu). Obie są w <span class="path">Ustawienia</span>, w części dostępnej także dla magazyniera.</p>
+
+    <h3>Kategorie</h3>
+    <p>Kategoria to rodzaj przedmiotu, np. „Elektronarzędzia” albo „Sprzęt AV”. Ma nazwę i krótki <b>kod</b> (np. <code>ELN</code>), od którego zaczyna się numer ewidencyjny. Kategoria może mieć nadrzędną: w przykładzie „Narzędzia pomiarowe” są podkategorią „Narzędzi”.</p>
+    <figure><a href="img/kategorie.jpg"><img src="img/kategorie.jpg" width="1280" height="860" alt="Lista kategorii z kodami i liczbą przedmiotów." loading="lazy"></a><figcaption>Kategorie z kodami i liczbą przedmiotów.</figcaption></figure>
+    <div class="tip"><p>Kody kategorii, magazynów i pomieszczeń mogą mieć tylko litery, cyfry, myślnik i podkreślnik, bo trafiają do numeru ewidencyjnego.</p></div>
+
+    <h3>Struktura magazynu</h3>
+    <p>Struktura magazynu to jedno drzewo „gdzie co leży”. Ma cztery poziomy, z których obowiązkowy jest tylko pierwszy:</p>
+    <ol>
+        <li><b>Magazyn</b>: budynek, hala, garaż. Od razu po założeniu da się go wybrać przy przedmiocie jako „cały magazyn”. Jeśli masz jedno pomieszczenie i nie potrzebujesz więcej, na tym możesz skończyć.</li>
+        <li><b>Pomieszczenie</b> (opcjonalne): np. „Hala warsztatowa” i „Magazyn narzędzi” w jednym budynku.</li>
+        <li><b>Regał → półka → pojemnik</b> (opcjonalne): najdokładniejsze miejsca.</li>
+    </ol>
+    <figure><a href="img/struktura-magazynu.jpg"><img src="img/struktura-magazynu.jpg" width="1280" height="1266" alt="Struktura magazynu: garaż z regałem 1 oraz magazyn główny z halą warsztatową i magazynem narzędzi, z regałami, półkami i pojemnikami." loading="lazy"></a><figcaption>Struktura magazynu. Ciemny pasek to magazyn, karty pod nim to pomieszczenia, a w nich regały, półki i pojemniki.</figcaption></figure>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Ewa dodaje garaż z regałem i półką</h4>
+        <ol>
+            <li>W <span class="path">Ustawienia → Struktura magazynu</span> klika <span class="ui">+ Nowy magazyn</span>, wpisuje nazwę „Garaż”, kod <code>G1</code> i adres. Zapisuje.</li>
+            <li>Garaż nie ma pomieszczeń, więc regał dodaje od razu w nim: <span class="ui">+ Regał</span>, numer „1”.</li>
+            <li>Pod regałem klika <span class="ui">+ Półka</span>. Formularz ma już wpisany magazyn i regał, zostaje numer półki: „2”.</li>
+            <li>Od teraz przy przedmiocie da się wybrać miejsce „Garaż, regał 1, półka 2”. Projektor i głośnik trafiły właśnie tam.</li>
+        </ol>
+    </div>
+    <p>Liczba przy każdym miejscu to przedmioty, które tam leżą (razem ze wszystkim niżej). Po najechaniu myszką widać ich nazwy, a kliknięcie otwiera listę przedmiotów z tego miejsca. Edycja i usuwanie są pod ołówkiem przy nazwie.</p>
+    <div class="tip"><p><b>Usuwanie niczego nie gubi.</b> Usunięcie pomieszczenia przenosi jego przedmioty do całego magazynu, a usunięcie regału, półki lub pojemnika przenosi je poziom wyżej. Każde przeniesienie widać w historii przedmiotu. Magazynu, w którym coś leży, nie da się usunąć.</p></div>
+</section>
+
+<!-- ============================================================ -->
+<section id="przedmioty">
+    <h2>Przedmioty</h2>
+    <h3>Dodawanie przedmiotu</h3>
+    <p>W zakładce <span class="ui">Przedmioty</span> kliknij <span class="ui">+ Dodaj przedmiot</span>. Wymagana jest tylko nazwa, ale im więcej wpiszesz, tym łatwiej będzie potem szukać.</p>
+    <figure><a href="img/przedmiot-nowy.jpg"><img src="img/przedmiot-nowy.jpg" width="1280" height="1208" alt="Formularz nowego przedmiotu: nazwa, numer seryjny, kod EAN, kategoria, lokalizacja, wartość, data zakupu, stan, status, gwarancja, przegląd, opis, zdjęcia i załączniki." loading="lazy"></a><figcaption>Formularz nowego przedmiotu. Pola gwarancji i przeglądów są widoczne przy włączonym module Serwis.</figcaption></figure>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Nowa wkrętarka w hali</h4>
+        <ol>
+            <li>Nazwa: „Wkrętarka akumulatorowa Makita DDF482”.</li>
+            <li>Numer seryjny z tabliczki (<code>DDF482-7731902</code>) i kod EAN z pudełka. Oba są opcjonalne, ale dzięki nim skaner znajdzie przedmiot po kodzie producenta.</li>
+            <li>Kategoria: Elektronarzędzia. Lokalizacja: Magazyn główny, hala, regał 3, półka 2.</li>
+            <li>Wartość 450 zł, data zakupu, stan „Nowy”, status „Dostępny”.</li>
+            <li>Gwarancja do: data z karty gwarancyjnej. W opisie: „18 V, 2 akumulatory 3 Ah, ładowarka, walizka”.</li>
+            <li>Zdjęcia i załączniki, np. paragon w PDF i instrukcja obsługi. Zapisuje.</li>
+        </ol>
+    </div>
+
+    <h3>Numer ewidencyjny</h3>
+    <p>Po zapisaniu Craty sam nadaje numer ewidencyjny i kod QR. Numer składa się z kodu kategorii, miejsca, roku i kolejnego numeru:</p>
+    <div class="numparts" aria-label="Budowa numeru ELN-M1HALAR3P2-2026-00006">
+        <span>ELN<small>kategoria</small></span><span>-</span>
+        <span>M1HALAR3P2<small>magazyn, pomieszczenie, regał, półka</small></span><span>-</span>
+        <span>2026<small>rok</small></span><span>-</span>
+        <span>00006<small>kolejny numer</small></span>
+    </div>
+    <p>Przedmiot bez kategorii albo miejsca dostaje w numerze <code>GEN</code> lub <code>BRAK</code>. Gdy uzupełnisz te dane później, na karcie przedmiotu przy kodzie QR jest przycisk odświeżenia, który przelicza numer i kod na nowo.</p>
+    <div class="tip"><p>Po odświeżeniu numeru stara, przyklejona naklejka przestaje pasować. Wydrukuj nową.</p></div>
+
+    <h3>Karta przedmiotu</h3>
+    <p>Kliknięcie przedmiotu otwiera jego kartę: dane, zdjęcia, kod QR, historia zmian, a po prawej ramki do pracy z przedmiotem: <b>Wypożyczenie</b> (z rezerwacjami), <b>Serwis</b> i <b>Sprzedaż</b>. Na górze są przyciski <span class="ui">Drukuj etykietę</span> i <span class="ui">Edytuj</span>.</p>
+    <figure><a href="img/przedmiot-karta.jpg"><img src="img/przedmiot-karta.jpg" width="1280" height="1190" alt="Karta wkrętarki: dane, kod QR, ramki Wypożyczenie, Serwis z kończącą się gwarancją i Sprzedaż." loading="lazy"></a><figcaption>Karta wkrętarki. Ramka Serwis ostrzega, że gwarancja niedługo się kończy.</figcaption></figure>
+
+    <h3>Historia zmian</h3>
+    <p>Każda zmiana ważnych pól (nazwa, wartość, stan, status, kategoria, miejsce), każde wypożyczenie, zwrot i naprawa zapisuje się w historii przedmiotu, z tym, kto i kiedy to zrobił.</p>
+    <figure class="doc"><a href="img/historia.jpg"><img src="img/historia.jpg" width="656" height="228" alt="Historia wiertarki: utworzenie, wypożyczenie Janowi Nowakowi, zwrot do Tomka i zmiany statusu." loading="lazy"></a><figcaption>Historia wiertarki: Ewa pożyczyła ją Janowi Nowakowi, a Tomek przyjął zwrot.</figcaption></figure>
+
+    <h3>Sprzedane i wycofane</h3>
+    <p>Przedmiot ze statusem „Sprzedany” albo „Wycofany” znika z listy przedmiotów i z liczb na Panelu, ale nie jest kasowany: jego karta, historia i kod QR dalej działają. Żeby go zobaczyć, wybierz ten status w filtrze listy.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="lista">
+    <h2>Lista i wyszukiwanie</h2>
+    <p>Zakładka <span class="ui">Przedmioty</span> ma dwa widoki, przełączane ikonami po prawej stronie filtrów: <b>kafelki</b> ze zdjęciami i <b>lista</b> w tabeli.</p>
+    <div class="pair">
+        <figure><a href="img/przedmioty-kafelki.jpg"><img src="img/przedmioty-kafelki.jpg" width="1280" height="860" alt="Lista przedmiotów w widoku kafelków." loading="lazy"></a><figcaption>Kafelki.</figcaption></figure>
+        <figure><a href="img/przedmioty-lista.jpg"><img src="img/przedmioty-lista.jpg" width="1280" height="1439" alt="Lista przedmiotów w tabeli, posortowana po nazwie." loading="lazy"></a><figcaption>Lista posortowana po nazwie.</figcaption></figure>
+    </div>
+    <ul>
+        <li><b>Szukaj</b> znajduje po nazwie, numerze ewidencyjnym, seryjnym i EAN. Ikona po lewej otwiera skaner.</li>
+        <li><b>Kategoria</b> i <b>Status</b> zawężają listę. Domyślny status to „wszystkie (w magazynie)”, czyli bez sprzedanych i wycofanych.</li>
+        <li><b>Sortowanie</b>: w liście kliknij nagłówek kolumny (drugie kliknięcie odwraca kolejność), w kafelkach wybierz z listy „Sortuj”.</li>
+    </ul>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Gdzie są wszystkie rzeczy Boscha?</h4>
+        <ol>
+            <li>Tomek wpisuje „bosch” w pole Szukaj i klika <span class="ui">Filtruj</span>.</li>
+            <li>Widzi wiertarkę, laser i dalmierz, z miejscem i statusem każdego z nich. Laser i dalmierz są wypożyczone.</li>
+            <li>Nad listą pojawia się żółty pasek „Filtry są włączone i zostają zapamiętane, dopóki ich nie wyczyścisz”. Po powrocie na listę później Craty pokaże te same wyniki, aż Tomek kliknie <span class="ui">Wyczyść filtry</span>.</li>
+        </ol>
+    </div>
+    <figure><a href="img/przedmioty-szukaj.jpg"><img src="img/przedmioty-szukaj.jpg" width="1280" height="860" alt="Wyniki wyszukiwania „bosch” z żółtym paskiem informującym o włączonych filtrach." loading="lazy"></a><figcaption>Wyniki wyszukiwania z paskiem włączonych filtrów.</figcaption></figure>
+    <div class="tip"><p>Lista pamięta ostatnie wyszukiwanie, filtry i sortowanie. Jeśli brakuje Ci jakiegoś przedmiotu, najpierw sprawdź, czy nad listą nie ma żółtego paska.</p></div>
+    <p>Checkboxy przy przedmiotach służą do dwóch rzeczy naraz dla wielu przedmiotów: <span class="ui">Drukuj etykiety</span> i <span class="ui">Wypożycz zaznaczone</span> (zestaw, opisany niżej). Z listy przedmiotów przefiltrowanej po miejscu można też zacząć inwentaryzację tego miejsca.</p>
+
+    <h3>Import z CSV</h3>
+    <p>Przycisk <span class="ui">Import z CSV</span> nad listą wczytuje wiele przedmiotów naraz z arkusza. Na stronie importu jest do pobrania szablon pliku z opisem kolumn.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="etykiety">
+    <h2>Etykiety z kodem QR</h2>
+    <p>Kod QR na naklejce prowadzi prosto do karty przedmiotu: wystarczy zeskanować go telefonem. Etykietę drukujesz z karty przedmiotu (<span class="ui">Drukuj etykietę</span>) albo dla wielu przedmiotów naraz z listy (zaznacz i <span class="ui">Drukuj etykiety</span>).</p>
+    <figure><a href="img/etykieta.jpg"><img src="img/etykieta.jpg" width="1400" height="388" alt="Podgląd etykiety 32 na 20 mm z kodem QR i nazwą wiertarki, z wyborem szablonu i opcją ceny." loading="lazy"></a><figcaption>Podgląd etykiety. Szablon i cenę wybierasz na podglądzie, przed drukiem.</figcaption></figure>
+    <div class="scroll"><table class="plain">
+        <thead><tr><th>Szablon</th><th>Co jest na naklejce</th></tr></thead>
+        <tbody>
+            <tr><td>32 × 20 mm</td><td>Kod QR i nazwa przedmiotu (domyślny).</td></tr>
+            <tr><td>35 × 25 mm</td><td>Sam kod QR.</td></tr>
+            <tr><td>50 × 30 mm</td><td>Kod QR, nazwa i numer ewidencyjny, większą czcionką.</td></tr>
+        </tbody>
+    </table></div>
+    <p>Każdy szablon może mieć dodatkowo cenę (z pola „Wartość”). Strona ustawia rozmiar papieru na rozmiar naklejki, więc w oknie drukowania wybierz drukarkę etykiet i nie zmieniaj marginesów. Na bardzo małej naklejce długa nazwa może się nie zmieścić w całości.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="wypozyczenia">
+    <h2>Wypożyczenia</h2>
+    <p>Wypożyczenie zapisujesz na karcie przedmiotu, w ramce <b>Wypożyczenie</b>. Craty zapamiętuje, komu i do kiedy, kto z obsługi wydał przedmiot i w jakim był stanie, a do wydrukowania przygotowuje protokół.</p>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Ewa pożycza wkrętarkę Janowi Nowakowi na tydzień</h4>
+        <ol>
+            <li>Na karcie wkrętarki klika <span class="ui">Wypożycz</span>, żeby rozwinąć formularz.</li>
+            <li>W polu „Komu wypożyczono” wybiera Jana Nowaka z kontaktów. Nowej osoby nie trzeba najpierw dodawać: opcja „+ Nowy kontakt” pozwala wpisać nazwę, telefon i e-mail od razu tutaj.</li>
+            <li>Termin zwrotu: za tydzień. Uwagi: „Z ładowarką i dwoma akumulatorami.” (drukują się na protokole).</li>
+            <li>Klika <span class="ui">Wypożycz</span>. Wkrętarka ma teraz status „Wypożyczony”.</li>
+        </ol>
+    </div>
+    <div class="pair">
+        <figure class="narrow"><a href="img/wypozycz-formularz.jpg"><img src="img/wypozycz-formularz.jpg" width="328" height="456" alt="Formularz wypożyczenia: Jan Nowak, termin zwrotu, uwagi." loading="lazy"></a><figcaption>Formularz wypożyczenia.</figcaption></figure>
+        <figure class="narrow"><a href="img/przedmiot-wypozyczony.jpg"><img src="img/przedmiot-wypozyczony.jpg" width="328" height="323" alt="Wypożyczony oscyloskop: komu, termin zwrotu, link do protokołu wydania i przycisk zwrotu." loading="lazy"></a><figcaption>Wypożyczony przedmiot: komu, do kiedy i protokół.</figcaption></figure>
+    </div>
+
+    <h3>Protokół wydania</h3>
+    <p>Przy wypożyczonym przedmiocie jest link <span class="ui">Protokół wydania (PDF)</span>. To dokument do wydrukowania i podpisania przez obie strony: dane wypożyczającego (z kontaktu: telefon, e-mail, adres), przedmiot z numerami, wartością i stanem, daty i uwagi. Protokoły powstają na bieżąco z danych w Craty, nie trzeba ich nigdzie zapisywać.</p>
+
+    <h3>Zwrot</h3>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Anna Zielińska oddaje oscyloskop</h4>
+        <ol>
+            <li>Tomek otwiera kartę oscyloskopu (najszybciej skanując naklejkę) i klika <span class="ui">Zarejestruj zwrot</span>.</li>
+            <li>Stan przy zwrocie: zostawia „Używany”. Gdyby coś było uszkodzone, wybrałby „Uszkodzony” i stan zmieniłby się też w kartotece.</li>
+            <li>Uwagi: „Bez uwag, komplet z sondami.” Zatwierdza <span class="ui">Zarejestruj zwrot</span>.</li>
+        </ol>
+    </div>
+    <div class="pair">
+        <figure class="narrow"><a href="img/zwrot-formularz.jpg"><img src="img/zwrot-formularz.jpg" width="328" height="510" alt="Formularz zwrotu: stan przy zwrocie i uwagi." loading="lazy"></a><figcaption>Rejestracja zwrotu.</figcaption></figure>
+        <figure class="doc"><a href="img/protokol-zwrotu.jpg"><img src="img/protokol-zwrotu.jpg" width="819" height="1137" alt="Protokół zwrotu wiertarki z danymi Jana Nowaka, stanem przy wydaniu i zwrocie oraz uwagą o brakującym wiertle." loading="lazy"></a><figcaption>Protokół zwrotu: stan przy wydaniu i przy zwrocie obok siebie, z uwagami.</figcaption></figure>
+    </div>
+    <p>Pod formularzem na karcie przedmiotu są ostatnie zakończone wypożyczenia z linkami do obu protokołów.</p>
+
+    <h3>Zakładka Wypożyczenia</h3>
+    <p>Zakładka <span class="ui">Wypożyczenia</span> zbiera wszystko w jednym miejscu: co jest teraz wypożyczone (po terminie na czerwono), wypożyczone zestawy i nadchodzące rezerwacje. Stąd też zaczniesz nowy zestaw przyciskiem <span class="ui">Wypożycz zestaw</span>.</p>
+    <figure><a href="img/wypozyczenia.jpg"><img src="img/wypozyczenia.jpg" width="1280" height="860" alt="Zakładka Wypożyczenia: wypożyczone teraz, zestawy i rezerwacje." loading="lazy"></a><figcaption>Zakładka Wypożyczenia.</figcaption></figure>
+    <p>Przeterminowane wypożyczenia widać też na Panelu. Administrator może dodatkowo włączyć codzienny e-mail z ich listą (<a href="#ustawienia">Ustawienia → Powiadomienia</a>).</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="zestawy">
+    <h2>Zestawy</h2>
+    <p>Gdy jedna osoba bierze kilka rzeczy naraz, wypożycz je jako <b>zestaw</b>: jeden formularz, jedna osoba, jeden wspólny protokół z listą wszystkich przedmiotów. Przedmioty do zestawu wybierasz na dwa sposoby:</p>
+    <ul>
+        <li><b>Z listy przedmiotów</b>: zaznacz checkboxy i kliknij <span class="ui">Wypożycz zaznaczone</span>.</li>
+        <li><b>Skanując serię</b>: na stronie <span class="ui">Skanuj serię</span> skanujesz naklejki po kolei i klikasz <span class="ui">Wypożycz jako zestaw</span> (opis w rozdziale <a href="#telefon">Telefon i skaner</a>).</li>
+    </ul>
+    <figure><a href="img/zaznaczone-na-liscie.jpg"><img src="img/zaznaczone-na-liscie.jpg" width="1280" height="860" alt="Lista przedmiotów z zaznaczonymi drabiną i pilarką oraz przyciskiem Wypożycz zaznaczone." loading="lazy"></a><figcaption>Zaznaczone przedmioty i przycisk <span class="ui">Wypożycz zaznaczone</span>.</figcaption></figure>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Ekipa Budmexu bierze sprzęt pomiarowy na remont</h4>
+        <ol>
+            <li>Ewa zaznacza na liście laser krzyżowy, dalmierz i przedłużacz bębnowy, potem <span class="ui">Wypożycz zaznaczone</span>.</li>
+            <li>Na stronie zestawu widzi trzy przedmioty. Gdyby któryś był wypożyczony albo w naprawie, byłby oznaczony na czerwono i zestaw by nie przeszedł.</li>
+            <li>Komu: Budmex Sp. z o.o. Termin zwrotu za dziesięć dni. Uwagi: „Wykończenie mieszkania przy ul. Lipowej.”</li>
+            <li><span class="ui">Wypożycz zestaw</span>. Zestaw dostaje numer <b>Z1/2026</b>, a każdy przedmiot status „Wypożyczony”.</li>
+            <li>Drukuje <span class="ui">Protokół wydania (PDF)</span> ze strony zestawu i daje go brygadziście do podpisu.</li>
+        </ol>
+    </div>
+    <div class="pair">
+        <figure><a href="img/zestaw-nowy.jpg"><img src="img/zestaw-nowy.jpg" width="1280" height="860" alt="Formularz nowego zestawu z trzema przedmiotami." loading="lazy"></a><figcaption>Nowy zestaw.</figcaption></figure>
+        <figure class="doc"><a href="img/protokol-zestawu.jpg"><img src="img/protokol-zestawu.jpg" width="819" height="1001" alt="Protokół wydania zestawu Z1/2026 dla Budmex z tabelą trzech przedmiotów." loading="lazy"></a><figcaption>Protokół wydania zestawu: wszystkie przedmioty w jednej tabeli.</figcaption></figure>
+    </div>
+
+    <h3>Zwrot całości albo części</h3>
+    <p>Na stronie zestawu każdy przedmiot ma swój checkbox, stan przy zwrocie i uwagi. Zaznaczasz to, co wróciło, i klikasz <span class="ui">Zarejestruj zwrot</span>. Resztę zwrócisz później tutaj albo zwykłym zwrotem z karty przedmiotu. Protokół zwrotu zestawu obejmuje to, co już wróciło.</p>
+    <figure><a href="img/zestaw.jpg"><img src="img/zestaw.jpg" width="1280" height="860" alt="Strona zestawu Z1/2026: przedłużacz już zwrócony, laser i dalmierz do zwrotu." loading="lazy"></a><figcaption>Budmex oddał już przedłużacz. Laser i dalmierz są jeszcze na budowie.</figcaption></figure>
+    <p>Na karcie przedmiotu z zestawu widać numer zestawu z linkiem, a protokoły prowadzą do wspólnego protokołu zestawu.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="rezerwacje">
+    <h2>Rezerwacje</h2>
+    <p>Rezerwacja „zaklepuje” przedmiot dla kogoś na konkretne dni. Dodajesz ją na karcie przedmiotu, w ramce Wypożyczenie, w części <b>Rezerwacje</b>.</p>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Głośnik dla Jana na urodziny, potem dla Anny na festyn</h4>
+        <ol>
+            <li>Jan Nowak zarezerwował głośnik od dziś do pojutrza. Na karcie głośnika jest żółta informacja „Zarezerwowane dla Jan Nowak”.</li>
+            <li>Gdy Jan przychodzi, Ewa klika <span class="ui">Wydaj teraz</span>: rezerwacja zamienia się w wypożyczenie dla Jana, z terminem zwrotu w ostatnim dniu rezerwacji.</li>
+            <li>Anna dzwoni, że potrzebuje głośnika w przyszłym tygodniu. Ewa klika <span class="ui">Zarezerwuj</span>, wybiera Annę, daty i dopisuje „Na festyn w szkole.”</li>
+        </ol>
+    </div>
+    <div class="pair">
+        <figure class="narrow"><a href="img/rezerwacja-trwa.jpg"><img src="img/rezerwacja-trwa.jpg" width="328" height="317" alt="Trwająca rezerwacja głośnika dla Jana Nowaka z przyciskami Wydaj teraz i Odwołaj rezerwację." loading="lazy"></a><figcaption>Trwająca rezerwacja.</figcaption></figure>
+        <figure class="narrow"><a href="img/rezerwacja-formularz.jpg"><img src="img/rezerwacja-formularz.jpg" width="328" height="552" alt="Formularz nowej rezerwacji dla Anny Zielińskiej z datami i uwagą." loading="lazy"></a><figcaption>Nowa rezerwacja.</figcaption></figure>
+    </div>
+    <ul>
+        <li>Dwie rezerwacje tego samego przedmiotu na zachodzące na siebie dni nie przejdą: Craty pokaże, kto już ma ten termin.</li>
+        <li>Zarezerwowany przedmiot da się wypożyczyć komuś innemu, Craty tylko ostrzega. Decyzja należy do obsługi.</li>
+        <li>Rezerwacje na dziś i jutro widać na Panelu, a wszystkie nadchodzące w zakładce Wypożyczenia.</li>
+    </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="telefon">
+    <h2>Telefon i skaner</h2>
+    <h3>Craty jako aplikacja na telefonie</h3>
+    <p>Craty działa w przeglądarce telefonu, ale można go też <b>zainstalować</b> jak aplikację: w Chrome na Androidzie wybierz z menu „Zainstaluj aplikację” (albo „Dodaj do ekranu głównego”), w Safari na iPhonie „Udostępnij → Do ekranu początkowego”. Aplikacja otwiera się od razu na Panelu. Instalacja i aparat wymagają adresu z HTTPS.</p>
+    <div class="pair">
+        <figure class="phone"><a href="img/telefon-panel.jpg"><img src="img/telefon-panel.jpg" width="780" height="1688" alt="Panel Craty na telefonie z rzędem ikon zamiast zakładek." loading="lazy"></a><figcaption>Panel na telefonie.</figcaption></figure>
+        <figure class="phone"><a href="img/telefon-skaner.jpg"><img src="img/telefon-skaner.jpg" width="780" height="1688" alt="Skaner Craty na telefonie: podgląd z aparatu skierowany na naklejkę z kodem QR." loading="lazy"></a><figcaption>Skaner: wystarczy skierować aparat na naklejkę.</figcaption></figure>
+    </div>
+
+    <h3>Skanowanie</h3>
+    <p>Strona <span class="ui">Skanuj</span> (ikona przy polu wyszukiwania na liście przedmiotów) używa aparatu. Rozpoznaje dwa rodzaje kodów:</p>
+    <ul>
+        <li><b>Kod QR z naklejki Craty</b>: od razu otwiera kartę przedmiotu.</li>
+        <li><b>Kod kreskowy producenta</b> (EAN, UPC i inne): Craty szuka przedmiotu z takim numerem EAN albo seryjnym. Jeśli go nie ma, proponuje szybkie dodanie.</li>
+    </ul>
+
+    <h3>Szybkie dodanie</h3>
+    <figure class="phone"><a href="img/telefon-szybkie-dodanie.jpg"><img src="img/telefon-szybkie-dodanie.jpg" width="780" height="2168" alt="Formularz szybkiego dodania na telefonie: zeskanowany kod, nazwa, zdjęcie z aparatu, kategoria, lokalizacja, stan i opis." loading="lazy"></a><figcaption>Szybkie dodanie po zeskanowaniu nieznanego kodu.</figcaption></figure>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Tomek dodaje zasilacz prosto z półki</h4>
+        <ol>
+            <li>Skanuje kod kreskowy na obudowie zasilacza. Craty go nie zna, więc otwiera szybkie dodanie z wpisanym kodem.</li>
+            <li>Wpisuje nazwę „Zasilacz laboratoryjny” i robi zdjęcie aparatem. Kategorię i miejsce może pominąć, gdy się spieszy.</li>
+            <li>Na liście przedmiotów zasilacz ma ikonkę 📱, a na Panelu jest w „Dodane z telefonu”. Ikonka znika, gdy ktoś otworzy pełną edycję i zapisze przedmiot.</li>
+        </ol>
+    </div>
+
+    <h3>Skanuj serię</h3>
+    <p><span class="ui">Skanuj serię</span> (link na stronie Skanuj) nie otwiera karty po pierwszym kodzie, tylko zbiera kolejne przedmioty na liście. Kod można też wpisać ręcznie albo użyć ręcznego czytnika kodów kreskowych podłączonego jak klawiatura. Z gotowej listy wypożyczasz wszystko jako zestaw albo drukujesz etykiety. Lista zostaje po odświeżeniu strony, a przycisk × usuwa pojedynczą pozycję.</p>
+    <figure><a href="img/skanuj-serie.jpg"><img src="img/skanuj-serie.jpg" width="1280" height="860" alt="Skanuj serię: podgląd kamery i lista czterech zeskanowanych przedmiotów, laser oznaczony jako już wypożyczony." loading="lazy"></a><figcaption>Cztery zeskanowane przedmioty. Laser jest oznaczony na czerwono, bo jest już wypożyczony.</figcaption></figure>
+</section>
+
+<!-- ============================================================ -->
+<section id="inwentaryzacja">
+    <h2>Inwentaryzacja</h2>
+    <p>Inwentaryzacja sprawdza, czy w danym miejscu leży to, co powinno. Wybierasz miejsce, skanujesz to, co faktycznie tam jest, a Craty porównuje to z kartoteką. Zaczynasz z <span class="path">Ustawienia → Struktura magazynu → Inwentaryzacja</span> albo z listy przedmiotów przefiltrowanej po miejscu (<span class="ui">Inwentaryzacja tego miejsca</span>).</p>
+    <figure><a href="img/inwentaryzacje.jpg"><img src="img/inwentaryzacje.jpg" width="1280" height="860" alt="Lista inwentaryzacji z wyborem miejsca do przeliczenia." loading="lazy"></a><figcaption>Nowa inwentaryzacja i lista poprzednich.</figcaption></figure>
+    <p>Magazyn, pomieszczenie, regał albo półka obejmuje wszystko, co jest pod nim. Każdy skan zapisuje się od razu, więc można przerwać i dokończyć później, także na innym telefonie.</p>
+    <figure><a href="img/inwentaryzacja-skanowanie.jpg"><img src="img/inwentaryzacja-skanowanie.jpg" width="1280" height="892" alt="Inwentaryzacja garażu w toku: kamera, licznik oczekiwanych przedmiotów i zeskanowane pozycje." loading="lazy"></a><figcaption>Inwentaryzacja garażu w toku: ile powinno być, ile już zeskanowano.</figcaption></figure>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Tomek liczy półkę 2 na regale 3 w hali</h4>
+        <ol>
+            <li>Wybiera miejsce „Magazyn główny › Hala warsztatowa › Regał 3 › Półka 2” i klika <span class="ui">Zacznij liczyć</span>.</li>
+            <li>Skanuje wszystko, co leży na półce: wiertarkę, zestaw wierteł, multimetr i profile aluminiowe.</li>
+            <li>Klika <span class="ui">Zakończ i pokaż raport</span>.</li>
+        </ol>
+    </div>
+    <figure><a href="img/inwentaryzacja-raport.jpg"><img src="img/inwentaryzacja-raport.jpg" width="1280" height="1048" alt="Raport inwentaryzacji: brakuje szlifierki i wkrętarki, profile aluminiowe znalezione nie na swoim miejscu, stacja lutownicza i oscyloskop wypożyczone, trzy przedmioty na miejscu." loading="lazy"></a><figcaption>Raport inwentaryzacji.</figcaption></figure>
+    <p>Raport ma cztery części:</p>
+    <ul>
+        <li><b>Brakuje</b>: według kartoteki powinny tu być, a nie zostały zeskanowane. Tu: szlifierka i wkrętarka. Craty niczego z nimi sam nie robi, to lista do sprawdzenia.</li>
+        <li><b>Znalezione tutaj, ale zapisane gdzie indziej</b>: profile aluminiowe są zapisane na regale 7. Przycisk <span class="ui">Przenieś tutaj</span> poprawia miejsce w kartotece (zmiana trafia do historii).</li>
+        <li><b>Wypożyczone albo w naprawie</b>: rzeczy z tego miejsca, które są teraz poza magazynem, więc nie liczą się jako braki.</li>
+        <li><b>Na miejscu</b>: wszystko, co się zgadza.</li>
+    </ul>
+    <p>Raporty zostają na liście inwentaryzacji. Sprzedane i wycofane przedmioty nie są brane pod uwagę.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="kontakty">
+    <h2>Kontakty</h2>
+    <p>Zakładka <span class="ui">Kontakty</span> (moduł, domyślnie włączony) to lista osób, firm i serwisów, z którymi pracujesz. Kontakt ma nazwę, typ (osoba, firma, serwis), telefon, e-mail, adres i notatkę. Telefon, e-mail i adres drukują się na protokołach.</p>
+    <figure><a href="img/kontakty.jpg"><img src="img/kontakty.jpg" width="1280" height="860" alt="Lista kontaktów z typem, telefonem, e-mailem i liczbą wypożyczonych teraz rzeczy." loading="lazy"></a><figcaption>Lista kontaktów. Przy każdym widać, ile rzeczy ma teraz u siebie.</figcaption></figure>
+    <p>Listę przeszukasz po nazwie, telefonie i e-mailu oraz zawęzisz do jednego typu. Karta kontaktu pokazuje całą historię jego wypożyczeń (co, kiedy, czy wróciło, z protokołami), a przy serwisie także zlecone mu naprawy.</p>
+    <figure><a href="img/kontakt-karta.jpg"><img src="img/kontakt-karta.jpg" width="1280" height="860" alt="Karta kontaktu Budmex: dane firmy i historia wypożyczeń z protokołami." loading="lazy"></a><figcaption>Karta Budmexu z historią wypożyczeń.</figcaption></figure>
+    <ul>
+        <li>Nowy kontakt dodasz tutaj (<span class="ui">+ Nowy kontakt</span>) albo w biegu, przy wypożyczeniu.</li>
+        <li>Usunięcie kontaktu nie kasuje jego wypożyczeń: zostają w historii pod tą samą nazwą.</li>
+        <li>Po wyłączeniu modułu pole „komu” przy wypożyczeniu jest zwykłym tekstem. Protokoły działają tak samo.</li>
+    </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="serwis">
+    <h2>Serwis</h2>
+    <p>Moduł Serwis (domyślnie wyłączony, włączasz go w <span class="path">Ustawienia → Moduły</span>) pilnuje napraw, przeglądów okresowych i gwarancji. Dochodzi wtedy zakładka <span class="ui">Serwis</span>, ramka Serwis na karcie przedmiotu i pola w formularzu przedmiotu.</p>
+    <figure><a href="img/serwis.jpg"><img src="img/serwis.jpg" width="1280" height="860" alt="Zakładka Serwis: odkurzacz w naprawie po terminie, przeglądy drabiny i pilarki, kończąca się gwarancja wkrętarki." loading="lazy"></a><figcaption>Zakładka Serwis: co wymaga uwagi.</figcaption></figure>
+
+    <h3>Naprawy</h3>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Odkurzacz jedzie do serwisu</h4>
+        <ol>
+            <li>Na karcie odkurzacza Ewa klika <span class="ui">Wyślij do naprawy</span>.</li>
+            <li>Wybiera „Serwis Elektronarzędzi Kraków” z kontaktów (serwisy są na górze listy). Przy naprawie we własnym warsztacie zostawiłaby to pole puste.</li>
+            <li>Opis usterki: „Słabe ssanie, głośna praca silnika.”, data wysłania i planowany powrót za dziesięć dni.</li>
+            <li>Odkurzacz ma status „W naprawie” i w tym czasie nie da się go wypożyczyć. Gdy minie planowany powrót, na Panelu i w Serwisie pojawia się czerwona data.</li>
+            <li>Kiedy wróci: <span class="ui">Zakończ naprawę</span>, z datą powrotu, kosztem, opisem tego, co zrobiono, i stanem po naprawie. Odkurzacz wraca do statusu sprzed naprawy.</li>
+        </ol>
+    </div>
+    <figure class="narrow"><a href="img/naprawa-w-toku.jpg"><img src="img/naprawa-w-toku.jpg" width="328" height="321" alt="Ramka Serwis na karcie odkurzacza: w naprawie w Serwisie Elektronarzędzi Kraków, powrót po terminie." loading="lazy"></a><figcaption>Naprawa w toku, po planowanym terminie powrotu.</figcaption></figure>
+    <p>Wypożyczonego przedmiotu nie da się wysłać do naprawy: najpierw trzeba zarejestrować zwrot.</p>
+
+    <h3>Przeglądy okresowe</h3>
+    <p>W formularzu przedmiotu ustawiasz „Przegląd co (miesięcy)” i datę następnego przeglądu, np. dla drabin, gaśnic albo elektronarzędzi. Wykonany przegląd zapisujesz na karcie przedmiotu, a następny termin Craty liczy sam.</p>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Coroczny przegląd drabiny</h4>
+        <ol>
+            <li>Drabina ma przegląd co 12 miesięcy i jest już po terminie, więc świeci na czerwono na Panelu.</li>
+            <li>Po sprawdzeniu Tomek klika na jej karcie <span class="ui">Zapisz przegląd</span>: data dzisiejsza, wynik „Pozytywny”, uwagi „Stopki wymienione, zawiasy nasmarowane.”</li>
+            <li>Następny przegląd ustawia się sam za rok, a wpis trafia do historii serwisowej.</li>
+        </ol>
+    </div>
+    <figure class="narrow"><a href="img/przeglad-formularz.jpg"><img src="img/przeglad-formularz.jpg" width="328" height="574" alt="Formularz zapisu przeglądu drabiny z datą, wynikiem i uwagami." loading="lazy"></a><figcaption>Zapis przeglądu.</figcaption></figure>
+
+    <h3>Gwarancje</h3>
+    <p>W formularzu przedmiotu jest pole „Gwarancja do”. Na karcie przedmiotu i w Serwisie widać, gdy gwarancja kończy się w ciągu 30 dni albo już wygasła (przez 30 dni po końcu). Jak wkrętarka w przykładzie: to dobry moment, żeby sprawdzić, czy wszystko działa, póki można ją jeszcze reklamować.</p>
+
+    <h3>Przypomnienie e-mailem</h3>
+    <p>W <span class="path">Ustawienia → Powiadomienia</span> administrator może włączyć cotygodniowe przypomnienie: w każdy poniedziałek rano e-mail z przeglądami po terminie i na najbliższe 14 dni, kończącymi się gwarancjami i naprawami po terminie. Przychodzi tylko wtedy, gdy coś jest na liście.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="materialy">
+    <h2>Materiały eksploatacyjne</h2>
+    <p>Moduł Materiały (domyślnie wyłączony) to osobna lista na rzeczy liczone ilością: wkręty, taśmę, kabel, klej. Materiały nie mają numerów ewidencyjnych ani wypożyczeń, za to mają jednostkę (szt., opak., m, l, kg), miejsce i <b>stan minimalny</b>.</p>
+    <figure><a href="img/materialy.jpg"><img src="img/materialy.jpg" width="1280" height="860" alt="Lista materiałów z ilościami; klej i wkręty oznaczone na czerwono jako kończące się, przy każdym pole szybkiego pobrania." loading="lazy"></a><figcaption>Lista materiałów. Kończące się są na czerwono, a z listy można od razu pobrać.</figcaption></figure>
+    <p>Ilość zmienia się tylko na trzy sposoby, a każda zmiana trafia do historii z datą, osobą i uwagą:</p>
+    <ul>
+        <li><b>Pobierz</b>: zużycie, także szybko z samej listy (pole z ilością i przycisk obok).</li>
+        <li><b>Uzupełnij</b>: zakup albo dostawa.</li>
+        <li><b>Ustaw policzony stan</b>: po przeliczeniu na półce, zapisuje się jako korekta.</li>
+    </ul>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Kończą się wkręty</h4>
+        <ol>
+            <li>Tomek pobiera z listy 2 opakowania wkrętów 4x40. Zostają 3, a minimum to 5, więc wkręty robią się czerwone i pojawiają się na Panelu w „Kończące się materiały”.</li>
+            <li>Ewa kupuje 10 opakowań i na karcie materiału wpisuje je w <span class="ui">Uzupełnij</span> z uwagą „Zakup w hurtowni”.</li>
+            <li>Przy porządkach okazuje się, że jest o jedno opakowanie mniej, niż pokazuje Craty. <span class="ui">Ustaw policzony stan</span> poprawia ilość i zapisuje korektę w historii.</li>
+        </ol>
+    </div>
+    <figure><a href="img/material-karta.jpg"><img src="img/material-karta.jpg" width="1280" height="1043" alt="Karta materiału Wkręty do drewna 4x40: 3 opakowania przy minimum 5, formularze Pobierz, Uzupełnij, Ustaw policzony stan i historia zmian." loading="lazy"></a><figcaption>Karta materiału z historią ruchów.</figcaption></figure>
+    <p>Edycja materiału zmienia tylko jego dane (nazwę, jednostkę, minimum, miejsce), nigdy ilość. Ilość nie spada poniżej zera. Filtr <span class="ui">Tylko kończące się</span> pokazuje wszystko, co trzeba dokupić.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="sprzedaz">
+    <h2>Sprzedaż i pchli targ</h2>
+    <p>Moduł Sprzedaż (domyślnie włączony) pomaga sprzedać niepotrzebny sprzęt. Craty nie jest sklepem: nie ma koszyka ani płatności. Przygotowujesz ofertę, wystawiasz ją na OLX, Allegro czy Vinted albo pokazujesz na własnym pchlim targu, a kupujący kontaktuje się z Tobą mailem lub telefonicznie.</p>
+    <h3>Oferty</h3>
+    <ol>
+        <li>Na karcie przedmiotu kliknij <span class="ui">Przygotuj ofertę sprzedaży</span>: tytuł, opis, cena i opcjonalnie link do tej samej oferty na OLX, Allegro albo Vinted.</li>
+        <li>Oferta trafia do zakładki <span class="ui">Przygotowane</span>. Stąd możesz ją wystawić ręcznie albo wyeksportować do CSV (gotowe tytuły i opisy do wykorzystania gdzie chcesz).</li>
+        <li>Wystawione oferty są w zakładce <span class="ui">Wystawione</span>, gdzie oznaczasz je jako sprzedane (przedmiot dostaje status „Sprzedany”) albo wycofujesz.</li>
+    </ol>
+    <div class="pair">
+        <figure><a href="img/sprzedaz-przygotowane.jpg"><img src="img/sprzedaz-przygotowane.jpg" width="1280" height="860" alt="Zakładka Przygotowane z ofertą profili aluminiowych." loading="lazy"></a><figcaption>Przygotowane oferty.</figcaption></figure>
+        <figure><a href="img/sprzedaz-wystawione.jpg"><img src="img/sprzedaz-wystawione.jpg" width="1280" height="860" alt="Zakładka Wystawione z ofertą multimetru i przyciskami sprzedane i wycofaj." loading="lazy"></a><figcaption>Wystawione oferty.</figcaption></figure>
+    </div>
+    <p>Link do oferty zwykle powstaje dopiero po wystawieniu, więc da się go dopisać później: kliknij wiersz oferty, a w podglądzie na dole jest pole na link.</p>
+
+    <h3>Pchli targ</h3>
+    <p>Pchli targ to publiczna strona główna Craty (sam adres, bez logowania) z wystawionymi ofertami. Adres możesz wysłać znajomym. Każda oferta ma swoją stronę ze zdjęciami, opisem, linkiem do OLX czy Allegro i kontaktem.</p>
+    <div class="pair">
+        <figure><a href="img/pchli-targ.jpg"><img src="img/pchli-targ.jpg" width="1280" height="860" alt="Publiczny pchli targ z opisem sprzedaży, kontaktem i ofertą multimetru." loading="lazy"></a><figcaption>Pchli targ.</figcaption></figure>
+        <figure><a href="img/pchli-targ-oferta.jpg"><img src="img/pchli-targ-oferta.jpg" width="1280" height="860" alt="Strona oferty multimetru z ceną, stanem, opisem i kontaktem." loading="lazy"></a><figcaption>Strona oferty.</figcaption></figure>
+    </div>
+    <p>Opis sprzedaży, e-mail i telefon kontaktowy, politykę prywatności i regulamin ustawia administrator w <span class="path">Ustawienia → Opcje sprzedaży</span>. Teksty piszesz prostym Markdownem: pusta linia to nowy akapit, <code>**pogrubienie**</code>, <code>## nagłówek</code>, <code>- punkt listy</code>, <code>[link](https://…)</code>.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="ustawienia">
+    <h2>Ustawienia</h2>
+    <p>Ustawienia otwierasz z menu z Twoim imieniem (prawy górny róg). Część podstawowa jest dla wszystkich, zaawansowana tylko dla administratora.</p>
+    <figure><a href="img/ustawienia.jpg"><img src="img/ustawienia.jpg" width="1280" height="922" alt="Strona Ustawienia z kafelkami: kategorie, struktura magazynu, ustawienia aplikacji, opcje sprzedaży, użytkownicy, poczta, powiadomienia, moduły, aktualizacje." loading="lazy"></a><figcaption>Ustawienia.</figcaption></figure>
+    <div class="scroll"><table class="plain">
+        <thead><tr><th>Ustawienie</th><th>Co tam jest</th></tr></thead>
+        <tbody>
+            <tr><td><b>Kategorie</b>, <b>Struktura magazynu</b></td><td>Opisane w rozdziale <a href="#struktura">Kategorie i miejsca</a>.</td></tr>
+            <tr><td><b>Ustawienia aplikacji</b></td><td>Nazwa (np. „Pracownia Kowalskich”), logo, ikonka karty przeglądarki, domyślny język (polski lub angielski) i opcja „Użyj logo jako ikony aplikacji na telefonie”.</td></tr>
+            <tr><td><b>Opcje sprzedaży</b></td><td>Opis, kontakt, polityka prywatności i regulamin pchlego targu.</td></tr>
+            <tr><td><b>Użytkownicy</b></td><td>Konta, role, wyłączanie kont. Wyłączone konto nie zaloguje się, a zalogowana osoba zostaje wylogowana przy następnym kliknięciu.</td></tr>
+            <tr><td><b>Poczta</b></td><td>Własny serwer SMTP do wysyłki e-maili, z przyciskiem wiadomości testowej.</td></tr>
+            <tr><td><b>Powiadomienia</b></td><td>Samodzielny reset hasła, codzienny e-mail o przeterminowanych wypożyczeniach i cotygodniowe przypomnienie serwisowe.</td></tr>
+            <tr><td><b>Moduły</b></td><td>Włączanie i wyłączanie Sprzedaży, Kontaktów, Serwisu i Materiałów.</td></tr>
+            <tr><td><b>Aktualizacje</b></td><td>Aktualizacja przez wgranie paczki <code>.zip</code> z nową wersją (w wersji Docker: pobranie nowego obrazu).</td></tr>
+        </tbody>
+    </table></div>
+    <div class="pair">
+        <figure><a href="img/ustawienia-moduly.jpg"><img src="img/ustawienia-moduly.jpg" width="1280" height="860" alt="Ustawienia modułów z czterema przełącznikami." loading="lazy"></a><figcaption>Moduły.</figcaption></figure>
+        <figure><a href="img/ustawienia-powiadomienia.jpg"><img src="img/ustawienia-powiadomienia.jpg" width="1280" height="860" alt="Ustawienia powiadomień: reset hasła, e-mail o przeterminowanych wypożyczeniach, przypomnienie serwisowe." loading="lazy"></a><figcaption>Powiadomienia.</figcaption></figure>
+        <figure><a href="img/ustawienia-aplikacja.jpg"><img src="img/ustawienia-aplikacja.jpg" width="1280" height="951" alt="Ustawienia aplikacji: nazwa, logo, ikona, język." loading="lazy"></a><figcaption>Ustawienia aplikacji.</figcaption></figure>
+        <figure><a href="img/uzytkownicy.jpg"><img src="img/uzytkownicy.jpg" width="1280" height="860" alt="Lista użytkowników: Ewa Kowalska administrator, Tomek Wiśniewski magazynier." loading="lazy"></a><figcaption>Użytkownicy.</figcaption></figure>
+    </div>
+    <div class="tip"><p>E-maile z powiadomieniami wysyłają się tylko wtedy, gdy na serwerze działa harmonogram zadań (cron). W wersji Docker działa sam.</p></div>
+
+    <h3>Aktualizacja</h3>
+    <figure><a href="img/ustawienia-aktualizacje.jpg"><img src="img/ustawienia-aktualizacje.jpg" width="1280" height="860" alt="Strona aktualizacji z bieżącą wersją i przyciskiem potwierdzenia hasła przed wgraniem paczki." loading="lazy"></a><figcaption>Aktualizacje: przed wgraniem paczki trzeba potwierdzić hasło.</figcaption></figure>
+    <ol>
+        <li>Pobierz paczkę <code>craty-X.Y.Z.zip</code> z <a href="https://github.com/cyryllo/craty/releases/latest">wydań na GitHubie</a>.</li>
+        <li><b>Zrób kopię plików i bazy danych</b> w panelu hostingu. Craty nie robi jej sam.</li>
+        <li>W <span class="path">Ustawienia → Aktualizacje</span> potwierdź hasło, wybierz paczkę i opcjonalnie wklej sumę kontrolną SHA-256 z opisu wydania.</li>
+        <li>Po wgraniu Craty sam wprowadza zmiany w bazie i pokazuje nową wersję w stopce.</li>
+    </ol>
+
+    <h3>Twój profil</h3>
+    <p>W <span class="ui">Profil</span> każdy zmienia swoje imię, e-mail, hasło i język. Jasny albo ciemny motyw przełącza ikona księżyca w górnym pasku; wybór zapamiętuje przeglądarka.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="pytania">
+    <h2>Częste pytania</h2>
+    <h3>Nie widzę przedmiotu na liście.</h3>
+    <p>Sprawdź, czy nad listą nie ma żółtego paska z włączonymi filtrami (<span class="ui">Wyczyść filtry</span>). Sprzedane i wycofane przedmioty są widoczne tylko po wybraniu tego statusu w filtrze.</p>
+    <h3>Nie mogę wypożyczyć przedmiotu.</h3>
+    <p>Przedmiot w naprawie, już wypożyczony, sprzedany albo wycofany nie może wyjść. Komunikat w ramce Wypożyczenie mówi dlaczego.</p>
+    <h3>Telefon nie chce włączyć aparatu.</h3>
+    <p>Aparat działa tylko na stronie z HTTPS i po zgodzie w przeglądarce. Jeśli wcześniej odmówiłeś, zmień uprawnienie aparatu dla tej strony w ustawieniach przeglądarki.</p>
+    <h3>Zmieniłem kategorię, a numer ewidencyjny został stary.</h3>
+    <p>Numer nie zmienia się sam, żeby nie unieważniać przyklejonych naklejek. Na karcie przedmiotu przy kodzie QR jest przycisk odświeżenia numeru. Po nim wydrukuj nową etykietę.</p>
+    <h3>Nie przychodzą e-maile z powiadomieniami.</h3>
+    <p>Sprawdź, czy powiadomienie jest włączone w <span class="path">Ustawienia → Powiadomienia</span>, czy w <span class="path">Ustawienia → Poczta</span> działa wiadomość testowa i czy na hostingu jest ustawiony cron. E-mail przychodzi tylko wtedy, gdy jest coś do zgłoszenia.</p>
+    <h3>Czy usunięcie kontaktu albo modułu skasuje dane?</h3>
+    <p>Nie. Wypożyczenia usuniętego kontaktu zostają pod tą samą nazwą, a wyłączony moduł tylko się chowa i po ponownym włączeniu wszystko jest na miejscu.</p>
+</section>
+
+    </article>
+</div>
+
+<footer>
+    <div class="wrap">
+        <p>Craty, darmowy program do ewidencji rzeczy. Licencja MIT. Zrzuty ekranu pochodzą z wersji 1.4 i z danych przykładowych.</p>
+        <p><a href="../">Strona projektu</a> · <a href="https://github.com/cyryllo/craty">GitHub</a></p>
+    </div>
+</footer>
+
+<script>
+// Podświetlenie bieżącego rozdziału w spisie treści i zwinięcie spisu na telefonie.
+(function () {
+    var toc = document.querySelector('.toc');
+    if (window.matchMedia('(max-width: 980px)').matches) { toc.removeAttribute('open'); }
+    var links = {};
+    toc.querySelectorAll('a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+    if (!('IntersectionObserver' in window)) { return; }
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                Object.values(links).forEach(function (a) { a.classList.remove('on'); });
+                var a = links[entry.target.id];
+                if (a) { a.classList.add('on'); }
+            }
+        });
+    }, { rootMargin: '-90px 0px -70% 0px' });
+    document.querySelectorAll('article section[id]').forEach(function (s) { observer.observe(s); });
+    toc.addEventListener('click', function (e) {
+        if (e.target.closest('a') && window.matchMedia('(max-width: 980px)').matches) { toc.removeAttribute('open'); }
+    });
+})();
+</script>
+</body>
+</html>

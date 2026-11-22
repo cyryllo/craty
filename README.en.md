@@ -210,7 +210,8 @@ Later, to be decided: several independent workshops in one installation with an 
 
 ## Documentation
 
-- [CHANGELOG.md](CHANGELOG.md) — change history
+- [User guide](https://cyryllo.github.io/craty/instrukcja/) (in Polish): every feature step by step, with examples and screenshots
+- [CHANGELOG.md](CHANGELOG.md): change history
 
 ## License
 

@@ -206,9 +206,9 @@ Dalej, do decyzji: obsługa wielu niezależnych pracowni w jednej instalacji z A
 
 ## Dokumentacja
 
-- [INSTRUKCJA.md](INSTRUKCJA.md) — instrukcja użytkownika (główne funkcje,
-  struktura magazynowa)
-- [CHANGELOG.md](CHANGELOG.md) — historia zmian
+- [Instrukcja użytkownika](https://cyryllo.github.io/craty/instrukcja/): wszystkie funkcje krok po kroku, z przykładami i zrzutami ekranu
+- [INSTRUKCJA.md](INSTRUKCJA.md): krótka ściąga z głównych funkcji
+- [CHANGELOG.md](CHANGELOG.md): historia zmian
 
 ## Licencja
 
