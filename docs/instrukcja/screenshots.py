@@ -228,6 +228,37 @@ with sync_playwright() as p:
     except Exception as e:  # noqa: BLE001
         errors.append("kontakty: " + str(e).splitlines()[0])
 
+    # ---------- maszyny i rezerwacje czasu ----------
+    try:
+        # Rezerwacje z ManualDemoSeeder są liczone od dziś; jutro zawsze trafia w tydzień z większością z nich.
+        week = day(1)
+        printer = item_url(page, "Drukarka 3D Prusa")
+        page.goto(printer + "/edit")
+        save(page, "stacjonarny-pole", locator=page.locator("label:has(input[name=stationary])"))
+        page.goto(f"{BASE}/bookings?week={week}")
+        save(page, "maszyny-grafik", full=True)
+        page.goto(printer)
+        page.click("summary:has-text('Zarezerwuj czas')")
+        booking = page.locator("form[action$='/bookings']")
+        booking.locator("input[name=date]").fill(day(2))
+        booking.locator("input[name=from]").fill("10:00")
+        booking.locator("input[name=to]").fill("12:00")
+        booking.locator("textarea[name=description]").fill("Uchwyty do szuflad")
+        save(page, "maszyna-karta", locator=card(page, "Rezerwacje maszyny"))
+
+        member = browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, color_scheme="light", locale="pl-PL")
+        mpage = member.new_page()
+        mpage.goto(f"{BASE}/login")
+        mpage.fill("#email", "uzytkownik@craty.test")
+        mpage.fill("#password", "password")
+        mpage.click("button[type=submit]")
+        mpage.wait_for_url(re.compile(r".*/bookings"))
+        mpage.goto(f"{BASE}/bookings?week={week}")
+        save(mpage, "maszyny-telefon")
+        member.close()
+    except Exception as e:  # noqa: BLE001
+        errors.append("maszyny: " + str(e).splitlines()[0])
+
     # ---------- serwis ----------
     try:
         page.goto(f"{BASE}/service")

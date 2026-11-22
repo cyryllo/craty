@@ -161,7 +161,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 <div class="wrap intro">
     <span class="eyebrow">Instrukcja użytkownika</span>
     <h1>Craty krok po kroku</h1>
-    <p class="lead">Wszystkie funkcje programu na przykładzie jednej pracowni: od dodania pierwszego przedmiotu, przez wypożyczenia i serwis, po inwentaryzację. Instrukcja dotyczy wersji 1.4.</p>
+    <p class="lead">Wszystkie funkcje programu na przykładzie jednej pracowni: od dodania pierwszego przedmiotu, przez wypożyczenia i serwis, po inwentaryzację. Instrukcja dotyczy wersji 1.5.</p>
 </div>
 
 <div class="wrap layout">
@@ -178,6 +178,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
                 <li><a href="#wypozyczenia">Wypożyczenia</a></li>
                 <li><a href="#zestawy">Zestawy</a></li>
                 <li><a href="#rezerwacje">Rezerwacje</a></li>
+                <li><a href="#maszyny">Rezerwacje maszyn</a></li>
                 <li><a href="#telefon">Telefon i skaner</a></li>
                 <li><a href="#inwentaryzacja">Inwentaryzacja</a></li>
                 <li><a href="#kontakty">Kontakty</a></li>
@@ -196,20 +197,21 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 <section id="start">
     <h2>Na początek</h2>
     <p>Craty to ewidencja rzeczy: każdy przedmiot ma swoje miejsce, numer i naklejkę z kodem QR. Przykłady w tej instrukcji pochodzą z wymyślonej <b>Pracowni Kowalskich</b>: dwa magazyny (główny w hali i garaż), kilkanaście narzędzi i urządzeń, kilka osób i firm, które je pożyczają.</p>
-    <p>W pracowni pracują dwie osoby, i to dobrze pokazuje obie role w Craty:</p>
+    <p>W pracowni pracują dwie osoby, a z maszyn korzystają też członkowie pracowni. To dobrze pokazuje trzy role w Craty:</p>
     <div class="scroll"><table class="plain">
         <thead><tr><th>Rola</th><th>Kto w przykładzie</th><th>Co może</th></tr></thead>
         <tbody>
             <tr><td><b>Administrator</b></td><td>Ewa Kowalska</td><td>Wszystko, także ustawienia aplikacji, użytkowników, moduły, pocztę i aktualizacje.</td></tr>
             <tr><td><b>Magazynier</b></td><td>Tomek Wiśniewski</td><td>Całą codzienną pracę: przedmioty, wypożyczenia, serwis, materiały, sprzedaż, kategorie i strukturę magazynu.</td></tr>
+            <tr><td><b>Użytkownik</b></td><td>Ola Mazur</td><td>Tylko rezerwacje maszyn i swój profil (opis w rozdziale <a href="#maszyny">Rezerwacje maszyn</a>).</td></tr>
         </tbody>
     </table></div>
     <p>Kont nie zakłada się samemu: robi to administrator w <span class="path">Ustawienia → Użytkownicy</span>. Logujesz się e-mailem i hasłem.</p>
     <figure class="narrow"><a href="img/logowanie.jpg"><img src="img/logowanie.jpg" width="1280" height="860" alt="Ekran logowania Craty z polami e-mail i hasło." loading="lazy"></a><figcaption>Logowanie. Link „Nie pamiętasz hasła?” znika, jeśli administrator wyłączy samodzielny reset hasła.</figcaption></figure>
 
     <h3>Menu</h3>
-    <p>Na górze są zakładki: <span class="ui">Panel</span>, <span class="ui">Przedmioty</span>, <span class="ui">Wypożyczenia</span>, a dalej te z włączonych modułów (<span class="ui">Sprzedaż</span>, <span class="ui">Kontakty</span>, <span class="ui">Materiały</span>, <span class="ui">Serwis</span>). Po prawej: koszyk (publiczny pchli targ), przełącznik jasnego i ciemnego motywu oraz menu z Twoim imieniem, w którym są <span class="ui">Ustawienia</span>, <span class="ui">Profil</span> i wylogowanie. Na telefonie i w wąskim oknie zakładki zamieniają się w rząd ikon, a resztę znajdziesz pod przyciskiem z trzema kreskami.</p>
-    <div class="tip"><p>Moduły Sprzedaż, Kontakty, Serwis i Materiały eksploatacyjne można włączać i wyłączać w <span class="path">Ustawienia → Moduły</span>. Wyłączony moduł znika z menu, ale jego dane zostają i wracają po ponownym włączeniu.</p></div>
+    <p>Na górze są zakładki: <span class="ui">Panel</span>, <span class="ui">Przedmioty</span>, <span class="ui">Wypożyczenia</span>, a dalej te z włączonych modułów (<span class="ui">Maszyny</span>, <span class="ui">Sprzedaż</span>, <span class="ui">Kontakty</span>, <span class="ui">Materiały</span>, <span class="ui">Serwis</span>). Po prawej: koszyk (publiczny pchli targ), przełącznik jasnego i ciemnego motywu oraz menu z Twoim imieniem, w którym są <span class="ui">Ustawienia</span>, <span class="ui">Profil</span> i wylogowanie. Na telefonie i w wąskim oknie zakładki zamieniają się w rząd ikon, a resztę znajdziesz pod przyciskiem z trzema kreskami.</p>
+    <div class="tip"><p>Moduły Sprzedaż, Kontakty, Serwis, Materiały eksploatacyjne i Rezerwacje maszyn można włączać i wyłączać w <span class="path">Ustawienia → Moduły</span>. Wyłączony moduł znika z menu, ale jego dane zostają i wracają po ponownym włączeniu.</p></div>
 </section>
 
 <!-- ============================================================ -->
@@ -221,9 +223,10 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
         <li><b>Kończące się materiały</b>: materiały, których jest na minimum albo mniej.</li>
         <li><b>Rezerwacje do wydania dziś i jutro.</b></li>
         <li><b>Serwis: wymaga uwagi</b>: rzeczy w naprawie, przeglądy po terminie i zbliżające się, kończące się gwarancje.</li>
+        <li><b>Dziś na maszynach</b>: kto i w jakich godzinach korzysta dziś z maszyn (moduł Rezerwacje maszyn).</li>
         <li><b>Ostatnio dodane</b> i <b>Dodane z telefonu</b>: te drugie to przedmioty dodane szybko ze skanera, które warto uzupełnić.</li>
     </ul>
-    <figure><a href="img/panel.jpg"><img src="img/panel.jpg" width="1280" height="1464" alt="Panel Craty: liczniki przedmiotów, przeterminowane wypożyczenie stacji lutowniczej, kończące się materiały, rezerwacja głośnika, sprawy serwisowe i ostatnio dodane przedmioty." loading="lazy"></a><figcaption>Panel Pracowni Kowalskich. Stacja lutownicza miała wrócić od koła robotyki, wkręty i klej się kończą, a drabina jest po terminie przeglądu.</figcaption></figure>
+    <figure><a href="img/panel.jpg"><img src="img/panel.jpg" width="1280" height="1642" alt="Panel Craty: liczniki przedmiotów, przeterminowane wypożyczenie stacji lutowniczej, kończące się materiały, rezerwacja głośnika, sprawy serwisowe i ostatnio dodane przedmioty." loading="lazy"></a><figcaption>Panel Pracowni Kowalskich. Stacja lutownicza miała wrócić od koła robotyki, wkręty i klej się kończą, a drabina jest po terminie przeglądu.</figcaption></figure>
     <p>Każda pozycja na Panelu jest linkiem: kliknięcie prowadzi prosto do przedmiotu, materiału albo odpowiedniej zakładki.</p>
 </section>
 
@@ -264,7 +267,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <h2>Przedmioty</h2>
     <h3>Dodawanie przedmiotu</h3>
     <p>W zakładce <span class="ui">Przedmioty</span> kliknij <span class="ui">+ Dodaj przedmiot</span>. Wymagana jest tylko nazwa, ale im więcej wpiszesz, tym łatwiej będzie potem szukać.</p>
-    <figure><a href="img/przedmiot-nowy.jpg"><img src="img/przedmiot-nowy.jpg" width="1280" height="1208" alt="Formularz nowego przedmiotu: nazwa, numer seryjny, kod EAN, kategoria, lokalizacja, wartość, data zakupu, stan, status, gwarancja, przegląd, opis, zdjęcia i załączniki." loading="lazy"></a><figcaption>Formularz nowego przedmiotu. Pola gwarancji i przeglądów są widoczne przy włączonym module Serwis.</figcaption></figure>
+    <figure><a href="img/przedmiot-nowy.jpg"><img src="img/przedmiot-nowy.jpg" width="1280" height="1276" alt="Formularz nowego przedmiotu: nazwa, numer seryjny, kod EAN, kategoria, lokalizacja, wartość, data zakupu, stan, status, gwarancja, przegląd, opis, zdjęcia i załączniki." loading="lazy"></a><figcaption>Formularz nowego przedmiotu. Pola gwarancji i przeglądów są widoczne przy włączonym module Serwis.</figcaption></figure>
     <div class="example">
         <span class="tag">Przykład</span>
         <h4>Nowa wkrętarka w hali</h4>
@@ -307,7 +310,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <p>Zakładka <span class="ui">Przedmioty</span> ma dwa widoki, przełączane ikonami po prawej stronie filtrów: <b>kafelki</b> ze zdjęciami i <b>lista</b> w tabeli.</p>
     <div class="pair">
         <figure><a href="img/przedmioty-kafelki.jpg"><img src="img/przedmioty-kafelki.jpg" width="1280" height="860" alt="Lista przedmiotów w widoku kafelków." loading="lazy"></a><figcaption>Kafelki.</figcaption></figure>
-        <figure><a href="img/przedmioty-lista.jpg"><img src="img/przedmioty-lista.jpg" width="1280" height="1439" alt="Lista przedmiotów w tabeli, posortowana po nazwie." loading="lazy"></a><figcaption>Lista posortowana po nazwie.</figcaption></figure>
+        <figure><a href="img/przedmioty-lista.jpg"><img src="img/przedmioty-lista.jpg" width="1280" height="1537" alt="Lista przedmiotów w tabeli, posortowana po nazwie." loading="lazy"></a><figcaption>Lista posortowana po nazwie.</figcaption></figure>
     </div>
     <ul>
         <li><b>Szukaj</b> znajduje po nazwie, numerze ewidencyjnym, seryjnym i EAN. Ikona po lewej otwiera skaner.</li>
@@ -444,6 +447,55 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
         <li>Zarezerwowany przedmiot da się wypożyczyć komuś innemu, Craty tylko ostrzega. Decyzja należy do obsługi.</li>
         <li>Rezerwacje na dziś i jutro widać na Panelu, a wszystkie nadchodzące w zakładce Wypożyczenia.</li>
     </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="maszyny">
+    <h2>Rezerwacje maszyn</h2>
+    <p>Niektóre rzeczy nigdy nie wychodzą z pracowni: drukarka 3D, ploter laserowy, stanowisko lutownicze. Ich się nie wypożycza, tylko rezerwuje na nich <b>czas</b>. Tak działa na przykład makerspace, gdzie członkowie zapisują się na maszyny pod swoje projekty, a inni widzą, kiedy maszyna jest zajęta.</p>
+
+    <h3>Przedmiot stacjonarny</h3>
+    <p>W formularzu przedmiotu (<span class="ui">Edytuj</span>) zaznacz pole <b>Stacjonarny</b>. Takiego przedmiotu nie da się wypożyczyć, zarezerwować na dni ani dodać do zestawu. Na jego karcie przy statusie widać dopisek „stacjonarny”, a zamiast formularza wypożyczenia informację, że zostaje w pracowni.</p>
+    <figure style="max-width: 680px"><a href="img/stacjonarny-pole.jpg"><img src="img/stacjonarny-pole.jpg" width="680" height="76" alt="Zaznaczone pole Stacjonarny w formularzu przedmiotu z opisem." loading="lazy"></a><figcaption>Pole „Stacjonarny” w formularzu przedmiotu.</figcaption></figure>
+
+    <h3>Grafik maszyn</h3>
+    <p>Rezerwacje czasu to moduł <b>Rezerwacje maszyn</b>, domyślnie wyłączony. Po włączeniu w <span class="path">Ustawienia → Moduły</span> w menu pojawia się zakładka <span class="ui">Maszyny</span> z grafikiem tygodnia. Wiersze to maszyny (wszystkie przedmioty stacjonarne), kolumny to dni, a każda rezerwacja ma godziny, osobę i kolor rodzaju użycia:</p>
+    <div class="scroll"><table class="plain">
+        <thead><tr><th>Rodzaj</th><th>Kiedy</th></tr></thead>
+        <tbody>
+            <tr><td><b>Użytek prywatny</b></td><td>Własny projekt, np. obudowa do czujnika.</td></tr>
+            <tr><td><b>Zajęcia</b></td><td>Lekcje, koło zainteresowań, zajęcia dla grupy.</td></tr>
+            <tr><td><b>Warsztaty</b></td><td>Jednorazowe warsztaty, np. grawerowanie dla seniorów.</td></tr>
+            <tr><td><b>Konserwacja</b></td><td>Maszyna wyłączona z użycia na czas przeglądu albo czyszczenia. Wybiera ją tylko obsługa.</td></tr>
+        </tbody>
+    </table></div>
+    <figure><a href="img/maszyny-grafik.jpg"><img src="img/maszyny-grafik.jpg" width="1280" height="938" alt="Grafik maszyn na tydzień: drukarka 3D i ploter laserowy z kolorowymi rezerwacjami, pod spodem formularz nowej rezerwacji i lista moich rezerwacji." loading="lazy"></a><figcaption>Grafik tygodnia z formularzem i listą „Moje rezerwacje”.</figcaption></figure>
+    <p>Strzałki przy datach przełączają tygodnie, a lista <span class="ui">Pokaż</span> zawęża grafik do jednej maszyny. Kliknięcie rezerwacji pokazuje jej opis i, jeśli wolno, przycisk odwołania.</p>
+
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Ewa rezerwuje drukarkę na zajęcia koła robotyki</h4>
+        <ol>
+            <li>W zakładce <span class="ui">Maszyny</span> widzi, że rano drukarkę ma Ola, ale po południu jest wolna.</li>
+            <li>W formularzu <b>Nowa rezerwacja</b> wybiera „Drukarka 3D Prusa MK4”, dzisiejszy dzień i godziny 16:00–19:00 (godziny ustawia się co 15 minut).</li>
+            <li>Rodzaj: „Zajęcia”, opis: „Koło robotyki: modelowanie 3D”. Klika <span class="ui">Zarezerwuj</span>.</li>
+            <li>Rezerwacja jest ważna od razu i od tej chwili wszyscy widzą ją w grafiku. Gdyby godziny nachodziły na cudzą rezerwację, Craty by ją odrzucił i napisał, kto ma już ten termin.</li>
+        </ol>
+    </div>
+
+    <h3>Rezerwacja z karty maszyny</h3>
+    <p>Na karcie przedmiotu stacjonarnego jest ramka <b>Rezerwacje maszyny</b>: najbliższe rezerwacje, link do grafiku tej maszyny i formularz <span class="ui">Zarezerwuj czas</span>.</p>
+    <figure class="narrow"><a href="img/maszyna-karta.jpg"><img src="img/maszyna-karta.jpg" width="328" height="655" alt="Ramka Rezerwacje maszyny na karcie drukarki 3D: trzy nadchodzące rezerwacje i formularz z dniem, godzinami 10:00–12:00 i opisem." loading="lazy"></a><figcaption>Rezerwacje na karcie drukarki i szybki formularz.</figcaption></figure>
+
+    <h3>Rola Użytkownik</h3>
+    <p>Osoby, które tylko korzystają z maszyn, nie potrzebują dostępu do magazynu. Administrator zakłada im konto z rolą <b>Użytkownik</b> w <span class="path">Ustawienia → Użytkownicy</span>. Użytkownik po zalogowaniu trafia od razu do grafiku maszyn: rezerwuje, widzi, kto i kiedy zajął maszyny, i odwołuje swoje rezerwacje. Magazynu, wypożyczeń, kontaktów ani ustawień nie widzi wcale.</p>
+    <figure class="phone"><a href="img/maszyny-telefon.jpg"><img src="img/maszyny-telefon.jpg" width="780" height="1688" alt="Grafik maszyn na telefonie Oli Mazur: lista rezerwacji dzień po dniu, przy jej rezerwacjach przycisk odwołania." loading="lazy"></a><figcaption>Grafik na telefonie Użytkownika: lista dzień po dniu.</figcaption></figure>
+    <ul>
+        <li>Użytkownik odwołuje tylko swoje rezerwacje, które jeszcze się nie skończyły. Obsługa może odwołać każdą.</li>
+        <li>Na Panelu obsługi lista <b>Dziś na maszynach</b> pokazuje, kto dziś korzysta z maszyn.</li>
+        <li>Gdy moduł jest wyłączony, Użytkownik po zalogowaniu zobaczy tylko informację, że rezerwacje są chwilowo niedostępne.</li>
+    </ul>
+    <div class="tip"><p>Rezerwacje są godzinowe, więc serwer powinien mieć ustawioną polską strefę czasową (<code>APP_TIMEZONE=Europe/Warsaw</code> w pliku <code>.env</code>). Inaczej „dziś” i „teraz” mogą być przesunięte o godzinę.</p></div>
 </section>
 
 <!-- ============================================================ -->
@@ -622,15 +674,15 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
             <tr><td><b>Kategorie</b>, <b>Struktura magazynu</b></td><td>Opisane w rozdziale <a href="#struktura">Kategorie i miejsca</a>.</td></tr>
             <tr><td><b>Ustawienia aplikacji</b></td><td>Nazwa (np. „Pracownia Kowalskich”), logo, ikonka karty przeglądarki, domyślny język (polski lub angielski) i opcja „Użyj logo jako ikony aplikacji na telefonie”.</td></tr>
             <tr><td><b>Opcje sprzedaży</b></td><td>Opis, kontakt, polityka prywatności i regulamin pchlego targu.</td></tr>
-            <tr><td><b>Użytkownicy</b></td><td>Konta, role, wyłączanie kont. Wyłączone konto nie zaloguje się, a zalogowana osoba zostaje wylogowana przy następnym kliknięciu.</td></tr>
+            <tr><td><b>Użytkownicy</b></td><td>Konta, role (Administrator, Magazynier, Użytkownik), wyłączanie kont. Wyłączone konto nie zaloguje się, a zalogowana osoba zostaje wylogowana przy następnym kliknięciu.</td></tr>
             <tr><td><b>Poczta</b></td><td>Własny serwer SMTP do wysyłki e-maili, z przyciskiem wiadomości testowej.</td></tr>
             <tr><td><b>Powiadomienia</b></td><td>Samodzielny reset hasła, codzienny e-mail o przeterminowanych wypożyczeniach i cotygodniowe przypomnienie serwisowe.</td></tr>
-            <tr><td><b>Moduły</b></td><td>Włączanie i wyłączanie Sprzedaży, Kontaktów, Serwisu i Materiałów.</td></tr>
+            <tr><td><b>Moduły</b></td><td>Włączanie i wyłączanie Sprzedaży, Kontaktów, Serwisu, Materiałów i Rezerwacji maszyn.</td></tr>
             <tr><td><b>Aktualizacje</b></td><td>Aktualizacja przez wgranie paczki <code>.zip</code> z nową wersją (w wersji Docker: pobranie nowego obrazu).</td></tr>
         </tbody>
     </table></div>
     <div class="pair">
-        <figure><a href="img/ustawienia-moduly.jpg"><img src="img/ustawienia-moduly.jpg" width="1280" height="860" alt="Ustawienia modułów z czterema przełącznikami." loading="lazy"></a><figcaption>Moduły.</figcaption></figure>
+        <figure><a href="img/ustawienia-moduly.jpg"><img src="img/ustawienia-moduly.jpg" width="1280" height="865" alt="Ustawienia modułów z czterema przełącznikami." loading="lazy"></a><figcaption>Moduły.</figcaption></figure>
         <figure><a href="img/ustawienia-powiadomienia.jpg"><img src="img/ustawienia-powiadomienia.jpg" width="1280" height="860" alt="Ustawienia powiadomień: reset hasła, e-mail o przeterminowanych wypożyczeniach, przypomnienie serwisowe." loading="lazy"></a><figcaption>Powiadomienia.</figcaption></figure>
         <figure><a href="img/ustawienia-aplikacja.jpg"><img src="img/ustawienia-aplikacja.jpg" width="1280" height="951" alt="Ustawienia aplikacji: nazwa, logo, ikona, język." loading="lazy"></a><figcaption>Ustawienia aplikacji.</figcaption></figure>
         <figure><a href="img/uzytkownicy.jpg"><img src="img/uzytkownicy.jpg" width="1280" height="860" alt="Lista użytkowników: Ewa Kowalska administrator, Tomek Wiśniewski magazynier." loading="lazy"></a><figcaption>Użytkownicy.</figcaption></figure>
@@ -672,7 +724,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 
 <footer>
     <div class="wrap">
-        <p>Craty, darmowy program do ewidencji rzeczy. Licencja MIT. Zrzuty ekranu pochodzą z wersji 1.4 i z danych przykładowych.</p>
+        <p>Craty, darmowy program do ewidencji rzeczy. Licencja MIT. Zrzuty ekranu pochodzą z wersji 1.5 i z danych przykładowych.</p>
         <p><a href="../">Strona projektu</a> · <a href="https://github.com/cyryllo/craty">GitHub</a></p>
     </div>
 </footer>
