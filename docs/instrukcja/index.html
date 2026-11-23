@@ -210,8 +210,8 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <figure class="narrow"><a href="img/logowanie.jpg"><img src="img/logowanie.jpg" width="1280" height="860" alt="Ekran logowania Craty z polami e-mail i hasło." loading="lazy"></a><figcaption>Logowanie. Link „Nie pamiętasz hasła?” znika, jeśli administrator wyłączy samodzielny reset hasła.</figcaption></figure>
 
     <h3>Menu</h3>
-    <p>Na górze są zakładki: <span class="ui">Panel</span>, <span class="ui">Przedmioty</span>, <span class="ui">Wypożyczenia</span>, a dalej te z włączonych modułów (<span class="ui">Maszyny</span>, <span class="ui">Sprzedaż</span>, <span class="ui">Kontakty</span>, <span class="ui">Materiały</span>, <span class="ui">Serwis</span>). Po prawej: koszyk (publiczny pchli targ), przełącznik jasnego i ciemnego motywu oraz menu z Twoim imieniem, w którym są <span class="ui">Ustawienia</span>, <span class="ui">Profil</span> i wylogowanie. Na telefonie i w wąskim oknie zakładki zamieniają się w rząd ikon, a resztę znajdziesz pod przyciskiem z trzema kreskami.</p>
-    <div class="tip"><p>Moduły Sprzedaż, Kontakty, Serwis, Materiały eksploatacyjne i Rezerwacje maszyn można włączać i wyłączać w <span class="path">Ustawienia → Moduły</span>. Wyłączony moduł znika z menu, ale jego dane zostają i wracają po ponownym włączeniu.</p></div>
+    <p>Na górze są zakładki: <span class="ui">Panel</span> i <span class="ui">Przedmioty</span>, a dalej te z włączonych modułów (<span class="ui">Wypożyczenia</span>, <span class="ui">Maszyny</span>, <span class="ui">Sprzedaż</span>, <span class="ui">Kontakty</span>, <span class="ui">Materiały</span>, <span class="ui">Serwis</span>). Po prawej: koszyk (publiczny pchli targ), przełącznik jasnego i ciemnego motywu oraz menu z Twoim imieniem, w którym są <span class="ui">Ustawienia</span>, <span class="ui">Profil</span> i wylogowanie. Na telefonie i w wąskim oknie zakładki zamieniają się w rząd ikon, a resztę znajdziesz pod przyciskiem z trzema kreskami.</p>
+    <div class="tip"><p>Moduły Wypożyczenia, Sprzedaż, Kontakty, Serwis, Materiały eksploatacyjne i Rezerwacje maszyn można włączać i wyłączać w <span class="path">Ustawienia → Moduły</span>. Wyłączony moduł znika z menu, ale jego dane zostają i wracają po ponownym włączeniu.</p></div>
 </section>
 
 <!-- ============================================================ -->
@@ -236,8 +236,10 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <p>Zanim dodasz pierwsze przedmioty, warto ustalić dwie rzeczy: <b>czym</b> są (kategorie) i <b>gdzie</b> leżą (struktura magazynu). Obie są w <span class="path">Ustawienia</span>, w części dostępnej także dla magazyniera.</p>
 
     <h3>Kategorie</h3>
-    <p>Kategoria to rodzaj przedmiotu, np. „Elektronarzędzia” albo „Sprzęt AV”. Ma nazwę i krótki <b>kod</b> (np. <code>ELN</code>), od którego zaczyna się numer ewidencyjny. Kategoria może mieć nadrzędną: w przykładzie „Narzędzia pomiarowe” są podkategorią „Narzędzi”.</p>
-    <figure><a href="img/kategorie.jpg"><img src="img/kategorie.jpg" width="1280" height="860" alt="Lista kategorii z kodami i liczbą przedmiotów." loading="lazy"></a><figcaption>Kategorie z kodami i liczbą przedmiotów.</figcaption></figure>
+    <p>Kategoria to rodzaj przedmiotu, np. „Elektronarzędzia” albo „Sprzęt AV”. Ma nazwę i krótki <b>kod</b> (np. <code>ELN</code>), od którego zaczyna się numer ewidencyjny. Kategoria może mieć nadrzędną: w przykładzie „Elektronarzędzia” i „Narzędzia pomiarowe” są podkategoriami „Narzędzi”.</p>
+    <p>Strona kategorii wygląda jak Struktura magazynu. Kategorie główne to karty, a ich podkategorie są w środku, na dowolną głębokość, i dają się zwijać. Liczba przy kategorii to jej przedmioty w magazynie (kliknięcie otwiera ich listę), a liczba w nawiasie obejmuje też podkategorie. Ołówek otwiera edycję, a przycisk <span class="ui">+ Podkategoria</span> (albo mały „+” przy podkategorii) otwiera formularz z już wybraną kategorią nadrzędną.</p>
+    <figure><a href="img/kategorie.jpg"><img src="img/kategorie.jpg" width="1280" height="860" alt="Kategorie jako drzewo: karty kategorii głównych, w Narzędziach podkategorie Elektronarzędzia i Narzędzia pomiarowe, przy każdej liczba przedmiotów." loading="lazy"></a><figcaption>Kategorie jako drzewo. Narzędzia mają 2 przedmioty, a razem z podkategoriami 9.</figcaption></figure>
+    <p>Kategorię usuwa się na dole formularza edycji, i tylko wtedy, gdy nie ma w niej przedmiotów ani podkategorii. Kategorii nie da się przenieść pod jej własną podkategorię.</p>
     <div class="tip"><p>Kody kategorii, magazynów i pomieszczeń mogą mieć tylko litery, cyfry, myślnik i podkreślnik, bo trafiają do numeru ewidencyjnego.</p></div>
 
     <h3>Struktura magazynu</h3>
@@ -353,6 +355,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 <!-- ============================================================ -->
 <section id="wypozyczenia">
     <h2>Wypożyczenia</h2>
+    <div class="tip"><p>Wypożyczenia to moduł, domyślnie włączony. Kto ich nie potrzebuje, wyłącza je w <span class="path">Ustawienia → Moduły</span>: znikają wtedy wypożyczenia, zestawy, rezerwacje na dni, protokoły i przypomnienia o przeterminowanych. Zapisane wypożyczenia zostają i wracają po ponownym włączeniu.</p></div>
     <p>Wypożyczenie zapisujesz na karcie przedmiotu, w ramce <b>Wypożyczenie</b>. Craty zapamiętuje, komu i do kiedy, kto z obsługi wydał przedmiot i w jakim był stanie, a do wydrukowania przygotowuje protokół.</p>
     <div class="example">
         <span class="tag">Przykład</span>
@@ -469,7 +472,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
             <tr><td><b>Konserwacja</b></td><td>Maszyna wyłączona z użycia na czas przeglądu albo czyszczenia. Wybiera ją tylko obsługa.</td></tr>
         </tbody>
     </table></div>
-    <figure><a href="img/maszyny-grafik.jpg"><img src="img/maszyny-grafik.jpg" width="1280" height="938" alt="Grafik maszyn na tydzień: drukarka 3D i ploter laserowy z kolorowymi rezerwacjami, pod spodem formularz nowej rezerwacji i lista moich rezerwacji." loading="lazy"></a><figcaption>Grafik tygodnia z formularzem i listą „Moje rezerwacje”.</figcaption></figure>
+    <figure><a href="img/maszyny-grafik.jpg"><img src="img/maszyny-grafik.jpg" width="1280" height="982" alt="Grafik maszyn na tydzień: drukarka 3D i ploter laserowy z kolorowymi rezerwacjami, pod spodem formularz nowej rezerwacji i lista moich rezerwacji." loading="lazy"></a><figcaption>Grafik tygodnia z formularzem i listą „Moje rezerwacje”.</figcaption></figure>
     <p>Strzałki przy datach przełączają tygodnie, a lista <span class="ui">Pokaż</span> zawęża grafik do jednej maszyny. Kliknięcie rezerwacji pokazuje jej opis i, jeśli wolno, przycisk odwołania.</p>
 
     <div class="example">
@@ -485,7 +488,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 
     <h3>Rezerwacja z karty maszyny</h3>
     <p>Na karcie przedmiotu stacjonarnego jest ramka <b>Rezerwacje maszyny</b>: najbliższe rezerwacje, link do grafiku tej maszyny i formularz <span class="ui">Zarezerwuj czas</span>.</p>
-    <figure class="narrow"><a href="img/maszyna-karta.jpg"><img src="img/maszyna-karta.jpg" width="328" height="655" alt="Ramka Rezerwacje maszyny na karcie drukarki 3D: trzy nadchodzące rezerwacje i formularz z dniem, godzinami 10:00–12:00 i opisem." loading="lazy"></a><figcaption>Rezerwacje na karcie drukarki i szybki formularz.</figcaption></figure>
+    <figure class="narrow"><a href="img/maszyna-karta.jpg"><img src="img/maszyna-karta.jpg" width="328" height="723" alt="Ramka Rezerwacje maszyny na karcie drukarki 3D: trzy nadchodzące rezerwacje i formularz z dniem, godzinami 10:00–12:00 i opisem." loading="lazy"></a><figcaption>Rezerwacje na karcie drukarki i szybki formularz.</figcaption></figure>
 
     <h3>Rola Użytkownik</h3>
     <p>Osoby, które tylko korzystają z maszyn, nie potrzebują dostępu do magazynu. Administrator zakłada im konto z rolą <b>Użytkownik</b> w <span class="path">Ustawienia → Użytkownicy</span>. Użytkownik po zalogowaniu trafia od razu do grafiku maszyn: rezerwuje, widzi, kto i kiedy zajął maszyny, i odwołuje swoje rezerwacje. Magazynu, wypożyczeń, kontaktów ani ustawień nie widzi wcale.</p>
@@ -677,12 +680,12 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
             <tr><td><b>Użytkownicy</b></td><td>Konta, role (Administrator, Magazynier, Użytkownik), wyłączanie kont. Wyłączone konto nie zaloguje się, a zalogowana osoba zostaje wylogowana przy następnym kliknięciu.</td></tr>
             <tr><td><b>Poczta</b></td><td>Własny serwer SMTP do wysyłki e-maili, z przyciskiem wiadomości testowej.</td></tr>
             <tr><td><b>Powiadomienia</b></td><td>Samodzielny reset hasła, codzienny e-mail o przeterminowanych wypożyczeniach i cotygodniowe przypomnienie serwisowe.</td></tr>
-            <tr><td><b>Moduły</b></td><td>Włączanie i wyłączanie Sprzedaży, Kontaktów, Serwisu, Materiałów i Rezerwacji maszyn.</td></tr>
+            <tr><td><b>Moduły</b></td><td>Włączanie i wyłączanie Wypożyczeń, Sprzedaży, Kontaktów, Serwisu, Materiałów i Rezerwacji maszyn.</td></tr>
             <tr><td><b>Aktualizacje</b></td><td>Aktualizacja przez wgranie paczki <code>.zip</code> z nową wersją (w wersji Docker: pobranie nowego obrazu).</td></tr>
         </tbody>
     </table></div>
     <div class="pair">
-        <figure><a href="img/ustawienia-moduly.jpg"><img src="img/ustawienia-moduly.jpg" width="1280" height="865" alt="Ustawienia modułów z czterema przełącznikami." loading="lazy"></a><figcaption>Moduły.</figcaption></figure>
+        <figure><a href="img/ustawienia-moduly.jpg"><img src="img/ustawienia-moduly.jpg" width="1280" height="970" alt="Ustawienia modułów z czterema przełącznikami." loading="lazy"></a><figcaption>Moduły.</figcaption></figure>
         <figure><a href="img/ustawienia-powiadomienia.jpg"><img src="img/ustawienia-powiadomienia.jpg" width="1280" height="860" alt="Ustawienia powiadomień: reset hasła, e-mail o przeterminowanych wypożyczeniach, przypomnienie serwisowe." loading="lazy"></a><figcaption>Powiadomienia.</figcaption></figure>
         <figure><a href="img/ustawienia-aplikacja.jpg"><img src="img/ustawienia-aplikacja.jpg" width="1280" height="951" alt="Ustawienia aplikacji: nazwa, logo, ikona, język." loading="lazy"></a><figcaption>Ustawienia aplikacji.</figcaption></figure>
         <figure><a href="img/uzytkownicy.jpg"><img src="img/uzytkownicy.jpg" width="1280" height="860" alt="Lista użytkowników: Ewa Kowalska administrator, Tomek Wiśniewski magazynier." loading="lazy"></a><figcaption>Użytkownicy.</figcaption></figure>
