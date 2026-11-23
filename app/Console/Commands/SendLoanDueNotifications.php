@@ -7,6 +7,7 @@ use App\Models\AppSetting;
 use App\Models\Loan;
 use App\Models\User;
 use App\Services\MailSettingsApplier;
+use App\Support\Modules;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -24,7 +25,8 @@ class SendLoanDueNotifications extends Command
 
     public function handle(MailSettingsApplier $applier): int
     {
-        if (! AppSetting::current()->loan_due_notifications_enabled) {
+        // Wyłączony moduł Wypożyczenia: żadnych e-maili, choć ustawienie zostaje zapamiętane.
+        if (! AppSetting::current()->loan_due_notifications_enabled || ! Modules::isEnabled('loans')) {
             return self::SUCCESS;
         }
 

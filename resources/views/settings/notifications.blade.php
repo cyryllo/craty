@@ -22,6 +22,7 @@
                 </label>
             </div>
 
+            @if (\App\Support\Modules::isEnabled('loans'))
             <div class="flex items-start gap-2 pt-4 border-t border-gray-100 dark:border-gray-700">
                 <input type="hidden" name="loan_due_notifications_enabled" value="0">
                 <input type="checkbox" id="loan_due_notifications_enabled" name="loan_due_notifications_enabled" value="1"
@@ -33,6 +34,8 @@
                     </span>
                 </label>
             </div>
+
+            @endif
 
             @if (\App\Support\Modules::isEnabled('service'))
                 <div class="flex items-start gap-2 pt-4 border-t border-gray-100 dark:border-gray-700">

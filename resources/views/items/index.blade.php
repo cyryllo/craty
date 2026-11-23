@@ -136,7 +136,7 @@
                     {{ __('Select all') }}
                 </label>
                 <div class="flex flex-wrap items-center gap-2">
-                    @if (auth()->user()->isMagazynier())
+                    @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('loans'))
                         {{-- Ten sam formularz co druk etykiet, inny cel: zaznaczone przedmioty jako zestaw. --}}
                         <button type="submit" formaction="{{ route('loan-groups.create') }}" formmethod="GET" formtarget="_self"
                                 class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">

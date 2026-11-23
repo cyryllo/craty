@@ -23,7 +23,7 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-                @if (auth()->user()->isMagazynier())
+                @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('loans'))
                     <form method="GET" action="{{ route('loan-groups.create') }}" data-batch-form>
                         <button type="submit" class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700 disabled:opacity-40">{{ __('Loan out as a kit') }}</button>
                     </form>

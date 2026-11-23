@@ -26,7 +26,9 @@
                         <th class="text-left px-4 py-3">{{ __('Type') }}</th>
                         <th class="text-left px-4 py-3">{{ __('Phone') }}</th>
                         <th class="text-left px-4 py-3">{{ __('Email') }}</th>
-                        <th class="text-left px-4 py-3">{{ __('Loans') }}</th>
+                        @if ($loansOn = \App\Support\Modules::isEnabled('loans'))
+                            <th class="text-left px-4 py-3">{{ __('Loans') }}</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -38,16 +40,18 @@
                             <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $contact->typeLabel() }}</td>
                             <td class="px-4 py-3 text-gray-500 whitespace-nowrap dark:text-gray-400">{{ $contact->phone }}</td>
                             <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $contact->email }}</td>
+                            @if ($loansOn)
                             <td class="px-4 py-3 text-gray-500 whitespace-nowrap dark:text-gray-400">
                                 {{ $contact->loans_count }}
                                 @if ($contact->active_loans_count)
                                     <span class="ms-1 text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">{{ __(':count on loan', ['count' => $contact->active_loans_count]) }}</span>
                                 @endif
                             </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">
+                            <td colspan="{{ $loansOn ? 5 : 4 }}" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">
                                 {{ $search !== '' || $type ? __('No contacts match the search.') : __('No contacts yet. They are also added when you loan an item to someone new.') }}
                             </td>
                         </tr>

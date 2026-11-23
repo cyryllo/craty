@@ -3,6 +3,18 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-24 (1.5.1)
+
+- Kategorie jako drzewo, jak Struktura magazynu: kategorie główne to karty,
+  podkategorie rozwijane w środku, liczba przedmiotów z sumą razem z
+  podkategoriami, przycisk „+ Podkategoria” z wybraną kategorią nadrzędną,
+  usuwanie na dole formularza edycji.
+- Poprawka: kategorii nie da się już przenieść pod jej własną podkategorię
+  (powstawała pętla i gałąź znikała z listy).
+- Wypożyczenia jako moduł do wyłączenia w Ustawienia → Moduły (domyślnie
+  włączony): po wyłączeniu znikają wypożyczenia, zestawy, rezerwacje na dni,
+  protokoły i powiadomienia o przeterminowanych, dane zostają.
+
 ## 2026-11-22 (1.5.0)
 
 - Przedmioty stacjonarne: pole „Stacjonarny” w formularzu przedmiotu; takiej

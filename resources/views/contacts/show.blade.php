@@ -29,6 +29,8 @@
             @endif
         </div>
 
+        {{-- Historia wypożyczeń tylko z modułem Wypożyczenia (kontakty służą też Serwisowi). --}}
+        @if (\App\Support\Modules::isEnabled('loans'))
         <div class="lg:col-span-2 bg-white rounded-lg shadow overflow-x-auto dark:bg-gray-800">
             <h3 class="px-5 pt-5 pb-3 text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Loan history') }}</h3>
             <table class="min-w-full text-sm">
@@ -72,6 +74,7 @@
                 </tbody>
             </table>
         </div>
+        @endif
 
         @if ($repairs->isNotEmpty())
             <div class="lg:col-start-2 lg:col-span-2 bg-white rounded-lg shadow overflow-x-auto dark:bg-gray-800">

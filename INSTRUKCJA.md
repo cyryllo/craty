@@ -122,6 +122,8 @@ wydruku.
 
 ## Wypożyczenia
 
+Wypożyczenia to moduł, domyślnie włączony. Kto ich nie potrzebuje, wyłącza je w Ustawienia → Moduły: znika wtedy zakładka Wypożyczenia, ramka wypożyczenia na karcie przedmiotu, zestawy, rezerwacje na dni, protokoły, liczniki na Panelu i e-mail o przeterminowanych wypożyczeniach. Zapisane wypożyczenia zostają w bazie i wracają po ponownym włączeniu.
+
 Wypożyczasz z karty przedmiotu, w ramce „Wypożyczenie”: kliknij „Wypożycz”, żeby rozwinąć formularz (zwrot rozwija się tak samo, przyciskiem „Zarejestruj zwrot”).
 
 - **Komu**: wybierasz kontakt z listy albo „+ Nowy kontakt” i wpisujesz nazwę (oraz opcjonalnie telefon i e-mail). Nowy kontakt zapisuje się sam, więc następnym razem jest już na liście. Przy wyłączonym module Kontakty pole „komu” to zwykły tekst, jak wcześniej.
@@ -308,7 +310,7 @@ miejscu:
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego
   resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń. Przy włączonym module Serwis dochodzi cotygodniowe przypomnienie serwisowe: w każdy poniedziałek rano e-mail z przeglądami po terminie i w ciągu 14 dni, gwarancjami kończącymi się w ciągu 30 dni i naprawami po planowanym powrocie (tylko gdy coś jest na liście). Oba e-maile wymagają, żeby hosting uruchamiał harmonogram zadań (cron); w wersji Docker działa to samo.
 - **Moduły** *(tylko Administrator)* — włącz/wyłącz opcjonalne części
-  appki (dziś: Sprzedaż, Kontakty, Serwis, Materiały eksploatacyjne i Rezerwacje maszyn).
+  appki (dziś: Wypożyczenia, Sprzedaż, Kontakty, Serwis, Materiały eksploatacyjne i Rezerwacje maszyn).
 - **Aktualizacje** *(tylko Administrator)* — samodzielna aktualizacja
   appki przez wgranie paczki `.zip`, bez SSH/Composera. Zawsze rób kopię
   plików i bazy danych przed wgraniem nowej wersji. W wersji z obrazu

@@ -30,7 +30,7 @@
                             <x-icon name="items" class="w-5 h-5" />
                         </a>
                     @endunless
-                    @if (auth()->user()->isMagazynier())
+                    @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('loans'))
                         <a href="{{ route('loans.index') }}" title="{{ __('Loans') }}"
                            @class(['hidden sm:flex items-center justify-center w-8 sm:w-9 h-9 rounded-md', 'text-indigo-600 dark:text-indigo-400' => request()->routeIs('loans.*', 'loan-groups.*'), 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300' => ! request()->routeIs('loans.*', 'loan-groups.*')])>
                             <x-icon name="loans" class="w-5 h-5" />
@@ -78,7 +78,7 @@
                             {{ __('Items') }}
                         </x-nav-link>
                     @endunless
-                    @if (auth()->user()->isMagazynier())
+                    @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('loans'))
                         <x-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*', 'loan-groups.*')">
                             {{ __('Loans') }}
                         </x-nav-link>
@@ -194,7 +194,7 @@
                     </span>
                 </x-responsive-nav-link>
             @endunless
-            @if (auth()->user()->isMagazynier())
+            @if (auth()->user()->isMagazynier() && \App\Support\Modules::isEnabled('loans'))
                 <x-responsive-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*', 'loan-groups.*')">
                     <span class="inline-flex items-center gap-2">
                         <x-icon name="loans" class="w-4 h-4" />

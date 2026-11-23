@@ -15,10 +15,12 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Total value') }}</p>
                 <p class="mt-1 text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ number_format((float) $totalValue, 0, ',', ' ') }} zł</p>
             </div>
-            <a href="{{ route('items.index', ['status' => 'wypozyczony']) }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition dark:bg-gray-800">
-                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Loaned out') }}</p>
-                <p class="mt-1 text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ $statusCounts['wypozyczony'] ?? 0 }}</p>
-            </a>
+            @if ($loansEnabled)
+                <a href="{{ route('items.index', ['status' => 'wypozyczony']) }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition dark:bg-gray-800">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Loaned out') }}</p>
+                    <p class="mt-1 text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ $statusCounts['wypozyczony'] ?? 0 }}</p>
+                </a>
+            @endif
             @if ($showSaleTile)
                 <a href="{{ route('sale-listings.exported') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition dark:bg-gray-800">
                     <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('For sale') }}</p>

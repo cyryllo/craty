@@ -81,23 +81,27 @@ Route::middleware('auth')->group(function () {
         Route::patch('items/{item}/photos/{photo}/move', [ItemController::class, 'movePhoto'])->name('items.photos.move');
         Route::delete('items/{item}/attachments/{attachment}', [ItemController::class, 'destroyAttachment'])->name('items.attachments.destroy');
 
-        Route::post('items/{item}/loans', [LoanController::class, 'store'])->name('items.loans.store');
-        Route::post('loans/{loan}/return', [LoanController::class, 'returnLoan'])->name('loans.return');
-        // Protokoły PDF działają też bez modułu Kontakty (wtedy z samą nazwą "komu").
-        Route::get('loans/{loan}/protokol-wydania.pdf', [LoanProtocolController::class, 'issue'])->name('loans.protocol.issue');
-        Route::get('loans/{loan}/protokol-zwrotu.pdf', [LoanProtocolController::class, 'returned'])->name('loans.protocol.return');
+        // Moduł "Wypożyczenia" (domyślnie włączony): wypożyczenia, zestawy,
+        // rezerwacje na dni i protokoły; 404 przy wyłączonym module.
+        Route::middleware('module:loans')->group(function () {
+            Route::post('items/{item}/loans', [LoanController::class, 'store'])->name('items.loans.store');
+            Route::post('loans/{loan}/return', [LoanController::class, 'returnLoan'])->name('loans.return');
+            // Protokoły PDF działają też bez modułu Kontakty (wtedy z samą nazwą "komu").
+            Route::get('loans/{loan}/protokol-wydania.pdf', [LoanProtocolController::class, 'issue'])->name('loans.protocol.issue');
+            Route::get('loans/{loan}/protokol-zwrotu.pdf', [LoanProtocolController::class, 'returned'])->name('loans.protocol.return');
 
-        // Strona "Wypożyczenia", zestawy (kilka przedmiotów, jeden protokół) i rezerwacje.
-        Route::get('loans', [LoansOverviewController::class, 'index'])->name('loans.index');
-        Route::get('loan-groups/create', [LoanGroupController::class, 'create'])->name('loan-groups.create');
-        Route::post('loan-groups', [LoanGroupController::class, 'store'])->name('loan-groups.store');
-        Route::get('loan-groups/{group}', [LoanGroupController::class, 'show'])->name('loan-groups.show');
-        Route::post('loan-groups/{group}/return', [LoanGroupController::class, 'returnItems'])->name('loan-groups.return');
-        Route::get('loan-groups/{group}/protokol-wydania.pdf', [LoanProtocolController::class, 'groupIssue'])->name('loan-groups.protocol.issue');
-        Route::get('loan-groups/{group}/protokol-zwrotu.pdf', [LoanProtocolController::class, 'groupReturned'])->name('loan-groups.protocol.return');
-        Route::post('items/{item}/reservations', [ReservationController::class, 'store'])->name('items.reservations.store');
-        Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
-        Route::post('reservations/{reservation}/issue', [ReservationController::class, 'issue'])->name('reservations.issue');
+            // Strona "Wypożyczenia", zestawy (kilka przedmiotów, jeden protokół) i rezerwacje.
+            Route::get('loans', [LoansOverviewController::class, 'index'])->name('loans.index');
+            Route::get('loan-groups/create', [LoanGroupController::class, 'create'])->name('loan-groups.create');
+            Route::post('loan-groups', [LoanGroupController::class, 'store'])->name('loan-groups.store');
+            Route::get('loan-groups/{group}', [LoanGroupController::class, 'show'])->name('loan-groups.show');
+            Route::post('loan-groups/{group}/return', [LoanGroupController::class, 'returnItems'])->name('loan-groups.return');
+            Route::get('loan-groups/{group}/protokol-wydania.pdf', [LoanProtocolController::class, 'groupIssue'])->name('loan-groups.protocol.issue');
+            Route::get('loan-groups/{group}/protokol-zwrotu.pdf', [LoanProtocolController::class, 'groupReturned'])->name('loan-groups.protocol.return');
+            Route::post('items/{item}/reservations', [ReservationController::class, 'store'])->name('items.reservations.store');
+            Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+            Route::post('reservations/{reservation}/issue', [ReservationController::class, 'issue'])->name('reservations.issue');
+        });
 
         // Moduł "Kontakty" — tak jak Sprzedaż: 404 przy wyłączonym module,
         // dołożone na role:admin,magazynier.

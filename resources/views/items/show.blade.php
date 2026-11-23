@@ -127,6 +127,7 @@
             @if (auth()->user()->isMagazynier())
                 @php($contactsEnabled = \App\Support\Modules::isEnabled('contacts'))
                 @php($field = 'w-full rounded-md border-gray-300 text-sm dark:border-gray-600')
+                @if (\App\Support\Modules::isEnabled('loans'))
                 <div class="bg-white rounded-lg shadow p-5 space-y-3 dark:bg-gray-800">
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Loan') }}</h3>
                     <x-input-error :messages="$errors->get('loan')" />
@@ -267,6 +268,8 @@
                         </div>
                     @endif
                 </div>
+
+                @endif
 
                 @if ($bookings !== null)
                     {{-- Moduł Rezerwacje maszyn: czas zarezerwowany na tej maszynie. --}}

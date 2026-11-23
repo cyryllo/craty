@@ -29,7 +29,8 @@ class DashboardController extends Controller
             'totalItems' => Item::inStock()->count(),
             'totalValue' => Item::inStock()->sum('value'),
             'statusCounts' => $statusCounts,
-            'overdueLoans' => Loan::with('item', 'borrower')
+            'loansEnabled' => Modules::isEnabled('loans'),
+            'overdueLoans' => ! Modules::isEnabled('loans') ? collect() : Loan::with('item', 'borrower')
                 ->whereNull('returned_at')
                 ->whereDate('due_at', '<', now())
                 ->get(),
@@ -39,7 +40,7 @@ class DashboardController extends Controller
             // Moduł Materiały: to, czego jest na minimum albo mniej.
             'lowConsumables' => Modules::isEnabled('consumables') ? Consumable::low()->orderBy('name')->get() : collect(),
             // Rezerwacje do wydania dziś i jutro.
-            'upcomingReservations' => Reservation::active()->whereDate('starts_on', '<=', today()->addDay())->with(['item', 'contact'])->orderBy('starts_on')->get(),
+            'upcomingReservations' => ! Modules::isEnabled('loans') ? collect() : Reservation::active()->whereDate('starts_on', '<=', today()->addDay())->with(['item', 'contact'])->orderBy('starts_on')->get(),
             'needsCompletionItems' => Item::inStock()->where('needs_completion', true)->latest()->take(8)->get(),
             // Moduł Serwis: naprawy w toku, przeglądy i gwarancje wymagające uwagi.
             'service' => Modules::isEnabled('service') && auth()->user()->isMagazynier() ? ServiceController::overview() : null,

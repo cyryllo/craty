@@ -17,7 +17,10 @@ class NotificationSettingController extends Controller
     {
         $setting = AppSetting::current();
         $setting->password_reset_enabled = $request->boolean('password_reset_enabled');
-        $setting->loan_due_notifications_enabled = $request->boolean('loan_due_notifications_enabled');
+        // Jak przy Serwisie niżej: pole jest tylko przy włączonym module Wypożyczenia.
+        if (Modules::isEnabled('loans')) {
+            $setting->loan_due_notifications_enabled = $request->boolean('loan_due_notifications_enabled');
+        }
         // Pole jest na stronie tylko przy włączonym module Serwis; bez niego
         // zapis formularza nie rusza zapamiętanego ustawienia.
         if (Modules::isEnabled('service')) {

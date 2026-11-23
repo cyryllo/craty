@@ -26,6 +26,10 @@ class Modules
      * angielskie), jak w Item::STATUSES — patrz settings/modules.blade.php.
      */
     public const MODULES = [
+        'loans' => [
+            'label' => 'Loans',
+            'description' => 'Lending items to people: single loans, kits, reservations for days, PDF issue and return protocols, the Loans page and overdue reminders.',
+        ],
         'sales' => [
             'label' => 'Sale',
             'description' => 'Sale listings, the "Sale" section, and the public flea market page.',

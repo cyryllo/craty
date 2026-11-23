@@ -21,11 +21,13 @@
             <div>
                 <x-input-label for="parent_id" :value="__('Parent category')" />
                 <select id="parent_id" name="parent_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600">
-                    <option value="">— {{ __('none') }} —</option>
-                    @foreach ($categories as $option)
-                        <option value="{{ $option->id }}" @selected(old('parent_id', $category->parent_id) == $option->id)>{{ $option->name }}</option>
+                    <option value="">— {{ __('none (main category)') }} —</option>
+                    {{-- W kolejności drzewa, z wcięciem; bez tej kategorii i jej podkategorii (pętla). --}}
+                    @foreach ($options as $option)
+                        <option value="{{ $option['category']->id }}" @selected(old('parent_id', $category->parent_id) == $option['category']->id)>{!! str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $option['depth']) !!}{{ $option['depth'] ? '└ ' : '' }}{{ $option['category']->name }} ({{ $option['category']->code }})</option>
                     @endforeach
                 </select>
+                <x-input-error :messages="$errors->get('parent_id')" class="mt-1" />
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
@@ -33,5 +35,19 @@
                 <x-primary-button>{{ __('Save') }}</x-primary-button>
             </div>
         </form>
+
+        {{-- Usuwanie na dole edycji, jak w Strukturze magazynu. --}}
+        @if ($category->exists)
+            <div class="mt-6 bg-white rounded-lg shadow p-6 dark:bg-gray-800">
+                @if ($category->items_count || $category->children_count)
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('This category can be deleted once it has no items and no subcategories (now: :items items, :subs subcategories).', ['items' => $category->items_count, 'subs' => $category->children_count]) }}</p>
+                @else
+                    <form method="POST" action="{{ route('categories.destroy', $category) }}" onsubmit="return confirm(@js(__('Delete this category?')));">
+                        @csrf @method('DELETE')
+                        <button class="text-sm font-medium text-red-600 hover:underline dark:text-red-400">{{ __('Delete category') }}</button>
+                    </form>
+                @endif
+            </div>
+        @endif
     </div>
 </x-app-layout>
