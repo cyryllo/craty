@@ -240,10 +240,6 @@ class SaleListingController extends Controller
      */
     public static function csvSafe(mixed $value): mixed
     {
-        if (is_string($value) && $value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-            return "'".$value;
-        }
-
-        return $value;
+        return \App\Support\Csv::safe($value);
     }
 }

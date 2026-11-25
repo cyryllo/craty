@@ -7,9 +7,9 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConsumableController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataTransferController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\ItemController;
-use App\Http\Controllers\ItemImportController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\LoanGroupController;
 use App\Http\Controllers\LoanProtocolController;
@@ -69,12 +69,24 @@ Route::middleware('auth')->group(function () {
         Route::get('items/create', [ItemController::class, 'create'])->name('items.create');
         Route::post('items', [ItemController::class, 'store'])->name('items.store');
 
-        // Import masowy istniejącego spisu (TODO.md) — literały pod "items/",
-        // więc muszą być zarejestrowane tu, przed wildcardem "items/{item}" niżej.
-        Route::get('items/import', [ItemImportController::class, 'create'])->name('items.import.create');
-        Route::post('items/import', [ItemImportController::class, 'store'])->name('items.import.store');
-        Route::post('items/import/nieprzypisane', [ItemImportController::class, 'confirmUnassigned'])->name('items.import.confirm-unassigned');
-        Route::get('items/import/szablon.csv', [ItemImportController::class, 'template'])->name('items.import.template');
+        // Eksport przedmiotów do CSV (z filtrami listy) — literał pod "items/",
+        // więc musi być tu, przed wildcardem "items/{item}" niżej.
+        Route::get('items/eksport.csv', [ItemController::class, 'export'])->name('items.export');
+
+        // Strona "Import i eksport" (link z Ustawień). Kontakty, materiały i
+        // historia wypożyczeń są dodatkowo za swoimi modułami.
+        Route::get('import-eksport', [DataTransferController::class, 'index'])->name('data-transfer.index');
+        Route::post('import-eksport/przedmioty', [DataTransferController::class, 'previewItems'])->name('data-transfer.items.preview');
+        Route::post('import-eksport/przedmioty/zatwierdz', [DataTransferController::class, 'applyItems'])->name('data-transfer.items.apply');
+        Route::middleware('module:contacts')->group(function () {
+            Route::get('import-eksport/kontakty.csv', [DataTransferController::class, 'exportContacts'])->name('data-transfer.contacts.export');
+            Route::post('import-eksport/kontakty', [DataTransferController::class, 'importContacts'])->name('data-transfer.contacts.import');
+        });
+        Route::middleware('module:consumables')->group(function () {
+            Route::get('import-eksport/materialy.csv', [DataTransferController::class, 'exportConsumables'])->name('data-transfer.consumables.export');
+            Route::post('import-eksport/materialy', [DataTransferController::class, 'importConsumables'])->name('data-transfer.consumables.import');
+        });
+        Route::get('import-eksport/wypozyczenia.csv', [DataTransferController::class, 'exportLoans'])->middleware('module:loans')->name('data-transfer.loans.export');
         Route::get('items/{item}/edit', [ItemController::class, 'edit'])->name('items.edit');
         Route::put('items/{item}', [ItemController::class, 'update'])->name('items.update');
         Route::delete('items/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
@@ -152,6 +164,7 @@ Route::middleware('auth')->group(function () {
         Route::get('stocktakes', [StocktakeController::class, 'index'])->name('stocktakes.index');
         Route::post('stocktakes', [StocktakeController::class, 'store'])->name('stocktakes.store');
         Route::get('stocktakes/{stocktake}', [StocktakeController::class, 'show'])->name('stocktakes.show');
+        Route::get('stocktakes/{stocktake}/raport.csv', [StocktakeController::class, 'reportCsv'])->name('stocktakes.report-csv');
         Route::post('stocktakes/{stocktake}/scan', [StocktakeController::class, 'scan'])->name('stocktakes.scan');
         Route::post('stocktakes/{stocktake}/finish', [StocktakeController::class, 'finish'])->name('stocktakes.finish');
         Route::post('stocktakes/{stocktake}/move/{item}', [StocktakeController::class, 'move'])->name('stocktakes.move');
@@ -214,6 +227,7 @@ Route::middleware('auth')->group(function () {
 
         // Dziennik aktywności (logowania, konta, ustawienia; opcjonalnie zmiany danych).
         Route::get('ustawienia/dziennik', [ActivityLogController::class, 'index'])->name('settings.activity.index');
+        Route::get('ustawienia/dziennik/eksport.csv', [ActivityLogController::class, 'export'])->name('settings.activity.export');
         Route::post('ustawienia/dziennik', [ActivityLogController::class, 'update'])->name('settings.activity.update');
 
         Route::get('ustawienia/powiadomienia', [NotificationSettingController::class, 'edit'])->name('settings.notifications.edit');

@@ -288,6 +288,15 @@ przeglądarce — Chrome/Android pokazuje to sam, wymaga HTTPS). Strona
 
 **Skanuj serię** (link na stronie Skanuj) nie otwiera karty po pierwszym kodzie, tylko zbiera kolejne zeskanowane przedmioty na liście; z niej wypożyczasz zestaw albo drukujesz etykiety. Kod można też wpisać ręcznie albo użyć ręcznego czytnika kodów kreskowych podpiętego jak klawiatura. Lista zostaje zapamiętana po odświeżeniu strony.
 
+## Import i eksport
+
+Strona **Ustawienia → Import i eksport** (Administrator i Magazynier). Pliki są w CSV ze średnikiem, które Excel, LibreOffice i Arkusze Google otwierają od razu; po zmianach zapisz plik znowu jako CSV (pliki .xlsx nie są przyjmowane).
+
+- **Eksport przedmiotów**: z wybraną kategorią i statusem (domyślnie wszystko na stanie, można też ze sprzedanymi i wycofanymi). Na końcu pliku są cztery kolumny tylko do wglądu (nazwa kategorii, miejsce, komu wypożyczony, do kiedy).
+- **Import przedmiotów**: wiersz bez numeru ewidencyjnego dodaje nowy przedmiot (wymagana tylko nazwa), wiersz z numerem zmienia ten przedmiot, więc eksport, poprawki w arkuszu i ponowny import zmieniają wiele przedmiotów naraz. Pusta komórka i brakująca kolumna zostawiają wartość bez zmian. Kategorię i miejsce podajesz kodem (np. `NAR`, `M1-R3-P2`), status i stan słowami albo kodem, „stacjonarny” jako tak/nie, daty jako 2026-11-25 albo 25.11.2026. Przed zapisem zawsze jest **podgląd** (nowe, zmiany „było → będzie”, bez zmian, błędy), a zapisuje dopiero „Zatwierdź import”; wiersze z błędami są pomijane. Nieznany kod przy nowym przedmiocie to ostrzeżenie (przedmiot powstaje bez tego pola), przy zmianie to błąd. Zmiany trafiają do historii przedmiotu. Do 2000 wierszy w pliku.
+- **Kontakty i materiały** (gdy moduły są włączone): eksport i import, dopasowanie po nazwie. Inna ilość materiału zapisuje się jako korekta w historii ruchów, więc import działa też jak spis z natury.
+- **Raporty**: historia wypożyczeń (opcjonalnie od daty), raport z zakończonej inwentaryzacji i dziennik aktywności (tylko Administrator; z filtrami przyciskiem CSV na stronie dziennika).
+
 ## Ustawienia
 
 Rozdzielnik Ustawień (link w prawym górnym rogu) grupuje wszystko w jednym
@@ -295,6 +304,7 @@ miejscu:
 
 - **Kategorie** i **Struktura magazynu** — opisane wyżej (magazyny,
   pomieszczenia, regały, półki i pojemniki w jednym drzewie).
+- **Import i eksport**: pliki CSV z przedmiotami, kontaktami i materiałami oraz raporty, opisane wyżej.
 - **Ustawienia aplikacji** *(tylko Administrator)*: nazwa, logo i
   favicon (ikonka karty przeglądarki w PNG albo ICO; bez własnej używane
   jest logo) oraz

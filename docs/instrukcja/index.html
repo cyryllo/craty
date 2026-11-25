@@ -161,7 +161,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 <div class="wrap intro">
     <span class="eyebrow">Instrukcja użytkownika</span>
     <h1>Craty krok po kroku</h1>
-    <p class="lead">Wszystkie funkcje programu na przykładzie jednej pracowni: od dodania pierwszego przedmiotu, przez wypożyczenia i serwis, po inwentaryzację. Instrukcja dotyczy wersji 1.5.2.</p>
+    <p class="lead">Wszystkie funkcje programu na przykładzie jednej pracowni: od dodania pierwszego przedmiotu, przez wypożyczenia i serwis, po inwentaryzację. Instrukcja dotyczy wersji 1.6.0.</p>
 </div>
 
 <div class="wrap layout">
@@ -185,6 +185,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
                 <li><a href="#serwis">Serwis</a></li>
                 <li><a href="#materialy">Materiały</a></li>
                 <li><a href="#sprzedaz">Sprzedaż i pchli targ</a></li>
+                <li><a href="#import">Import i eksport</a></li>
                 <li><a href="#ustawienia">Ustawienia</a></li>
                 <li><a href="#pytania">Częste pytania</a></li>
             </ol>
@@ -312,7 +313,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <p>Zakładka <span class="ui">Przedmioty</span> ma dwa widoki, przełączane ikonami po prawej stronie filtrów: <b>kafelki</b> ze zdjęciami i <b>lista</b> w tabeli.</p>
     <div class="pair">
         <figure><a href="img/przedmioty-kafelki.jpg"><img src="img/przedmioty-kafelki.jpg" width="1280" height="860" alt="Lista przedmiotów w widoku kafelków." loading="lazy"></a><figcaption>Kafelki.</figcaption></figure>
-        <figure><a href="img/przedmioty-lista.jpg"><img src="img/przedmioty-lista.jpg" width="1280" height="1537" alt="Lista przedmiotów w tabeli, posortowana po nazwie." loading="lazy"></a><figcaption>Lista posortowana po nazwie.</figcaption></figure>
+        <figure><a href="img/przedmioty-lista.jpg"><img src="img/przedmioty-lista.jpg" width="1280" height="1535" alt="Lista przedmiotów w tabeli, posortowana po nazwie." loading="lazy"></a><figcaption>Lista posortowana po nazwie.</figcaption></figure>
     </div>
     <ul>
         <li><b>Szukaj</b> znajduje po nazwie, numerze ewidencyjnym, seryjnym i EAN. Ikona po lewej otwiera skaner.</li>
@@ -332,8 +333,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <div class="tip"><p>Lista pamięta ostatnie wyszukiwanie, filtry i sortowanie. Jeśli brakuje Ci jakiegoś przedmiotu, najpierw sprawdź, czy nad listą nie ma żółtego paska.</p></div>
     <p>Checkboxy przy przedmiotach służą do dwóch rzeczy naraz dla wielu przedmiotów: <span class="ui">Drukuj etykiety</span> i <span class="ui">Wypożycz zaznaczone</span> (zestaw, opisany niżej). Z listy przedmiotów przefiltrowanej po miejscu można też zacząć inwentaryzację tego miejsca.</p>
 
-    <h3>Import z CSV</h3>
-    <p>Przycisk <span class="ui">Import z CSV</span> nad listą wczytuje wiele przedmiotów naraz z arkusza. Na stronie importu jest do pobrania szablon pliku z opisem kolumn.</p>
+    <p>Wczytanie wielu przedmiotów naraz z arkusza, eksport listy i zmiana wielu przedmiotów jednym plikiem są opisane w rozdziale <a href="#import">Import i eksport</a>.</p>
 </section>
 
 <!-- ============================================================ -->
@@ -488,7 +488,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 
     <h3>Rezerwacja z karty maszyny</h3>
     <p>Na karcie przedmiotu stacjonarnego jest ramka <b>Rezerwacje maszyny</b>: najbliższe rezerwacje, link do grafiku tej maszyny i formularz <span class="ui">Zarezerwuj czas</span>.</p>
-    <figure class="narrow"><a href="img/maszyna-karta.jpg"><img src="img/maszyna-karta.jpg" width="328" height="655" alt="Ramka Rezerwacje maszyny na karcie drukarki 3D: trzy nadchodzące rezerwacje i formularz z dniem, godzinami 10:00–12:00 i opisem." loading="lazy"></a><figcaption>Rezerwacje na karcie drukarki i szybki formularz.</figcaption></figure>
+    <figure class="narrow"><a href="img/maszyna-karta.jpg"><img src="img/maszyna-karta.jpg" width="328" height="563" alt="Ramka Rezerwacje maszyny na karcie drukarki 3D: trzy nadchodzące rezerwacje i formularz z dniem, godzinami 10:00–12:00 i opisem." loading="lazy"></a><figcaption>Rezerwacje na karcie drukarki i szybki formularz.</figcaption></figure>
 
     <h3>Rola Użytkownik</h3>
     <p>Osoby, które tylko korzystają z maszyn, nie potrzebują dostępu do magazynu. Administrator zakłada im konto z rolą <b>Użytkownik</b> w <span class="path">Ustawienia → Użytkownicy</span>. Użytkownik po zalogowaniu trafia od razu do grafiku maszyn: rezerwuje, widzi, kto i kiedy zajął maszyny, i odwołuje swoje rezerwacje. Magazynu, wypożyczeń, kontaktów ani ustawień nie widzi wcale.</p>
@@ -667,19 +667,62 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 </section>
 
 <!-- ============================================================ -->
+<section id="import">
+    <h2>Import i eksport</h2>
+    <p>Stronę <span class="path">Ustawienia → Import i eksport</span> widzą administrator i magazynier. Wszystkie pliki są w formacie CSV ze średnikiem jako separatorem, który Excel, LibreOffice i Arkusze Google otwierają od razu z polskimi znakami. Po zmianach zapisz plik znowu jako CSV (w Excelu: <span class="ui">Zapisz jako → CSV (rozdzielany średnikami)</span>), bo pliki .xlsx nie są przyjmowane.</p>
+    <figure><a href="img/import-eksport.jpg"><img src="img/import-eksport.jpg" width="1280" height="1772" alt="Strona Import i eksport: przedmioty z eksportem i importem, kontakty, materiały i raporty." loading="lazy"></a><figcaption>Import i eksport.</figcaption></figure>
+
+    <h3>Eksport przedmiotów</h3>
+    <p>Wybierz kategorię i status (domyślnie wszystko, co jest na stanie, albo „Wszystkie, także sprzedane i wycofane”) i kliknij <span class="ui">Eksportuj przedmioty</span>. W pliku są wszystkie pola przedmiotu, a na końcu cztery kolumny tylko do wglądu: nazwa kategorii, pełne miejsce, komu jest wypożyczony i do kiedy.</p>
+
+    <h3>Import i zmiana wielu przedmiotów naraz</h3>
+    <ul>
+        <li>Wiersz <b>bez</b> numeru ewidencyjnego dodaje nowy przedmiot. Wtedy wymagana jest tylko nazwa, a numer i kod QR Craty nadaje sam.</li>
+        <li>Wiersz <b>z</b> numerem ewidencyjnym zmienia ten przedmiot. Pusta komórka i kolumna, której w pliku nie ma, zostawiają wartość bez zmian.</li>
+        <li>Kategorię i miejsce podajesz kodem, np. <code>NAR</code> albo <code>M1-R3-P2</code>. Status i stan możesz wpisać słowami („w naprawie”, „używany”), „stacjonarny” jako tak albo nie, daty jako 2026-11-25 albo 25.11.2026, kwoty z przecinkiem.</li>
+        <li>Najpierw zawsze widzisz <b>podgląd</b>: nowe przedmioty, zmiany w postaci „było → będzie”, wiersze bez zmian i błędy. W bazie nic się nie zmienia, dopóki nie klikniesz <span class="ui">Zatwierdź import</span>. Wiersze z błędami są pomijane.</li>
+        <li>Nieznany kod kategorii albo miejsca przy nowym przedmiocie to tylko ostrzeżenie: przedmiot powstanie bez tego pola. Przy zmianie istniejącego przedmiotu to błąd, żeby literówka nie skasowała przypisania.</li>
+        <li>Zmiany z importu trafiają do historii przedmiotu tak samo jak zmiany z formularza. Jeden plik może mieć do 2000 wierszy.</li>
+    </ul>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Nowe ceny i projektor do naprawy jednym plikiem</h4>
+        <ol>
+            <li>Ewa eksportuje przedmioty i otwiera plik w Excelu.</li>
+            <li>Zmienia wartość drabiny na 650, projektorowi wpisuje status „w naprawie”, a w nowym wierszu na dole dopisuje lutownicę (bez numeru ewidencyjnego). Przy głośniku przez pomyłkę wpisuje kategorię „AUDIO”, której nie ma.</li>
+            <li>Zapisuje plik jako CSV i wgrywa go przyciskiem <span class="ui">Sprawdź plik</span>.</li>
+            <li>Podgląd pokazuje jedną nową pozycję, dwie zmiany i jeden błąd przy głośniku. Ewa zatwierdza import, a głośnik poprawi później.</li>
+        </ol>
+    </div>
+    <figure><a href="img/import-podglad.jpg"><img src="img/import-podglad.jpg" width="1280" height="1528" alt="Podgląd importu: dwie zmiany (status projektora, wartość drabiny), jedna nowa lutownica i błąd przy głośniku z nieznaną kategorią." loading="lazy"></a><figcaption>Podgląd importu przed zapisem.</figcaption></figure>
+
+    <h3>Kontakty i materiały</h3>
+    <p>Gdy te moduły są włączone, na stronie są też ich eksport i import. Rekordy dopasowują się po nazwie (bez względu na wielkość liter): istniejący kontakt albo materiał dostaje wartości z wypełnionych komórek, a nowa nazwa dodaje nowy. Inna ilość materiału zapisuje się jako korekta w historii ruchów, więc import materiałów działa też jak spis z natury. Te importy wchodzą od razu, bez podglądu, a podsumowanie pokazuje, ile dodano, zmieniono i które wiersze miały błędy.</p>
+
+    <h3>Raporty</h3>
+    <ul>
+        <li><b>Historia wypożyczeń</b>: wszystkie wypożyczenia, także zwrócone, opcjonalnie od wybranej daty, z terminami, stanem przy wydaniu i zwrocie oraz tym, kto wydał i przyjął.</li>
+        <li><b>Raport z inwentaryzacji</b>: wybrana zakończona inwentaryzacja, jeden wiersz na przedmiot z wynikiem (brakuje, nie na swoim miejscu, na miejscu, wypożyczony albo w naprawie).</li>
+        <li><b>Dziennik aktywności</b> (tylko administrator): cały dziennik. Na stronie dziennika przycisk <span class="ui">CSV</span> pobiera tylko wpisy z ustawionymi tam filtrami.</li>
+    </ul>
+</section>
+
+<!-- ============================================================ -->
 <section id="ustawienia">
     <h2>Ustawienia</h2>
     <p>Ustawienia otwierasz z menu z Twoim imieniem (prawy górny róg). Część podstawowa jest dla wszystkich, zaawansowana tylko dla administratora.</p>
-    <figure><a href="img/ustawienia.jpg"><img src="img/ustawienia.jpg" width="1280" height="942" alt="Strona Ustawienia z kafelkami: kategorie, struktura magazynu, ustawienia aplikacji, opcje sprzedaży, użytkownicy, poczta, powiadomienia, moduły, aktualizacje." loading="lazy"></a><figcaption>Ustawienia.</figcaption></figure>
+    <figure><a href="img/ustawienia.jpg"><img src="img/ustawienia.jpg" width="1280" height="1170" alt="Strona Ustawienia z kafelkami: kategorie, struktura magazynu, import i eksport, ustawienia aplikacji, opcje sprzedaży, użytkownicy, poczta, powiadomienia, moduły, kopie zapasowe, dziennik aktywności, aktualizacje." loading="lazy"></a><figcaption>Ustawienia.</figcaption></figure>
     <div class="scroll"><table class="plain">
         <thead><tr><th>Ustawienie</th><th>Co tam jest</th></tr></thead>
         <tbody>
             <tr><td><b>Kategorie</b>, <b>Struktura magazynu</b></td><td>Opisane w rozdziale <a href="#struktura">Kategorie i miejsca</a>.</td></tr>
+            <tr><td><b>Import i eksport</b></td><td>Przedmioty, kontakty i materiały w plikach CSV oraz raporty. Opisane w rozdziale <a href="#import">Import i eksport</a>.</td></tr>
             <tr><td><b>Ustawienia aplikacji</b></td><td>Nazwa (np. „Pracownia Kowalskich”), logo, ikonka karty przeglądarki, domyślny język (polski lub angielski) i opcja „Użyj logo jako ikony aplikacji na telefonie”.</td></tr>
             <tr><td><b>Opcje sprzedaży</b></td><td>Opis, kontakt, polityka prywatności i regulamin pchlego targu.</td></tr>
             <tr><td><b>Użytkownicy</b></td><td>Konta, role (Administrator, Magazynier, Użytkownik), wyłączanie kont. Wyłączone konto nie zaloguje się, a zalogowana osoba zostaje wylogowana przy następnym kliknięciu.</td></tr>
             <tr><td><b>Poczta</b></td><td>Własny serwer SMTP do wysyłki e-maili, z przyciskiem wiadomości testowej.</td></tr>
             <tr><td><b>Powiadomienia</b></td><td>Samodzielny reset hasła, codzienny e-mail o przeterminowanych wypożyczeniach i cotygodniowe przypomnienie serwisowe.</td></tr>
+            <tr><td><b>Kopie zapasowe</b></td><td>Cała baza i wszystkie pliki w jednym .zip, ręcznie albo automatycznie, z pobieraniem i przywracaniem. Opis niżej.</td></tr>
             <tr><td><b>Dziennik aktywności</b></td><td>Kto, co i kiedy zrobił: logowania, zmiany kont i ustawień, aktualizacje, opcjonalnie zmiany danych. Opis niżej.</td></tr>
             <tr><td><b>Moduły</b></td><td>Włączanie i wyłączanie Wypożyczeń, Sprzedaży, Kontaktów, Serwisu, Materiałów i Rezerwacji maszyn.</td></tr>
             <tr><td><b>Aktualizacje</b></td><td>Aktualizacja przez wgranie paczki <code>.zip</code> z nową wersją (w wersji Docker: pobranie nowego obrazu).</td></tr>
@@ -693,11 +736,22 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     </div>
     <div class="tip"><p>E-maile z powiadomieniami wysyłają się tylko wtedy, gdy na serwerze działa harmonogram zadań (cron). W wersji Docker działa sam.</p></div>
 
+    <h3>Kopie zapasowe</h3>
+    <p>W <span class="path">Ustawienia → Kopie zapasowe</span> (tylko administrator) przycisk <span class="ui">Zrób kopię zapasową</span> zapisuje w jednym pliku .zip całą bazę danych i wszystkie wgrane pliki: zdjęcia, załączniki, kody QR i logo. Kopia działa także na hostingach, które nie pozwalają uruchamiać zewnętrznych programów.</p>
+    <figure><a href="img/kopie-zapasowe.jpg"><img src="img/kopie-zapasowe.jpg" width="1280" height="1025" alt="Kopie zapasowe: przycisk kopii, ustawienia kopii automatycznych, lista kopii z typem i rozmiarem." loading="lazy"></a><figcaption>Kopie zapasowe.</figcaption></figure>
+    <ul>
+        <li><b>Automatycznie</b>: codziennie albo co tydzień. Wymaga harmonogramu zadań (cron) na hostingu, w wersji Docker działa samo.</li>
+        <li><b>Przechowywanie</b>: kopie leżą na serwerze w katalogu niedostępnym z internetu i usuwają się po wybranym czasie (7, 14, 30 albo 90 dni, albo bez limitu). Najnowsza zostaje zawsze.</li>
+        <li><b>Pobieranie i wgrywanie</b> wymagają potwierdzenia hasła. Wgrać można kopię z komputera albo z innej instalacji Craty.</li>
+        <li><b>Przywracanie</b> zastępuje wszystkie dane i pliki zawartością kopii. Przed nim Craty sam robi kopię bieżącego stanu (typ „przed przywróceniem”), żeby dało się wrócić. Kopię ze starszej wersji Craty po przywróceniu sam aktualizuje, a kopii z nowszej wersji nie przyjmie. Na koniec trzeba się zalogować kontem z kopii.</li>
+    </ul>
+    <div class="tip"><p>W każdej kopii jest plik CZYTAJ-MNIE.txt z instrukcją ręcznego odtworzenia, np. przez import bazy w phpMyAdmin. Przechowuj co jakiś czas jedną kopię także poza serwerem, np. na swoim komputerze.</p></div>
+
     <h3>Aktualizacja</h3>
     <figure><a href="img/ustawienia-aktualizacje.jpg"><img src="img/ustawienia-aktualizacje.jpg" width="1280" height="860" alt="Strona aktualizacji z bieżącą wersją i przyciskiem potwierdzenia hasła przed wgraniem paczki." loading="lazy"></a><figcaption>Aktualizacje: przed wgraniem paczki trzeba potwierdzić hasło.</figcaption></figure>
     <ol>
         <li>Pobierz paczkę <code>craty-X.Y.Z.zip</code> z <a href="https://github.com/cyryllo/craty/releases/latest">wydań na GitHubie</a>.</li>
-        <li><b>Zrób kopię plików i bazy danych</b> w panelu hostingu. Craty nie robi jej sam.</li>
+        <li><b>Zrób kopię zapasową</b> w <span class="path">Ustawienia → Kopie zapasowe</span> (link jest też na stronie Aktualizacje).</li>
         <li>W <span class="path">Ustawienia → Aktualizacje</span> potwierdź hasło, wybierz paczkę i opcjonalnie wklej sumę kontrolną SHA-256 z opisu wydania.</li>
         <li>Po wgraniu Craty sam wprowadza zmiany w bazie i pokazuje nową wersję w stopce.</li>
     </ol>
@@ -711,7 +765,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
         <li>wgrane i nieudane aktualizacje.</li>
     </ul>
     <p>Po zaznaczeniu <span class="ui">Zapisuj też zmiany danych</span> dochodzi dodawanie, zmiany i usuwanie przedmiotów, kategorii, miejsc, kontaktów, wypożyczeń i innych danych. Hasła nigdy nie trafiają do dziennika, zapisuje się tylko informacja, że je zmieniono. Stare wpisy usuwają się same po czasie wybranym w polu <span class="ui">Przechowuj wpisy przez</span>: domyślnie rok, do wyboru od 30 dni do 2 lat albo bez limitu.</p>
-    <figure><a href="img/dziennik.jpg"><img src="img/dziennik.jpg" width="1280" height="1172" alt="Dziennik aktywności: zmiana wartości drabiny, włączenie zapisu zmian danych, logowania Ewy i Oli, nieudane logowanie wyróżnione na czerwono, zmiany ustawień i kont." loading="lazy"></a><figcaption>Dziennik aktywności. Nieudane logowanie jest wyróżnione na czerwono.</figcaption></figure>
+    <figure><a href="img/dziennik.jpg"><img src="img/dziennik.jpg" width="1280" height="1176" alt="Dziennik aktywności: zmiana wartości drabiny, włączenie zapisu zmian danych, logowania Ewy i Oli, nieudane logowanie wyróżnione na czerwono, zmiany ustawień i kont." loading="lazy"></a><figcaption>Dziennik aktywności. Nieudane logowanie jest wyróżnione na czerwono.</figcaption></figure>
     <div class="example">
         <span class="tag">Przykład</span>
         <h4>Ktoś próbuje zgadnąć hasło</h4>
@@ -739,6 +793,8 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <p>Numer nie zmienia się sam, żeby nie unieważniać przyklejonych naklejek. Na karcie przedmiotu przy kodzie QR jest przycisk odświeżenia numeru. Po nim wydrukuj nową etykietę.</p>
     <h3>Nie przychodzą e-maile z powiadomieniami.</h3>
     <p>Sprawdź, czy powiadomienie jest włączone w <span class="path">Ustawienia → Powiadomienia</span>, czy w <span class="path">Ustawienia → Poczta</span> działa wiadomość testowa i czy na hostingu jest ustawiony cron. E-mail przychodzi tylko wtedy, gdy jest coś do zgłoszenia.</p>
+    <h3>Jak zmienić coś w wielu przedmiotach naraz?</h3>
+    <p>Wyeksportuj przedmioty w <span class="path">Ustawienia → Import i eksport</span>, popraw kolumny w arkuszu i wgraj plik z powrotem. Podgląd pokaże każdą zmianę, zanim ją zatwierdzisz.</p>
     <h3>Czy usunięcie kontaktu albo modułu skasuje dane?</h3>
     <p>Nie. Wypożyczenia usuniętego kontaktu zostają pod tą samą nazwą, a wyłączony moduł tylko się chowa i po ponownym włączeniu wszystko jest na miejscu.</p>
 </section>
@@ -748,7 +804,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 
 <footer>
     <div class="wrap">
-        <p>Craty, darmowy program do ewidencji rzeczy. Licencja MIT. Zrzuty ekranu pochodzą z wersji 1.5.2 i z danych przykładowych.</p>
+        <p>Craty, darmowy program do ewidencji rzeczy. Licencja MIT. Zrzuty ekranu pochodzą z wersji 1.6.0 i z danych przykładowych.</p>
         <p><a href="../">Strona projektu</a> · <a href="https://github.com/cyryllo/craty">GitHub</a></p>
     </div>
 </footer>

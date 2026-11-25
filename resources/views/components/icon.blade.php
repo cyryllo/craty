@@ -134,6 +134,14 @@
         </svg>
         @break
 
+    @case('transfer')
+        {{-- dwie strzałki w przeciwne strony: Import i eksport --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" {{ $attributes }}>
+            <path d="M3.5 6.5h12M12.5 3.5l3 3-3 3"/>
+            <path d="M16.5 13.5h-12M7.5 10.5l-3 3 3 3"/>
+        </svg>
+        @break
+
     @case('activity')
         {{-- lista z zegarem: Dziennik aktywności --}}
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>

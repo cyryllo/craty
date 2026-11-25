@@ -4,9 +4,6 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">{{ __('Items') }}</h2>
             @if (auth()->user()->isMagazynier())
                 <div class="flex items-center gap-2">
-                    <a href="{{ route('items.import.create') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
-                        {{ __('Import from CSV') }}
-                    </a>
                     <a href="{{ route('items.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">
                         + {{ __('Add item') }}
                     </a>

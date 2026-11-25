@@ -14,20 +14,41 @@ use Illuminate\Validation\Rule;
  */
 class ActivityLogController extends Controller
 {
-    public function index(Request $request)
+    /** Zapytanie z filtrami ze strony, wspólne dla listy i eksportu CSV. */
+    private function filtered(Request $request)
     {
         $category = in_array($request->query('category'), ['security', 'data'], true) ? $request->query('category') : null;
         $userId = $request->integer('user') ?: null;
         $search = trim((string) $request->query('q', ''));
 
-        $entries = ActivityLog::query()
+        return ActivityLog::query()
             ->when($category, fn ($q) => $q->where('category', $category))
             ->when($userId, fn ($q) => $q->where('user_id', $userId))
             ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
                 ->where('user_name', 'like', "%{$search}%")
                 ->orWhere('subject_label', 'like', "%{$search}%")
                 ->orWhere('ip', 'like', "%{$search}%")))
-            ->latest('created_at')->latest('id')
+            ->latest('created_at')->latest('id');
+    }
+
+    public function export(Request $request)
+    {
+        $rows = (function () use ($request) {
+            foreach ($this->filtered($request)->lazy(500) as $entry) {
+                yield [$entry->created_at?->format('Y-m-d H:i:s'), $entry->user_name, $entry->eventLabel(), $entry->category === 'data' ? __('data changes') : __('security and administration'), $entry->subject_label, $entry->details(), $entry->ip];
+            }
+        })();
+
+        return \App\Support\Csv::download('craty-dziennik-'.now()->format('Y-m-d').'.csv', ['kiedy', 'kto', 'zdarzenie', 'rodzaj', 'czego_dotyczy', 'szczegoly', 'ip'], $rows);
+    }
+
+    public function index(Request $request)
+    {
+        $category = in_array($request->query('category'), ['security', 'data'], true) ? $request->query('category') : null;
+        $userId = $request->integer('user') ?: null;
+        $search = trim((string) $request->query('q', ''));
+
+        $entries = $this->filtered($request)
             ->paginate(50)
             ->withQueryString();
 

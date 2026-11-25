@@ -3,6 +3,20 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-25 (1.6.0)
+
+- Import i eksport CSV na nowej stronie Ustawienia → Import i eksport
+  (zamiast przycisku nad listą przedmiotów): eksport przedmiotów z wyborem
+  kategorii i statusu, import z podglądem przed zapisem, zmiana wielu
+  przedmiotów naraz po numerze ewidencyjnym, nowe kolumny (data zakupu,
+  gwarancja, przeglądy, stacjonarny), statusy i stany wpisywane słowami.
+- Eksport i import kontaktów i materiałów (dopasowanie po nazwie, korekta
+  stanu materiału w historii ruchów).
+- Raporty CSV: historia wypożyczeń, raport z inwentaryzacji, dziennik
+  aktywności (także z filtrami ze strony dziennika).
+- Instrukcja na stronie: rozdziały o kopiach zapasowych i imporcie oraz
+  eksporcie, zrzuty z wersji 1.6.0.
+
 ## 2026-11-25 (1.5.5)
 
 - Poprawki bezpieczeństwa w bibliotekach (wszystkie zgłoszenia z composer

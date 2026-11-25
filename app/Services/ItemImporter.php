@@ -6,286 +6,354 @@ use App\Models\Category;
 use App\Models\Item;
 use App\Models\StorageLocation;
 use App\Models\User;
+use App\Support\Csv;
 
 /**
- * Import masowy istniejącego spisu (TODO.md "Import masowy"). Świadomie
- * tylko CSV, nie prawdziwy .xlsx — arkusz Excela/Google Sheets/LibreOffice
- * eksportuje się do CSV jednym kliknięciem ("Zapisz jako"), a prawdziwy
- * parser .xlsx (np. PhpSpreadsheet przez maatwebsite/laravel-excel) to spora,
- * niebagatelna zależność Composer, która trafiłaby też do KAŻDEJ paczki
- * aktualizacji/instalacyjnej (patrz UpdatePackageBuilder — cały vendor/ jest
- * pakowany) tylko dla wygody "nie trzeba samemu eksportować do CSV". Jeśli
- * to się kiedyś okaże realnie potrzebne, dopisać wsparcie .xlsx osobno.
+ * Import i eksport przedmiotów w CSV (Import i eksport, dostępne z Ustawień).
+ * Świadomie tylko CSV, nie .xlsx: każdy arkusz zapisuje CSV jednym
+ * kliknięciem, a parser .xlsx to duża zależność, która trafiłaby do każdej
+ * paczki aktualizacji.
  *
- * Format zgodny z konwencją już istniejącego eksportu ofert sprzedażowych
- * (SaleListingController::exportCsv()) — płaskie nagłówki bez polskich
- * znaków, separator ";" (przecinek dziesiętny w polskim Excelu koliduje z
- * separatorem ","). Kategoria/lokalizacja dopasowywane po ich krótkim,
- * unikalnym "code" (np. "NAR", "M1-R3-P2") — to samo, co już widać w
- * dropdownach pełnego formularza dodawania przedmiotu i na liście
- * lokalizacji, więc administrator nie musi zgadywać żadnego nowego formatu.
+ * Dwa kroki: analyze() czyta plik i układa plan (nowe, zmiany z wartościami
+ * przed i po, bez zmian, błędy) bez zapisu do bazy; apply() wykonuje plan
+ * dopiero po zatwierdzeniu podglądu. Wiersz z wypełnioną kolumną
+ * nr_ewidencyjny zmienia istniejący przedmiot (masowa edycja: eksport →
+ * Excel → import), bez niej powstaje nowy. Przy zmianie pusta komórka
+ * znaczy "bez zmian", a kolumn, których w pliku nie ma, import nie dotyka.
  *
- * Nierozpoznany kod kategorii/lokalizacji NIE odrzuca wiersza (życzenie
- * użytkownika, 2026-09-16 — pierwsza wersja robiła to i została uznana za
- * zbyt surową). Zamiast tego wiersz trafia do "oczekujących" — przedmiot
- * nie jest jeszcze tworzony, dopóki admin nie potwierdzi przyciskiem
- * "Dodaj do nieprzypisanych" na stronie importu (`ItemImportController::
- * confirmUnassigned()`), świadomie dwuetapowo, nie w pełni automatycznie —
- * admin ma zobaczyć, co dokładnie nie zostało rozpoznane, zanim cokolwiek
- * naprawdę powstanie w bazie. "Nieprzypisany" to nie osobna kategoria w
- * bazie, tylko zwykłe `category_id`/`storage_location_id` = NULL, dokładnie
- * to samo, co przy pustej komórce w CSV.
+ * Nierozpoznany kod kategorii/lokalizacji przy NOWYM przedmiocie nie blokuje
+ * wiersza (życzenie właściciela z 2026-09-16): przedmiot powstanie bez niej,
+ * co podgląd wyraźnie pokazuje. Przy ZMIANIE to błąd wiersza, żeby literówka
+ * w kodzie nie wyczyściła przypisania.
  */
 class ItemImporter
 {
-    public const HEADER = [
-        'nazwa', 'kategoria_kod', 'lokalizacja_kod', 'stan', 'status', 'wartosc', 'nr_seryjny', 'ean', 'opis',
+    /** Kolumny, które import czyta (poza nr_ewidencyjny). */
+    public const IMPORT_COLUMNS = [
+        'nazwa', 'kategoria_kod', 'lokalizacja_kod', 'stan', 'status', 'wartosc', 'nr_seryjny', 'ean',
+        'data_zakupu', 'gwarancja_do', 'przeglad_co_miesiecy', 'nastepny_przeglad', 'stacjonarny', 'opis',
     ];
 
-    /** Bezpiecznik na zbyt duży plik — import jest synchroniczny (appka nie ma kolejek), zbyt wiele wierszy ryzykuje przekroczenie max_execution_time. */
+    /** Kolumny eksportu: najpierw te z importu, na końcu informacyjne (import je pomija). */
+    public const EXPORT_COLUMNS = [
+        'nr_ewidencyjny', ...self::IMPORT_COLUMNS, 'kategoria', 'lokalizacja', 'wypozyczone_komu', 'termin_zwrotu',
+    ];
+
+    /** Bezpiecznik: import jest synchroniczny (appka nie ma kolejek). */
     public const MAX_ROWS = 2000;
+
+    /** Kolumna CSV → atrybut przedmiotu. */
+    private const FIELDS = [
+        'nazwa' => 'name', 'kategoria_kod' => 'category_id', 'lokalizacja_kod' => 'storage_location_id',
+        'stan' => 'condition', 'status' => 'status', 'wartosc' => 'value', 'nr_seryjny' => 'serial_number',
+        'ean' => 'ean', 'data_zakupu' => 'purchased_at', 'gwarancja_do' => 'warranty_until',
+        'przeglad_co_miesiecy' => 'inspection_interval_months', 'nastepny_przeglad' => 'next_inspection_at',
+        'stacjonarny' => 'stationary', 'opis' => 'description',
+    ];
 
     public function __construct(
         private readonly InventoryNumberGenerator $numbers,
         private readonly QrCodeGenerator $qr,
-        // Nadpisywalne w testach (patrz ItemImporterTest) — budowanie 2000+
-        // prawdziwych wierszy tylko po to, żeby dobić do stałej MAX_ROWS,
-        // byłoby powolne i niepotrzebne, skoro sama logika obcinania jest
-        // identyczna dla dowolnego progu.
+        // Nadpisywalne w testach, żeby nie budować 2000 wierszy dla sprawdzenia limitu.
         private readonly int $maxRows = self::MAX_ROWS,
     ) {
     }
 
+    /** Wiersz eksportu dla przedmiotu (kolejność jak EXPORT_COLUMNS). */
+    public static function exportRow(Item $item): array
+    {
+        return [
+            $item->inventory_no,
+            $item->name,
+            $item->category?->code,
+            $item->storageLocation?->code,
+            $item->condition,
+            $item->status,
+            Csv::formatNumber($item->value),
+            $item->serial_number,
+            $item->ean,
+            $item->purchased_at?->format('Y-m-d'),
+            $item->warranty_until?->format('Y-m-d'),
+            $item->inspection_interval_months,
+            $item->next_inspection_at?->format('Y-m-d'),
+            $item->stationary ? 'tak' : 'nie',
+            $item->description,
+            $item->category?->name,
+            $item->storageLocation?->label(),
+            $item->currentLoan?->borrowerLabel(),
+            $item->currentLoan?->due_at?->format('Y-m-d'),
+        ];
+    }
+
     /**
+     * Analiza pliku bez zapisu do bazy.
+     *
      * @return array{
-     *     created: int, failed: int, pending: int,
-     *     rows: array<int, array{line: int, outcome: 'created'|'failed'|'pending', name: string, inventory_no: ?string, message: ?string}>,
-     *     pending_rows: array<int, array<string, mixed>>,
+     *     counts: array{create: int, update: int, unchanged: int, error: int},
+     *     rows: list<array{line: int, action: string, name: string, inventory_no: ?string, changes: array<string, array{0: mixed, 1: mixed}>, messages: list<string>}>,
+     *     plan: list<array{action: string, line: int, item_id: ?int, attributes: array<string, mixed>}>,
      * }
      */
-    public function import(string $csvPath, User $user): array
+    public function analyze(string $csvPath): array
     {
-        $handle = fopen($csvPath, 'r');
+        $result = ['counts' => ['create' => 0, 'update' => 0, 'unchanged' => 0, 'error' => 0], 'rows' => [], 'plan' => []];
 
-        if (! $this->rawLooksLikeUtf8($csvPath)) {
-            stream_filter_append($handle, 'convert.iconv.WINDOWS-1250/UTF-8//IGNORE', STREAM_FILTER_READ);
+        $header = Csv::header($csvPath);
+        if (! in_array('nazwa', $header, true) && ! in_array('nr_ewidencyjny', $header, true)) {
+            $result['counts']['error'] = 1;
+            $result['rows'][] = $this->row(1, 'error', '', null, [], [__('The file needs a "nazwa" column (new items) or an "nr_ewidencyjny" column (changes to existing items) in its header row.')]);
+
+            return $result;
         }
 
-        $header = $this->readHeaderRow($handle);
-
-        // Bez "nazwa" w nagłówku KAŻDY wiersz i tak skończyłby się tym samym
-        // błędem "brak nazwy" — jeden czytelny komunikat od razu jest
-        // uczciwszy niż powtórzenie go raz na wiersz przy większym pliku.
-        if (! in_array('nazwa', $header, true)) {
-            fclose($handle);
-
-            return ['created' => 0, 'failed' => 1, 'pending' => 0, 'pending_rows' => [], 'rows' => [
-                ['line' => 1, 'outcome' => 'failed', 'name' => '', 'inventory_no' => null, 'message' => __('The file is missing the required "nazwa" column in its header row.')],
-            ]];
-        }
-
-        $rows = [];
-        $pendingRows = [];
-        $created = 0;
-        $failed = 0;
-        $pending = 0;
-        $line = 1;
-
-        while (($record = fgetcsv($handle, 0, ';')) !== false) {
-            $line++;
-
-            if ($record === [null] || $record === false) {
-                continue; // pusta linia
-            }
-
-            if ($line - 1 > $this->maxRows) {
-                $rows[] = ['line' => $line, 'outcome' => 'failed', 'name' => '', 'inventory_no' => null, 'message' => __('Import stopped after :max rows — split the file into smaller batches.', ['max' => $this->maxRows])];
-                $failed++;
-
+        $count = 0;
+        foreach (Csv::read($csvPath) as $line => $data) {
+            if (++$count > $this->maxRows) {
+                $result['counts']['error']++;
+                $result['rows'][] = $this->row($line, 'error', '', null, [], [__('Import stopped after :max rows, split the file into smaller batches.', ['max' => $this->maxRows])]);
                 break;
             }
 
-            $data = $this->mapRow($header, $record);
-            $result = $this->importRow($data, $user, $line);
-            $rows[] = $result['row'];
-
-            match ($result['row']['outcome']) {
-                'created' => $created++,
-                'failed' => $failed++,
-                'pending' => $pending++,
-            };
-
-            if ($result['pending'] !== null) {
-                $pendingRows[] = $result['pending'];
+            [$row, $plan] = $this->analyzeRow($line, $data);
+            $result['rows'][] = $row;
+            $result['counts'][$row['action']]++;
+            if ($plan) {
+                $result['plan'][] = $plan;
             }
         }
 
-        fclose($handle);
-
-        return ['created' => $created, 'failed' => $failed, 'pending' => $pending, 'pending_rows' => $pendingRows, 'rows' => $rows];
+        return $result;
     }
 
     /**
-     * Tworzy przedmioty z wierszy zostawionych wcześniej jako "oczekujące" —
-     * bez kategorii/lokalizacji, których kod się wtedy nie rozpoznał (te pola
-     * są w `$pendingRows` już jako NULL, patrz `importRow()`). Te, które SIĘ
-     * rozpoznały (tylko jedno z dwóch pól było nierozpoznane), zostają
-     * przypisane normalnie.
+     * Wykonanie planu z analyze() (po zatwierdzeniu podglądu).
      *
-     * @param  array<int, array<string, mixed>>  $pendingRows
-     * @return array{created: int, rows: array<int, array{line: int, outcome: 'created', name: string, inventory_no: string, message: null}>}
+     * @param  list<array{action: string, line: int, item_id: ?int, attributes: array<string, mixed>}>  $plan
+     * @return array{created: int, updated: int, rows: list<array{line: int, action: string, name: string, inventory_no: ?string}>}
      */
-    public function confirmUnassigned(array $pendingRows, User $user): array
+    public function apply(array $plan, User $user): array
     {
-        $created = 0;
-        $rows = [];
+        $done = ['created' => 0, 'updated' => 0, 'rows' => []];
 
-        foreach ($pendingRows as $pending) {
-            $category = $pending['category_id'] ? Category::find($pending['category_id']) : null;
-            $location = $pending['storage_location_id'] ? StorageLocation::find($pending['storage_location_id']) : null;
+        foreach ($plan as $step) {
+            if ($step['action'] === 'update') {
+                $item = Item::find($step['item_id']);
+                if (! $item) {
+                    continue; // usunięty między podglądem a zatwierdzeniem
+                }
+                $item->update($step['attributes']); // ItemObserver zapisze historię
+                $done['updated']++;
+                $done['rows'][] = ['line' => $step['line'], 'action' => 'update', 'name' => $item->name, 'inventory_no' => $item->inventory_no];
 
-            $item = new Item([
-                'name' => $pending['name'],
-                'category_id' => $category?->id,
-                'storage_location_id' => $location?->id,
-                'condition' => $pending['condition'],
-                'status' => $pending['status'],
-                'value' => $pending['value'],
-                'serial_number' => $pending['serial_number'],
-                'ean' => $pending['ean'],
-                'description' => $pending['description'],
-            ]);
+                continue;
+            }
+
+            $attributes = $step['attributes'];
+            $category = isset($attributes['category_id']) ? Category::find($attributes['category_id']) : null;
+            $location = isset($attributes['storage_location_id']) ? StorageLocation::find($attributes['storage_location_id']) : null;
+
+            $item = new Item($attributes);
             $item->created_by = $user->id;
             $item->inventory_no = $this->numbers->generate($category, $location);
             $item->save();
-
             $item->qr_path = $this->qr->generateForItem($item);
-            $item->saveQuietly(); // nie duplikujemy wpisu w historii tylko dla qr_path
+            $item->saveQuietly(); // bez dodatkowego wpisu w historii tylko dla qr_path
 
-            $created++;
-            $rows[] = ['line' => $pending['line'], 'outcome' => 'created', 'name' => $item->name, 'inventory_no' => $item->inventory_no, 'message' => null];
+            $done['created']++;
+            $done['rows'][] = ['line' => $step['line'], 'action' => 'create', 'name' => $item->name, 'inventory_no' => $item->inventory_no];
         }
 
-        return ['created' => $created, 'rows' => $rows];
+        return $done;
     }
 
-    /**
-     * @param  array<string, string|null>  $data
-     * @return array{row: array{line: int, outcome: 'created'|'failed'|'pending', name: string, inventory_no: ?string, message: ?string}, pending: ?array<string, mixed>}
-     */
-    private function importRow(array $data, User $user, int $line): array
+    /** @return array{0: array, 1: ?array} wiersz podglądu i krok planu */
+    private function analyzeRow(int $line, array $data): array
     {
-        $name = trim((string) ($data['nazwa'] ?? ''));
-
-        if ($name === '') {
-            return $this->outcome($line, 'failed', '', null, __('Missing item name.'));
-        }
-
-        // Nierozpoznany kod NIE jest tu jeszcze błędem — zbieramy komunikaty
-        // i lecimy dalej, decyzja "pending czy created" zapada na końcu.
-        $unmatched = [];
-
-        $category = null;
-        if (filled($data['kategoria_kod'] ?? null)) {
-            $category = Category::query()->whereRaw('LOWER(code) = ?', [mb_strtolower(trim($data['kategoria_kod']))])->first();
-
-            if (! $category) {
-                $unmatched[] = __('Category ":code" was not recognized.', ['code' => trim($data['kategoria_kod'])]);
+        $inventoryNo = trim((string) ($data['nr_ewidencyjny'] ?? ''));
+        $item = null;
+        if ($inventoryNo !== '') {
+            $item = Item::where('inventory_no', $inventoryNo)->first();
+            if (! $item) {
+                return [$this->row($line, 'error', (string) ($data['nazwa'] ?? ''), $inventoryNo, [], [__('There is no item with inventory number :number.', ['number' => $inventoryNo])]), null];
             }
         }
 
-        $location = null;
-        if (filled($data['lokalizacja_kod'] ?? null)) {
-            $location = StorageLocation::query()->whereRaw('LOWER(code) = ?', [mb_strtolower(trim($data['lokalizacja_kod']))])->first();
-
-            if (! $location) {
-                $unmatched[] = __('Location ":code" was not recognized.', ['code' => trim($data['lokalizacja_kod'])]);
+        $errors = [];
+        $warnings = [];
+        $values = [];
+        foreach (self::FIELDS as $column => $attribute) {
+            $raw = $data[$column] ?? null;
+            if ($raw === null || trim($raw) === '') {
+                continue; // brak kolumny albo pusta komórka: bez zmian / wartość domyślna
+            }
+            $parsed = $this->parse($column, trim($raw), $item !== null, $errors, $warnings);
+            if ($parsed !== '__skip') {
+                $values[$attribute] = $parsed;
             }
         }
 
-        $condition = trim((string) ($data['stan'] ?? '')) ?: 'uzywany';
-        if (! array_key_exists($condition, Item::CONDITIONS)) {
-            return $this->outcome($line, 'failed', $name, null, __('Unknown condition value: :value', ['value' => $condition]));
+        $name = (string) ($values['name'] ?? $item?->name ?? '');
+        if ($errors) {
+            return [$this->row($line, 'error', $name, $item?->inventory_no, [], $errors), null];
         }
 
-        $status = trim((string) ($data['status'] ?? '')) ?: 'dostepny';
-        if (! array_key_exists($status, Item::STATUSES)) {
-            return $this->outcome($line, 'failed', $name, null, __('Unknown status value: :value', ['value' => $status]));
-        }
+        if ($item) {
+            $changes = [];
+            foreach ($values as $attribute => $new) {
+                $old = $this->comparable($item, $attribute);
+                if ($old !== $new && ! (is_float($new) && $old !== null && abs((float) $old - $new) < 0.005)) {
+                    $changes[$attribute] = [$old, $new];
+                }
+            }
+            if (! $changes) {
+                return [$this->row($line, 'unchanged', $name, $item->inventory_no, [], $warnings), null];
+            }
 
-        $value = trim((string) ($data['wartosc'] ?? ''));
-        if ($value !== '' && ! is_numeric(str_replace(',', '.', $value))) {
-            return $this->outcome($line, 'failed', $name, null, __('Value is not a number: :value', ['value' => $value]));
-        }
+            $display = [];
+            foreach ($changes as $attribute => [$old, $new]) {
+                $display[$attribute] = [$this->display($attribute, $old), $this->display($attribute, $new)];
+            }
 
-        $attributes = [
-            'name' => $name,
-            'condition' => $condition,
-            'status' => $status,
-            'value' => $value !== '' ? (float) str_replace(',', '.', $value) : null,
-            'serial_number' => filled($data['nr_seryjny'] ?? null) ? trim($data['nr_seryjny']) : null,
-            'ean' => filled($data['ean'] ?? null) ? trim($data['ean']) : null,
-            'description' => filled($data['opis'] ?? null) ? trim($data['opis']) : null,
-        ];
-
-        if ($unmatched !== []) {
             return [
-                'row' => ['line' => $line, 'outcome' => 'pending', 'name' => $name, 'inventory_no' => null, 'message' => implode(' ', $unmatched)],
-                'pending' => $attributes + ['line' => $line, 'category_id' => $category?->id, 'storage_location_id' => $location?->id],
+                $this->row($line, 'update', $name, $item->inventory_no, $display, $warnings),
+                ['action' => 'update', 'line' => $line, 'item_id' => $item->id, 'attributes' => array_map(fn ($c) => $c[1], $changes)],
             ];
         }
 
-        $item = new Item($attributes + ['category_id' => $category?->id, 'storage_location_id' => $location?->id]);
-        $item->created_by = $user->id;
-        $item->inventory_no = $this->numbers->generate($category, $location);
-        $item->save();
-
-        $item->qr_path = $this->qr->generateForItem($item);
-        $item->saveQuietly(); // nie duplikujemy wpisu w historii tylko dla qr_path
-
-        return ['row' => ['line' => $line, 'outcome' => 'created', 'name' => $name, 'inventory_no' => $item->inventory_no, 'message' => null], 'pending' => null];
-    }
-
-    /** @return array{row: array{line: int, outcome: 'failed', name: string, inventory_no: null, message: string}, pending: null} */
-    private function outcome(int $line, string $outcome, string $name, ?string $inventoryNo, string $message): array
-    {
-        return ['row' => ['line' => $line, 'outcome' => $outcome, 'name' => $name, 'inventory_no' => $inventoryNo, 'message' => $message], 'pending' => null];
-    }
-
-    /** @return array<int, string> */
-    private function readHeaderRow($handle): array
-    {
-        $header = fgetcsv($handle, 0, ';') ?: [];
-
-        // BOM na pierwszej komórce — typowe dla plików zapisanych przez Excela na Windows.
-        if (isset($header[0])) {
-            $header[0] = preg_replace('/^\x{FEFF}/u', '', $header[0]) ?? $header[0];
+        if ($name === '') {
+            return [$this->row($line, 'error', '', null, [], [__('Missing item name.')]), null];
         }
+        $values += ['condition' => 'uzywany', 'status' => 'dostepny'];
 
-        return array_map(fn ($cell) => mb_strtolower(trim((string) $cell)), $header);
+        return [
+            $this->row($line, 'create', $name, null, [], $warnings),
+            ['action' => 'create', 'line' => $line, 'item_id' => null, 'attributes' => $values],
+        ];
     }
 
-    /**
-     * @param  array<int, string>  $header
-     * @param  array<int, string|null>  $record
-     * @return array<string, string|null>
-     */
-    private function mapRow(array $header, array $record): array
+    /** Wartość z komórki w postaci zapisywanej w bazie; błąd dopisuje do $errors i zwraca "__skip". */
+    private function parse(string $column, string $raw, bool $updating, array &$errors, array &$warnings): mixed
     {
-        $data = [];
+        switch ($column) {
+            case 'kategoria_kod':
+                $category = Category::query()->whereRaw('LOWER(code) = ?', [mb_strtolower($raw)])->first();
+                if ($category) {
+                    return $category->id;
+                }
+                $message = __('Category ":code" was not recognized.', ['code' => $raw]);
+                if ($updating) {
+                    $errors[] = $message;
+                } else {
+                    $warnings[] = $message.' '.__('The item will be added without a category.');
+                }
 
-        foreach ($header as $index => $column) {
-            $data[$column] = $record[$index] ?? null;
+                return '__skip';
+            case 'lokalizacja_kod':
+                $location = StorageLocation::query()->whereRaw('LOWER(code) = ?', [mb_strtolower($raw)])->first();
+                if ($location) {
+                    return $location->id;
+                }
+                $message = __('Location ":code" was not recognized.', ['code' => $raw]);
+                if ($updating) {
+                    $errors[] = $message;
+                } else {
+                    $warnings[] = $message.' '.__('The item will be added without a location.');
+                }
+
+                return '__skip';
+            case 'stan':
+                return $this->option($raw, Item::CONDITIONS, __('Unknown condition value: :value', ['value' => $raw]), $errors);
+            case 'status':
+                return $this->option($raw, Item::STATUSES, __('Unknown status value: :value', ['value' => $raw]), $errors);
+            case 'wartosc':
+                $number = Csv::number($raw);
+                if ($number === false || $number < 0) {
+                    $errors[] = __('Value is not a number: :value', ['value' => $raw]);
+
+                    return '__skip';
+                }
+
+                return round($number, 2);
+            case 'przeglad_co_miesiecy':
+                if (! ctype_digit($raw) || (int) $raw < 1 || (int) $raw > 120) {
+                    $errors[] = __('Inspection interval must be a whole number of months from 1 to 120: :value', ['value' => $raw]);
+
+                    return '__skip';
+                }
+
+                return (int) $raw;
+            case 'data_zakupu':
+            case 'gwarancja_do':
+            case 'nastepny_przeglad':
+                $date = Csv::date($raw);
+                if ($date === false) {
+                    $errors[] = __('Not a date (use 2026-11-25 or 25.11.2026): :value', ['value' => $raw]);
+
+                    return '__skip';
+                }
+
+                return $date;
+            case 'stacjonarny':
+                $bool = Csv::bool($raw);
+                if ($bool === 'invalid') {
+                    $errors[] = __('Stationary must be "tak" or "nie": :value', ['value' => $raw]);
+
+                    return '__skip';
+                }
+
+                return $bool;
+            case 'nazwa':
+            case 'nr_seryjny':
+            case 'ean':
+                return mb_substr($raw, 0, 255);
+            default:
+                return $raw;
         }
-
-        return $data;
     }
 
-    /** Excel na Windows domyślnie zapisuje polskie CSV w Windows-1250, nie UTF-8 — bez konwersji "ł"/"ą"/"ę" zamieniłyby się w krzaki. */
-    private function rawLooksLikeUtf8(string $path): bool
+    /** Kod z listy (np. "uzywany") albo jego polska lub angielska nazwa (np. "używany", "Used"). */
+    private function option(string $raw, array $options, string $error, array &$errors): mixed
     {
-        $sample = file_get_contents($path, false, null, 0, 8192);
+        $key = Csv::option($raw, $options);
+        if ($key !== false) {
+            return $key;
+        }
+        $errors[] = $error;
 
-        return $sample === false || mb_check_encoding($sample, 'UTF-8');
+        return '__skip';
+    }
+
+    /** Obecna wartość przedmiotu w tej samej postaci co z parse(), do porównania. */
+    private function comparable(Item $item, string $attribute): mixed
+    {
+        $value = $item->getAttribute($attribute);
+
+        return match (true) {
+            $value instanceof \DateTimeInterface => $value->format('Y-m-d'),
+            $attribute === 'value' => $value === null ? null : round((float) $value, 2),
+            $attribute === 'stationary' => (bool) $value,
+            $attribute === 'inspection_interval_months', $attribute === 'category_id', $attribute === 'storage_location_id' => $value === null ? null : (int) $value,
+            default => $value,
+        };
+    }
+
+    /** Wartość do podglądu: kod zamiast numeru kategorii/lokalizacji, nazwa stanu i statusu, tak/nie. */
+    private function display(string $attribute, mixed $value): string
+    {
+        return match (true) {
+            $value === null || $value === '' => '',
+            $attribute === 'category_id' => (string) Category::find($value)?->code,
+            $attribute === 'storage_location_id' => (string) StorageLocation::find($value)?->code,
+            $attribute === 'condition' => __(Item::CONDITIONS[$value] ?? (string) $value),
+            $attribute === 'status' => __(Item::STATUSES[$value] ?? (string) $value),
+            $attribute === 'stationary' => $value ? __('yes') : __('no'),
+            $attribute === 'value' => Csv::formatNumber($value),
+            default => \Illuminate\Support\Str::limit((string) $value, 80),
+        };
+    }
+
+    private function row(int $line, string $action, string $name, ?string $inventoryNo, array $changes, array $messages): array
+    {
+        return compact('line', 'action', 'name', 'changes', 'messages') + ['inventory_no' => $inventoryNo];
     }
 }

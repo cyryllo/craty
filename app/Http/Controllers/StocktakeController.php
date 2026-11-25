@@ -62,19 +62,55 @@ class StocktakeController extends Controller
             ]);
         }
 
+        return view('stocktakes.report', ['stocktake' => $stocktake, ...self::reportData($stocktake)]);
+    }
+
+    /** Części raportu zakończonej inwentaryzacji, wspólne dla strony i pliku CSV. */
+    public static function reportData(Stocktake $stocktake): array
+    {
         $scans = $stocktake->scans()->with('item.storageLocation.warehouse', 'item.storageLocation.room')->get();
         $scannedIds = $scans->pluck('item_id')->all();
         $expectedIds = $stocktake->expected_item_ids ?? [];
         $awayIds = $stocktake->away_item_ids ?? [];
         $items = Item::with('storageLocation.warehouse', 'storageLocation.room')->whereIn('id', $expectedIds)->get()->keyBy('id');
 
-        return view('stocktakes.report', [
-            'stocktake' => $stocktake,
+        return [
             'missing' => $items->only(array_diff($expectedIds, $scannedIds, $awayIds))->values(),
             'away' => $items->only(array_diff($awayIds, $scannedIds))->values(),
             'misplaced' => $scans->where('in_place', false)->values(),
             'matching' => $scans->where('in_place', true)->values(),
-        ]);
+        ];
+    }
+
+    /** Raport zakończonej inwentaryzacji w CSV: jeden wiersz na przedmiot, z wynikiem. */
+    public function reportCsv(Stocktake $stocktake)
+    {
+        abort_unless($stocktake->isFinished(), 404);
+        $data = self::reportData($stocktake);
+        $rows = [];
+        $add = function (string $result, ?Item $item) use (&$rows) {
+            if ($item) {
+                $rows[] = [$result, $item->name, $item->inventory_no, $item->storageLocation?->label(), $item->statusLabel()];
+            }
+        };
+        foreach ($data['missing'] as $item) {
+            $add(__('Missing'), $item);
+        }
+        foreach ($data['misplaced'] as $scan) {
+            $add(__('Not in its place'), $scan->item);
+        }
+        foreach ($data['away'] as $item) {
+            $add(__('Loaned out or under repair'), $item);
+        }
+        foreach ($data['matching'] as $scan) {
+            $add(__('In place'), $scan->item);
+        }
+
+        return \App\Support\Csv::download(
+            'craty-inwentaryzacja-'.$stocktake->id.'-'.$stocktake->finished_at->format('Y-m-d').'.csv',
+            ['wynik', 'przedmiot', 'nr_ewidencyjny', 'zapisane_miejsce', 'status'],
+            $rows,
+        );
     }
 
     /** Zapis jednego skanu (JSON, wołane z serii skanów w resources/js/scan.js). */

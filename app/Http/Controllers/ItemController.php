@@ -64,21 +64,8 @@ class ItemController extends Controller
         [$sort, $dir] = $this->listSort($request);
         $location = LocationScope::fromArray($request->query());
 
-        $items = Item::query()
+        $items = $this->listQuery($request)
             ->with(['category', 'storageLocation.warehouse', 'storageLocation.room', 'primaryPhoto'])
-            ->when($request->filled('q'), fn ($q) => $q->where(function ($q) use ($request) {
-                $term = '%'.$request->string('q').'%';
-                $q->where('name', 'like', $term)
-                    ->orWhere('inventory_no', 'like', $term)
-                    ->orWhere('serial_number', 'like', $term)
-                    ->orWhere('ean', 'like', $term);
-            }))
-            ->when($request->filled('category_id'), fn ($q) => $q->where('category_id', $request->integer('category_id')))
-            ->tap(fn ($q) => $location->apply($q))
-            // Bez filtra statusu lista pokazuje tylko to, co jest w magazynie
-            // — sprzedane/wycofane tylko po jawnym wybraniu ich filtra.
-            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')), fn ($q) => $q->inStock())
-            ->tap(fn ($q) => $this->applySort($q, $sort, $dir))
             ->paginate(24)
             ->withQueryString();
 
@@ -97,6 +84,53 @@ class ItemController extends Controller
             'locationParams' => $location->params,
             'clearLocationUrl' => route('items.index', [...$request->except([...self::LOCATION_PARAMS, 'page', 'f']), 'f' => 1]),
         ]);
+    }
+
+    /**
+     * Zapytanie listy przedmiotów z filtrami i sortowaniem z adresu: wspólne
+     * dla /items i eksportu CSV, żeby eksport zawierał dokładnie to, co widać.
+     */
+    private function listQuery(Request $request)
+    {
+        [$sort, $dir] = $this->listSort($request);
+        $location = LocationScope::fromArray($request->query());
+
+        return Item::query()
+            ->when($request->filled('q'), fn ($q) => $q->where(function ($q) use ($request) {
+                $term = '%'.$request->string('q').'%';
+                $q->where('name', 'like', $term)
+                    ->orWhere('inventory_no', 'like', $term)
+                    ->orWhere('serial_number', 'like', $term)
+                    ->orWhere('ean', 'like', $term);
+            }))
+            ->when($request->filled('category_id'), fn ($q) => $q->where('category_id', $request->integer('category_id')))
+            ->tap(fn ($q) => $location->apply($q))
+            // Bez filtra statusu lista pokazuje tylko to, co jest w magazynie
+            // — sprzedane/wycofane tylko po jawnym wybraniu ich filtra.
+            // "all" (tylko eksport) obejmuje też sprzedane i wycofane.
+            ->when($request->input('status') !== 'all', fn ($q) => $q->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')), fn ($q) => $q->inStock()))
+            ->tap(fn ($q) => $this->applySort($q, $sort, $dir));
+    }
+
+    /**
+     * Eksport przedmiotów do CSV z bieżącymi filtrami listy. Kolumny jak w
+     * imporcie (ItemImporter::EXPORT_COLUMNS), więc plik po edycji w Excelu
+     * wraca importem jako masowa zmiana; ?wzor=1 daje sam nagłówek.
+     */
+    public function export(Request $request)
+    {
+        $rows = $request->boolean('wzor') ? [] : (function () use ($request) {
+            $query = $this->listQuery($request)->with(['category', 'storageLocation.warehouse', 'storageLocation.room', 'currentLoan']);
+            foreach ($query->lazy(500) as $item) {
+                yield \App\Services\ItemImporter::exportRow($item);
+            }
+        })();
+
+        return \App\Support\Csv::download(
+            $request->boolean('wzor') ? 'craty-przedmioty-wzor.csv' : 'craty-przedmioty-'.now()->format('Y-m-d').'.csv',
+            \App\Services\ItemImporter::EXPORT_COLUMNS,
+            $rows,
+        );
     }
 
     /**

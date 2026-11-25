@@ -315,6 +315,38 @@ with sync_playwright() as p:
     except Exception as e:  # noqa: BLE001
         errors.append("ustawienia: " + str(e).splitlines()[0])
 
+    # ---------- kopie zapasowe ----------
+    try:
+        page.goto(f"{BASE}/ustawienia/kopie")
+        page.click("text=Zrób kopię zapasową")
+        page.wait_for_load_state()
+        save(page, "kopie-zapasowe", full=True)
+    except Exception as e:  # noqa: BLE001
+        errors.append("kopie: " + str(e).splitlines()[0])
+
+    # ---------- import i eksport ----------
+    try:
+        import csv, io
+        page.goto(f"{BASE}/import-eksport")
+        save(page, "import-eksport", full=True)
+        with page.expect_download() as download:
+            page.click("text=Eksportuj przedmioty")
+        rows = list(csv.reader(io.StringIO(open(download.value.path(), encoding="utf-8-sig").read()), delimiter=";"))
+        by_name = {r[1]: r for r in rows[1:]}
+        by_name["Drabina aluminiowa 3x9"][6] = "650,00"
+        by_name["Projektor Epson EB-W06"][5] = "w naprawie"
+        by_name["Głośnik JBL PartyBox 110"][2] = "AUDIO"
+        rows.append(["", "Lutownica transformatorowa", "ELE", "", "używany", "", "120", "", "", "", "", "", "", "nie", "Z działu elektroniki"] + [""] * 4)
+        out = io.StringIO()
+        csv.writer(out, delimiter=";").writerows(rows)
+        open(f"{OUT}/import.csv", "w", encoding="utf-8").write(out.getvalue())
+        page.set_input_files("#file", f"{OUT}/import.csv")
+        page.click("text=Sprawdź plik")
+        page.wait_for_load_state()
+        save(page, "import-podglad", full=True)
+    except Exception as e:  # noqa: BLE001
+        errors.append("import: " + str(e).splitlines()[0])
+
     # ---------- protokoły PDF (zamieniane na obrazki przez screenshots.sh) ----------
     try:
         page.goto(f"{BASE}/loans")
