@@ -3,6 +3,19 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-25 (1.5.3)
+
+- Kopie zapasowe (Ustawienia → Kopie zapasowe, tylko administrator): baza
+  danych i wszystkie wgrane pliki w jednym .zip, w czystym PHP (bez
+  mysqldump). Ręcznie albo automatycznie codziennie lub co tydzień,
+  przechowywanie od 7 do 90 dni albo bez limitu. Pobieranie, wgrywanie kopii
+  z komputera i przywracanie po potwierdzeniu hasła; przed przywróceniem
+  powstaje kopia bieżącego stanu.
+- Dziennik aktywności: wybór czasu przechowywania wpisów (od 30 dni do 2 lat
+  albo bez limitu).
+- Aktualizacja i przywracanie kopii kończą się na serwerze nawet wtedy, gdy
+  przeglądarka zerwie połączenie (np. komunikat o zmianie sieci).
+
 ## 2026-11-25 (1.5.2)
 
 - Dziennik aktywności (Ustawienia → Dziennik aktywności, tylko
