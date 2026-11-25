@@ -3,6 +3,13 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-25 (1.5.5)
+
+- Poprawki bezpieczeństwa w bibliotekach (wszystkie zgłoszenia z composer
+  audit): Laravel 12.74, Symfony 7.4.24 (http-foundation, http-kernel,
+  routing, mime), league/commonmark 2.10.8 i drobniejsze zależności, w
+  obrębie tych samych wersji głównych i nadal z PHP 8.3.
+
 ## 2026-11-25 (1.5.4)
 
 - Mniejsze paczki aktualizacji (około 13 MB zamiast 26 MB): bez narzędzi
