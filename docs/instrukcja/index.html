@@ -57,6 +57,9 @@ a { color: var(--accent); }
 a:hover { color: var(--accent-strong); }
 img { max-width: 100%; height: auto; display: block; }
 code, kbd { font: 500 .88em/1.4 ui-monospace, "SFMono-Regular", Menlo, monospace; background: var(--accent-soft); color: var(--accent-strong); padding: 1px 6px; border-radius: 5px; }
+article code { overflow-wrap: anywhere; }
+pre { max-width: 100%; background: var(--accent-soft); border-radius: 10px; padding: 12px 16px; margin: 10px 0 20px; overflow-x: auto; }
+pre code { background: none; padding: 0; white-space: pre; }
 .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
 
 /* ---------- nawigacja ---------- */
@@ -745,18 +748,41 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
         <figure><a href="img/ustawienia-aplikacja.jpg"><img src="img/ustawienia-aplikacja.jpg" width="1280" height="951" alt="Ustawienia aplikacji: nazwa, logo, ikona, język." loading="lazy"></a><figcaption>Ustawienia aplikacji.</figcaption></figure>
         <figure><a href="img/uzytkownicy.jpg"><img src="img/uzytkownicy.jpg" width="1280" height="860" alt="Lista użytkowników: Ewa Kowalska administrator, Tomek Wiśniewski magazynier." loading="lazy"></a><figcaption>Użytkownicy.</figcaption></figure>
     </div>
-    <div class="tip"><p>E-maile z powiadomieniami wysyłają się tylko wtedy, gdy na serwerze działa harmonogram zadań (cron). W wersji Docker działa sam.</p></div>
+    <div class="tip"><p>E-maile z powiadomieniami wysyłają się tylko wtedy, gdy na serwerze działa harmonogram zadań (cron), opisany niżej w części <a href="#cron">Zadania automatyczne (cron)</a>. W wersji Docker działa sam.</p></div>
 
     <h3>Kopie zapasowe</h3>
     <p>W <span class="path">Ustawienia → Kopie zapasowe</span> (tylko administrator) przycisk <span class="ui">Zrób kopię zapasową</span> zapisuje w jednym pliku .zip całą bazę danych i wszystkie wgrane pliki: zdjęcia, załączniki, kody QR i logo. Kopia działa także na hostingach, które nie pozwalają uruchamiać zewnętrznych programów.</p>
     <figure><a href="img/kopie-zapasowe.jpg"><img src="img/kopie-zapasowe.jpg" width="1280" height="1086" alt="Kopie zapasowe: przycisk kopii, ustawienia kopii automatycznych, lista kopii z typem i rozmiarem." loading="lazy"></a><figcaption>Kopie zapasowe.</figcaption></figure>
     <ul>
-        <li><b>Automatycznie</b>: codziennie albo co tydzień. Wymaga harmonogramu zadań (cron) na hostingu, w wersji Docker działa samo.</li>
+        <li><b>Automatycznie</b>: codziennie albo co tydzień. Wymaga harmonogramu zadań (cron) na hostingu, jak go ustawić, opisuje <a href="#cron">następna część</a>. W wersji Docker działa samo.</li>
         <li><b>Przechowywanie</b>: kopie leżą na serwerze w katalogu niedostępnym z internetu i usuwają się po wybranym czasie (7, 14, 30 albo 90 dni, albo bez limitu). Najnowsza zostaje zawsze.</li>
         <li><b>Pobieranie i wgrywanie</b> wymagają potwierdzenia hasła. Wgrać można kopię z komputera albo z innej instalacji Craty.</li>
         <li><b>Przywracanie</b> zastępuje wszystkie dane i pliki zawartością kopii. Przed nim Craty sam robi kopię bieżącego stanu (typ „przed przywróceniem”), żeby dało się wrócić. Kopię ze starszej wersji Craty po przywróceniu sam aktualizuje, a kopii z nowszej wersji nie przyjmie. Na koniec trzeba się zalogować kontem z kopii.</li>
     </ul>
     <div class="tip"><p>W każdej kopii jest plik CZYTAJ-MNIE.txt z instrukcją ręcznego odtworzenia, np. przez import bazy w phpMyAdmin. Przechowuj co jakiś czas jedną kopię także poza serwerem, np. na swoim komputerze.</p></div>
+
+    <h3 id="cron">Zadania automatyczne (cron)</h3>
+    <p>Kilka rzeczy Craty robi sam o stałych porach, ale tylko wtedy, gdy są włączone w Ustawieniach:</p>
+    <div class="scroll"><table class="plain">
+        <thead><tr><th>Kiedy</th><th>Co</th><th>Gdzie się włącza</th></tr></thead>
+        <tbody>
+            <tr><td>codziennie 2:30</td><td>kopia zapasowa (codziennie albo raz w tygodniu)</td><td><span class="path">Ustawienia → Kopie zapasowe</span>, pole „Automatyczna kopia”</td></tr>
+            <tr><td>codziennie 3:30</td><td>usuwanie starych wpisów dziennika aktywności</td><td>zawsze, według czasu wybranego na stronie dziennika</td></tr>
+            <tr><td>codziennie 8:00</td><td>e-mail o przeterminowanych wypożyczeniach</td><td><span class="path">Ustawienia → Powiadomienia</span></td></tr>
+            <tr><td>poniedziałek 8:00</td><td>przypomnienie serwisowe</td><td><span class="path">Ustawienia → Powiadomienia</span> (moduł Serwis)</td></tr>
+        </tbody>
+    </table></div>
+    <p>Żeby to działało na własnym hostingu, serwer musi co jakiś czas uruchamiać Craty. Służy do tego <b>harmonogram zadań (cron)</b>, który ustawiasz w panelu hostingu, zwykle w zakładce „Cron”, „Zadania cykliczne” albo „Harmonogram zadań”. Dodaj jedno zadanie uruchamiane <b>co minutę</b>:</p>
+    <pre><code>* * * * * cd /ścieżka/do/craty &amp;&amp; php artisan schedule:run &gt;&gt; /dev/null 2&gt;&amp;1</code></pre>
+    <ul>
+        <li><b>/ścieżka/do/craty</b> to katalog na serwerze, w którym leżą pliki <code>index.php</code> i <code>artisan</code>, czyli ten sam, do którego wgrałeś Craty. Panel hostingu zwykle pokazuje pełną ścieżkę w menedżerze plików, np. <code>/home/uzytkownik/domains/twojadomena.pl/public_html</code>.</li>
+        <li><b>php</b>: na części hostingów trzeba podać pełną ścieżkę do PHP w wersji 8.3 lub nowszej, np. <code>/usr/local/bin/php83</code> albo <code>/opt/alt/php83/usr/bin/php</code>. Właściwą hosting zwykle podpowiada przy dodawaniu zadania albo w swojej pomocy.</li>
+        <li>Jedno zadanie wystarczy na wszystko z tabeli. Craty sam sprawdza, co jest włączone i czy przyszła na to pora.</li>
+    </ul>
+    <p>Jeśli hosting nie pozwala uruchamiać zadań co minutę, ustaw <b>co 5 albo co 15 minut</b>: wszystkie pory z tabeli wypadają na pełne 5 i 15 minut, więc nic nie przepadnie. Gdy da się tylko raz na godzinę, kopię zapasową dodaj jako osobne zadanie o 2:30:</p>
+    <pre><code>30 2 * * * cd /ścieżka/do/craty &amp;&amp; php artisan backup:run --auto</code></pre>
+    <p>Ta komenda sama sprawdza, czy automatyczna kopia jest włączona i czy przyszła na nią pora, więc przy ustawieniu „co tydzień” zrobi kopię raz w tygodniu.</p>
+    <div class="tip"><p>Jak sprawdzić, czy cron działa: włącz automatyczną kopię i następnego dnia zajrzyj do <span class="path">Ustawienia → Kopie zapasowe</span>. Na liście powinna być kopia typu „automatyczna”. W wersji Docker nic nie trzeba ustawiać, harmonogram działa w kontenerze sam.</p></div>
 
     <h3>Aktualizacja</h3>
     <figure><a href="img/ustawienia-aktualizacje.jpg"><img src="img/ustawienia-aktualizacje.jpg" width="1280" height="860" alt="Strona aktualizacji z bieżącą wersją i przyciskiem potwierdzenia hasła przed wgraniem paczki." loading="lazy"></a><figcaption>Aktualizacje: przed wgraniem paczki trzeba potwierdzić hasło.</figcaption></figure>
@@ -803,7 +829,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <h3>Zmieniłem kategorię, a numer ewidencyjny został stary.</h3>
     <p>Numer nie zmienia się sam, żeby nie unieważniać przyklejonych naklejek. Na karcie przedmiotu przy kodzie QR jest przycisk odświeżenia numeru. Po nim wydrukuj nową etykietę.</p>
     <h3>Nie przychodzą e-maile z powiadomieniami.</h3>
-    <p>Sprawdź, czy powiadomienie jest włączone w <span class="path">Ustawienia → Powiadomienia</span>, czy w <span class="path">Ustawienia → Poczta</span> działa wiadomość testowa i czy na hostingu jest ustawiony cron. E-mail przychodzi tylko wtedy, gdy jest coś do zgłoszenia.</p>
+    <p>Sprawdź, czy powiadomienie jest włączone w <span class="path">Ustawienia → Powiadomienia</span>, czy w <span class="path">Ustawienia → Poczta</span> działa wiadomość testowa i czy na hostingu jest ustawiony cron (patrz <a href="#cron">Zadania automatyczne</a>). E-mail przychodzi tylko wtedy, gdy jest coś do zgłoszenia.</p>
     <h3>Jak zmienić coś w wielu przedmiotach naraz?</h3>
     <p>Wyeksportuj przedmioty w <span class="path">Ustawienia → Import i eksport</span>, popraw kolumny w arkuszu i wgraj plik z powrotem. Podgląd pokaże każdą zmianę, zanim ją zatwierdzisz.</p>
     <h3>Czy usunięcie kontaktu albo modułu skasuje dane?</h3>

@@ -335,6 +335,24 @@ miejscu:
   Aktualizacje tylko to podpowiada. Dane zostają w wolumenie Dockera, a
   zmiany w bazie wprowadzają się same przy starcie kontenera.
 
+### Zadania automatyczne (cron)
+
+Kilka rzeczy Craty robi sam o stałych porach, ale tylko gdy są włączone w Ustawieniach: kopia zapasowa o 2:30 (codziennie albo raz w tygodniu, Ustawienia → Kopie zapasowe), usuwanie starych wpisów dziennika o 3:30, e-mail o przeterminowanych wypożyczeniach o 8:00 i przypomnienie serwisowe w poniedziałek o 8:00 (oba w Ustawienia → Powiadomienia). W wersji Docker działa to samo. Na własnym hostingu trzeba w panelu hostingu (zakładka „Cron” albo „Zadania cykliczne”) dodać jedno zadanie uruchamiane co minutę:
+
+```
+* * * * * cd /ścieżka/do/craty && php artisan schedule:run >> /dev/null 2>&1
+```
+
+`/ścieżka/do/craty` to katalog, w którym leżą `index.php` i `artisan` (ten, do którego wgrałeś Craty). Na części hostingów zamiast `php` trzeba podać pełną ścieżkę do PHP 8.3 lub nowszego, np. `/usr/local/bin/php83`. Jedno zadanie wystarczy na wszystko, Craty sam sprawdza, co jest włączone i czy przyszła na to pora.
+
+Jeśli hosting nie pozwala na zadania co minutę, ustaw co 5 albo co 15 minut (wszystkie pory wypadają na pełne 5 i 15 minut). Gdy da się tylko raz na godzinę, kopię dodaj jako osobne zadanie o 2:30; komenda sama sprawdza, czy kopia jest włączona i czy przyszła na nią pora:
+
+```
+30 2 * * * cd /ścieżka/do/craty && php artisan backup:run --auto
+```
+
+Czy cron działa, sprawdzisz następnego dnia po włączeniu automatycznej kopii: w Ustawienia → Kopie zapasowe powinna być kopia typu „automatyczna”.
+
 Każdy może też zmienić własny język i hasło w Profilu (menu użytkownika w
 prawym górnym rogu), a jasny/ciemny motyw przełącza się przyciskiem w
 prawym dolnym rogu ekranu.
