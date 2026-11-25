@@ -309,6 +309,7 @@ miejscu:
   ze standardowymi portami poczty (25, 465, 587, 2525).
 - **Powiadomienia** *(tylko Administrator)* — włącznik samodzielnego
   resetu hasła oraz e-mailowe podsumowanie przeterminowanych wypożyczeń. Przy włączonym module Serwis dochodzi cotygodniowe przypomnienie serwisowe: w każdy poniedziałek rano e-mail z przeglądami po terminie i w ciągu 14 dni, gwarancjami kończącymi się w ciągu 30 dni i naprawami po planowanym powrocie (tylko gdy coś jest na liście). Oba e-maile wymagają, żeby hosting uruchamiał harmonogram zadań (cron); w wersji Docker działa to samo.
+- **Dziennik aktywności** *(tylko Administrator)*: kto, co i kiedy zrobił. Zawsze zapisują się logowania (także nieudane, z wpisanym e-mailem), wylogowania, zakładanie, zmiany i usuwanie kont, zmiany ustawień i modułów oraz wgrane aktualizacje, z adresem IP. Po zaznaczeniu „Zapisuj też zmiany danych” dochodzi dodawanie, zmiany i usuwanie przedmiotów, kategorii, miejsc, kontaktów, wypożyczeń i innych danych. Hasła nigdy nie trafiają do dziennika, tylko informacja, że je zmieniono. Wpisy można filtrować po rodzaju i osobie oraz przeszukiwać, a starsze niż rok usuwają się same.
 - **Moduły** *(tylko Administrator)* — włącz/wyłącz opcjonalne części
   appki (dziś: Wypożyczenia, Sprzedaż, Kontakty, Serwis, Materiały eksploatacyjne i Rezerwacje maszyn).
 - **Aktualizacje** *(tylko Administrator)* — samodzielna aktualizacja

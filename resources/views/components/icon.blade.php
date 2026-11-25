@@ -124,6 +124,15 @@
         </svg>
         @break
 
+    @case('activity')
+        {{-- lista z zegarem: Dziennik aktywności --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>
+            <path d="M4 5h8M4 9h6M4 13h4" stroke-linecap="round"/>
+            <circle cx="14" cy="13" r="3.8"/>
+            <path d="M14 11.2V13l1.2.9" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        @break
+
     @case('consumables')
         {{-- szpula / rolka: Materiały eksploatacyjne --}}
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>

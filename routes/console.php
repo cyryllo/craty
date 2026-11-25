@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\PruneActivityLog;
 use App\Console\Commands\SendLoanDueNotifications;
 use App\Console\Commands\SendServiceReminders;
 use Illuminate\Foundation\Inspiring;
@@ -17,3 +18,6 @@ Artisan::command('inspire', function () {
 Schedule::command(SendLoanDueNotifications::class)->dailyAt('08:00');
 // Moduł Serwis: raz w tygodniu (poniedziałek rano), nie codziennie, patrz SendServiceReminders.
 Schedule::command(SendServiceReminders::class)->weeklyOn(1, '08:00');
+
+// Dziennik aktywności: wpisy starsze niż rok (dodatkowo czyszczone przy zapisie, gdyby cron nie działał).
+Schedule::command(PruneActivityLog::class)->dailyAt('03:30');

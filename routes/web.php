@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AppSettingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConsumableController;
@@ -199,6 +200,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('ustawienia/moduly', [ModuleSettingController::class, 'edit'])->name('settings.modules.edit');
         Route::post('ustawienia/moduly', [ModuleSettingController::class, 'update'])->name('settings.modules.update');
+
+        // Dziennik aktywności (logowania, konta, ustawienia; opcjonalnie zmiany danych).
+        Route::get('ustawienia/dziennik', [ActivityLogController::class, 'index'])->name('settings.activity.index');
+        Route::post('ustawienia/dziennik', [ActivityLogController::class, 'update'])->name('settings.activity.update');
 
         Route::get('ustawienia/powiadomienia', [NotificationSettingController::class, 'edit'])->name('settings.notifications.edit');
         Route::post('ustawienia/powiadomienia', [NotificationSettingController::class, 'update'])->name('settings.notifications.update');

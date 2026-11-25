@@ -80,6 +80,14 @@
                         </div>
                     </a>
 
+                    <a href="{{ route('settings.activity.index') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition flex gap-4 items-start dark:bg-gray-800">
+                        <x-icon name="activity" class="w-8 h-8 text-indigo-500 shrink-0 dark:text-indigo-400" />
+                        <div>
+                            <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ __('Activity log') }}</h3>
+                            <p class="text-sm text-gray-500 mt-1 dark:text-gray-400">{{ __('Sign-ins, account and settings changes, optionally data changes.') }}</p>
+                        </div>
+                    </a>
+
                     <a href="{{ route('settings.updates.index') }}" class="bg-white rounded-lg shadow p-5 hover:shadow-md transition flex gap-4 items-start dark:bg-gray-800">
                         <x-icon name="update" class="w-8 h-8 text-indigo-500 shrink-0 dark:text-indigo-400" />
                         <div>

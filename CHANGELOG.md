@@ -3,6 +3,15 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-25 (1.5.2)
+
+- Dziennik aktywności (Ustawienia → Dziennik aktywności, tylko
+  administrator): logowania (także nieudane i blokady), wylogowania,
+  zmiany kont, ustawień i modułów oraz aktualizacje, z adresem IP.
+  Opcjonalnie także dodawanie, zmiany i usuwanie danych. Hasła i inne
+  sekrety nigdy nie trafiają do dziennika. Filtry po rodzaju i osobie,
+  wyszukiwanie, wpisy starsze niż rok usuwają się same.
+
 ## 2026-11-24 (1.5.1)
 
 - Kategorie jako drzewo, jak Struktura magazynu: kategorie główne to karty,

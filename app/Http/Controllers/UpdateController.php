@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\UpdatePackageException;
+use App\Models\ActivityLog;
 use App\Services\UpdateService;
+use App\Support\AppVersion;
 use App\Support\PhpUploadLimits;
 use Illuminate\Http\Request;
 
@@ -66,13 +68,18 @@ class UpdateController extends Controller
             'checksum' => ['nullable', 'string'],
         ]);
 
+        $from = app(AppVersion::class)->current();
         try {
             $path = $request->file('package')->getRealPath();
             $manifest = $updates->validatePackage($path, $request->input('checksum'));
             $updates->apply($path, $manifest);
         } catch (UpdatePackageException $e) {
+            ActivityLog::record('update.failed', null, ['error' => \Illuminate\Support\Str::limit($e->getMessage(), 200)]);
+
             return back()->with('updateError', $e->getMessage());
         }
+
+        ActivityLog::record('update.applied', null, ['from' => $from, 'to' => $manifest['version']]);
 
         return redirect()->route('settings.updates.index')
             ->with('status', __('Updated to version :version.', ['version' => $manifest['version']]));
