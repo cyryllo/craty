@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AppSettingController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConsumableController;
 use App\Http\Controllers\ContactController;
@@ -200,6 +201,16 @@ Route::middleware('auth')->group(function () {
 
         Route::get('ustawienia/moduly', [ModuleSettingController::class, 'edit'])->name('settings.modules.edit');
         Route::post('ustawienia/moduly', [ModuleSettingController::class, 'update'])->name('settings.modules.update');
+
+        // Kopie zapasowe (BackupService): pobieranie, wgrywanie i przywracanie po potwierdzeniu hasła.
+        Route::get('ustawienia/kopie', [BackupController::class, 'index'])->name('settings.backups.index');
+        Route::post('ustawienia/kopie', [BackupController::class, 'store'])->name('settings.backups.store');
+        Route::post('ustawienia/kopie/ustawienia', [BackupController::class, 'settings'])->name('settings.backups.settings');
+        Route::get('ustawienia/kopie/potwierdz', [BackupController::class, 'confirmed'])->middleware('password.confirm')->name('settings.backups.confirm');
+        Route::post('ustawienia/kopie/wgraj', [BackupController::class, 'upload'])->middleware('password.confirm')->name('settings.backups.upload');
+        Route::get('ustawienia/kopie/{name}/pobierz', [BackupController::class, 'download'])->middleware('password.confirm')->name('settings.backups.download');
+        Route::post('ustawienia/kopie/{name}/przywroc', [BackupController::class, 'restore'])->middleware('password.confirm')->name('settings.backups.restore');
+        Route::delete('ustawienia/kopie/{name}', [BackupController::class, 'destroy'])->name('settings.backups.destroy');
 
         // Dziennik aktywności (logowania, konta, ustawienia; opcjonalnie zmiany danych).
         Route::get('ustawienia/dziennik', [ActivityLogController::class, 'index'])->name('settings.activity.index');

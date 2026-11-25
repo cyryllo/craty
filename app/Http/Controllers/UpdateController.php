@@ -68,6 +68,9 @@ class UpdateController extends Controller
             'checksum' => ['nullable', 'string'],
         ]);
 
+        // Aktualizacja trwa długo; jeśli przeglądarka się w tym czasie rozłączy
+        // (np. "sieć się zmieniła"), PHP ma dokończyć, a nie urwać w połowie.
+        ignore_user_abort(true);
         $from = app(AppVersion::class)->current();
         try {
             $path = $request->file('package')->getRealPath();

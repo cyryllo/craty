@@ -16,7 +16,18 @@ class ActivityLog extends Model
 {
     public const UPDATED_AT = null;
 
-    public const RETENTION_DAYS = 365;
+    /** Domyślny czas przechowywania wpisów; administrator zmienia go w ustawieniach dziennika. */
+    public const DEFAULT_RETENTION_DAYS = 365;
+
+    /** Do wyboru w ustawieniach (dni → tekst źródłowy do __()); 0 = bez limitu. */
+    public const RETENTION_OPTIONS = [
+        30 => '30 days',
+        90 => '90 days',
+        180 => '180 days',
+        365 => '1 year',
+        730 => '2 years',
+        0 => 'no limit',
+    ];
 
     protected $fillable = ['user_id', 'user_name', 'event', 'category', 'subject_type', 'subject_id', 'subject_label', 'properties', 'ip'];
 
@@ -35,6 +46,11 @@ class ActivityLog extends Model
         'settings.updated' => 'Settings changed',
         'update.applied' => 'Update installed',
         'update.failed' => 'Update failed',
+        'backup.created' => 'Backup created',
+        'backup.downloaded' => 'Backup downloaded',
+        'backup.deleted' => 'Backup deleted',
+        'backup.uploaded' => 'Backup uploaded',
+        'backup.restored' => 'Backup restored',
         'data.created' => 'Added',
         'data.updated' => 'Changed',
         'data.deleted' => 'Deleted',
@@ -109,9 +125,19 @@ class ActivityLog extends Model
         }
     }
 
+    /** Czas przechowywania z ustawień; 0 = bez limitu, nieznana wartość = domyślny rok. */
+    public static function retentionDays(): int
+    {
+        $days = (int) (AppSetting::current()->activity_log_retention_days ?? self::DEFAULT_RETENTION_DAYS);
+
+        return array_key_exists($days, self::RETENTION_OPTIONS) ? $days : self::DEFAULT_RETENTION_DAYS;
+    }
+
     public static function prune(): int
     {
-        return static::where('created_at', '<', now()->subDays(self::RETENTION_DAYS))->delete();
+        $days = self::retentionDays();
+
+        return $days === 0 ? 0 : static::where('created_at', '<', now()->subDays($days))->delete();
     }
 
     /** Zmienione pola modelu jako [pole => [stara, nowa]], z ukrytymi sekretami i skróconymi długimi tekstami. */
@@ -169,6 +195,9 @@ class ActivityLog extends Model
         if (isset($p['from'], $p['to'])) {
             $parts[] = $p['from'].' → '.$p['to'];
         }
+        if (isset($p['name'])) {
+            $parts[] = $p['name'];
+        }
         if (isset($p['error'])) {
             $parts[] = $p['error'];
         }
@@ -194,7 +223,7 @@ class ActivityLog extends Model
             'value' => 'Value', 'category_id' => 'Category', 'storage_location_id' => 'Location', 'quantity' => 'Quantity',
             'protected' => 'Main administrator account', 'returned_at' => 'Returned', 'due_at' => 'Due date', 'stationary' => 'Stationary', 'parent_id' => 'Parent category',
             // Ustawienia (AppSetting): te same nazwy co na stronach ustawień.
-            'activity_log_all_enabled' => 'Also record data changes', 'password_reset_enabled' => 'Self-service password reset',
+            'activity_log_all_enabled' => 'Also record data changes', 'activity_log_retention_days' => 'Keep activity log entries for (days)', 'password_reset_enabled' => 'Self-service password reset',
             'loan_due_notifications_enabled' => 'Email a daily summary of overdue loans', 'service_reminders_enabled' => 'Weekly service reminder',
             'logo_as_app_icon' => 'Use the logo as the app icon on phones', 'logo_path' => 'Logo', 'favicon_path' => 'Favicon',
             'public_contact_email' => 'Contact email', 'public_contact_phone' => 'Contact phone', 'shop_description' => 'Sale description',

@@ -56,6 +56,8 @@ docker compose up -d</pre>
 
                 <div class="bg-amber-50 border border-amber-200 text-amber-900 text-sm rounded-md p-4 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-300">
                     {{ __('This overwrites the application code and cannot be undone from here. Remember to back up your files and database before applying an update.') }}
+                    <a href="{{ route('settings.backups.index') }}" class="font-medium underline">{{ __('Create a backup') }} →</a>
+                    <span class="block mt-2">{{ __('Installing takes a while. If the browser reports a network error meanwhile, the update still finishes on the server: wait a minute and reload this page, the current version above (and the activity log) shows whether it went through.') }}</span>
                 </div>
 
                 <div class="flex justify-end">

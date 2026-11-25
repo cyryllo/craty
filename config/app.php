@@ -131,4 +131,8 @@ return [
     */
     'docker' => (bool) env('CRATY_DOCKER', false),
 
+    // Katalog kopii zapasowych (BackupService). Pusty = app-storage/app/backups;
+    // testy podstawiają tu katalog tymczasowy.
+    'backup_path' => env('CRATY_BACKUP_PATH'),
+
 ];

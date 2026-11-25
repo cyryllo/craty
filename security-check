@@ -71,7 +71,8 @@ for path in /.env /.env.example /composer.json /composer.lock /artisan /VERSION 
             /phpunit.xml /.htaccess /.git/HEAD /.git/config /app/Models/User.php /config/app.php \
             /routes/web.php /bootstrap/cache/config.php /vendor/autoload.php /database/database.sqlite \
             /resources/views/welcome.blade.php /app-storage/logs/laravel.log /CLAUDE.md /TODO.md \
-            /storage/app/updates/state.json /storage/framework/.gitignore /storage/logs/laravel.log; do
+            /storage/app/updates/state.json /storage/framework/.gitignore /storage/logs/laravel.log \
+            /app-storage/app/backups/.htaccess /storage/app/backups/.htaccess; do
     c=$(code "$BASE$path")
     if [[ "$c" == "200" ]]; then
         fail "$path jest do pobrania (HTTP $c)"

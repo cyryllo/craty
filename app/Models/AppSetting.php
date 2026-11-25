@@ -23,7 +23,8 @@ class AppSetting extends Model
         'module_loans_enabled', 'module_sales_enabled', 'module_contacts_enabled', 'module_service_enabled', 'module_consumables_enabled', 'module_bookings_enabled',
         'password_reset_enabled', 'loan_due_notifications_enabled',
         'service_reminders_enabled', 'logo_as_app_icon',
-        'activity_log_all_enabled',
+        'activity_log_all_enabled', 'activity_log_retention_days',
+        'backup_schedule', 'backup_retention_days',
     ];
 
     protected $casts = [
@@ -37,6 +38,8 @@ class AppSetting extends Model
         'module_bookings_enabled' => 'boolean',
         'module_loans_enabled' => 'boolean',
         'activity_log_all_enabled' => 'boolean',
+        'activity_log_retention_days' => 'integer',
+        'backup_retention_days' => 'integer',
         'password_reset_enabled' => 'boolean',
         'loan_due_notifications_enabled' => 'boolean',
         'service_reminders_enabled' => 'boolean',
@@ -54,6 +57,9 @@ class AppSetting extends Model
         'module_bookings_enabled' => false,
         'module_loans_enabled' => true,
         'activity_log_all_enabled' => false,
+        'activity_log_retention_days' => 365,
+        'backup_schedule' => 'off',
+        'backup_retention_days' => 14,
         'password_reset_enabled' => true,
         'loan_due_notifications_enabled' => false,
         'service_reminders_enabled' => false,

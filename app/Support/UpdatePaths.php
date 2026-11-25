@@ -38,6 +38,9 @@ class UpdatePaths
         'security-check',
         'app-storage/app/public',
         'app-storage/app/updates',
+        // Kopie zapasowe z panelu (BackupService) i ich katalog roboczy.
+        'app-storage/app/backups',
+        'app-storage/app/backup-temp',
         // Wyjście samego release:build — bez tego każde kolejne wydanie
         // pakowałoby ze sobą wszystkie poprzednie .zip-y z tego katalogu
         // (znalezione realnie: paczka 1.1.0 spuchła do 49 MB, bo wciągnęła
@@ -106,6 +109,7 @@ class UpdatePaths
     public const PROTECTED_PATHS = [
         '.env',
         'app-storage/app/public',
+        'app-storage/app/backups',
         'app-storage/logs',
         'storage',
     ];

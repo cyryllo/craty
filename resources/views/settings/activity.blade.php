@@ -3,7 +3,13 @@
         <div class="space-y-1">
             @include('settings._back-link')
             <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">{{ __('Activity log') }}</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Who did what and when. Entries older than :days days are deleted automatically.', ['days' => \App\Models\ActivityLog::RETENTION_DAYS]) }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                @if ($retentionDays)
+                    {{ __('Who did what and when. Entries older than :days days are deleted automatically.', ['days' => $retentionDays]) }}
+                @else
+                    {{ __('Who did what and when. Entries are kept without a time limit.') }}
+                @endif
+            </p>
         </div>
     </x-slot>
 
@@ -20,8 +26,17 @@
                     <span class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Sign-ins, accounts, settings and updates are always recorded. With this on, adding, changing and deleting items, categories, places, contacts, loans and other data is recorded too.') }}</span>
                 </span>
             </label>
+            <label class="text-sm text-gray-700 shrink-0 dark:text-gray-300">
+                <span class="block text-xs text-gray-500 dark:text-gray-400">{{ __('Keep entries for') }}</span>
+                <select name="activity_log_retention_days" class="mt-0.5 {{ $field }}">
+                    @foreach (\App\Models\ActivityLog::RETENTION_OPTIONS as $days => $label)
+                        <option value="{{ $days }}" @selected($retentionDays === $days)>{{ __($label) }}</option>
+                    @endforeach
+                </select>
+            </label>
             <button class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700 shrink-0">{{ __('Save') }}</button>
         </form>
+        <x-input-error :messages="$errors->get('activity_log_retention_days')" />
 
         <form method="GET" action="{{ route('settings.activity.index') }}" class="flex flex-col sm:flex-row gap-2 sm:items-center">
             <select name="category" aria-label="{{ __('Type') }}" class="{{ $field }}">

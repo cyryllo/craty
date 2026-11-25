@@ -100,11 +100,33 @@ class ActivityLogTest extends TestCase
     {
         ActivityLog::record('auth.login', null, [], $this->admin);
         $old = ActivityLog::record('auth.login', null, [], $this->admin);
-        $old->forceFill(['created_at' => now()->subDays(ActivityLog::RETENTION_DAYS + 1)])->save();
+        $old->forceFill(['created_at' => now()->subDays(ActivityLog::DEFAULT_RETENTION_DAYS + 1)])->save();
 
         $this->artisan('activity:prune')->assertSuccessful();
 
         $this->assertSame(1, ActivityLog::count());
+    }
+
+    public function test_retention_period_can_be_changed_or_switched_off(): void
+    {
+        $entry = fn (int $daysAgo) => tap(ActivityLog::record('auth.login', null, [], $this->admin))
+            ->forceFill(['created_at' => now()->subDays($daysAgo)])->save();
+        $entry(10);
+        $entry(100);
+        $entry(400);
+
+        // Krótszy okres działa od razu po zapisie ustawień.
+        $this->actingAs($this->admin)->post(route('settings.activity.update'), ['activity_log_retention_days' => 90])->assertSessionHasNoErrors();
+        $this->assertSame(90, ActivityLog::retentionDays());
+        $this->assertSame(1, ActivityLog::where('event', 'auth.login')->count());
+
+        $this->actingAs($this->admin)->post(route('settings.activity.update'), ['activity_log_retention_days' => 0])->assertSessionHasNoErrors();
+        $entry(5000);
+        $this->artisan('activity:prune')->assertSuccessful();
+        $this->assertSame(2, ActivityLog::where('event', 'auth.login')->count());
+
+        $this->actingAs($this->admin)->post(route('settings.activity.update'), ['activity_log_retention_days' => 7])->assertSessionHasErrors('activity_log_retention_days');
+        $this->actingAs($this->admin)->get(route('settings.activity.index'))->assertSee(__('Who did what and when. Entries are kept without a time limit.'));
     }
 
     public function test_page_is_admin_only_filters_and_escapes(): void

@@ -124,6 +124,16 @@
         </svg>
         @break
 
+    @case('backup')
+        {{-- dysk ze strzałką: Kopie zapasowe --}}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>
+            <ellipse cx="10" cy="5" rx="6" ry="2.2"/>
+            <path d="M4 5v4c0 1.2 2.7 2.2 6 2.2M16 5v3"/>
+            <path d="M4 9v5c0 1.2 2.7 2.2 6 2.2"/>
+            <path d="M15 10.5v6M12.5 14l2.5 2.5 2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        @break
+
     @case('activity')
         {{-- lista z zegarem: Dziennik aktywności --}}
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" {{ $attributes }}>

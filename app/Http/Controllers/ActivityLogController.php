@@ -6,6 +6,7 @@ use App\Models\ActivityLog;
 use App\Models\AppSetting;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 /**
  * Ustawienia → Dziennik aktywności (tylko administrator): lista zdarzeń z
@@ -37,14 +38,25 @@ class ActivityLogController extends Controller
             'userId' => $userId,
             'search' => $search,
             'setting' => AppSetting::current(),
+            'retentionDays' => ActivityLog::retentionDays(),
         ]);
     }
 
     public function update(Request $request)
     {
+        $data = $request->validate([
+            'activity_log_retention_days' => ['sometimes', 'integer', Rule::in(array_keys(ActivityLog::RETENTION_OPTIONS))],
+        ]);
+
         $setting = AppSetting::current();
         $setting->activity_log_all_enabled = $request->boolean('activity_log_all_enabled');
+        if (isset($data['activity_log_retention_days'])) {
+            $setting->activity_log_retention_days = (int) $data['activity_log_retention_days'];
+        }
         $setting->save();
+
+        // Krótszy okres działa od razu, a nie dopiero przy nocnym czyszczeniu.
+        ActivityLog::prune();
 
         return back()->with('status', __('Activity log settings saved.'));
     }

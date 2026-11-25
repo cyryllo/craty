@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Models\ActivityLog;
 use Illuminate\Console\Command;
 
-/** Usuwa wpisy dziennika aktywności starsze niż rok (ActivityLog::RETENTION_DAYS). */
+/** Usuwa wpisy dziennika aktywności starsze niż czas z ustawień (ActivityLog::retentionDays(), 0 = nic). */
 class PruneActivityLog extends Command
 {
     protected $signature = 'activity:prune';

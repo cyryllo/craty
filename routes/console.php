@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\PruneActivityLog;
+use App\Console\Commands\RunBackup;
 use App\Console\Commands\SendLoanDueNotifications;
 use App\Console\Commands\SendServiceReminders;
 use Illuminate\Foundation\Inspiring;
@@ -21,3 +22,6 @@ Schedule::command(SendServiceReminders::class)->weeklyOn(1, '08:00');
 
 // Dziennik aktywności: wpisy starsze niż rok (dodatkowo czyszczone przy zapisie, gdyby cron nie działał).
 Schedule::command(PruneActivityLog::class)->dailyAt('03:30');
+
+// Kopie zapasowe: komenda sama sprawdza, czy automat jest włączony i czy przyszła pora.
+Schedule::command(RunBackup::class, ['--auto'])->dailyAt('02:30');
