@@ -96,6 +96,23 @@ class BuildReleasePackageTest extends TestCase
         $this->assertNotFalse($zip->locateName('composer.json'));
         $this->assertFalse($zip->locateName('composer.lock'));
 
+        // Bez narzędzi programistycznych (composer install --no-dev w katalogu
+        // roboczym), z listą pakietów wygenerowaną dla tego vendor/: lista z
+        // komputera deweloperskiego wskazywałaby na nieistniejące klasy.
+        $this->assertFalse($zip->locateName('vendor/fakerphp/faker/composer.json'));
+        $this->assertFalse($zip->locateName('vendor/phpunit/phpunit/composer.json'));
+        $this->assertFalse($zip->locateName('vendor/laravel-lang/lang/composer.json'));
+        $this->assertNotFalse($zip->locateName('vendor/laravel/framework/composer.json'));
+        $packages = (string) $zip->getFromName('bootstrap/cache/packages.php');
+        $this->assertStringContainsString('barryvdh/laravel-dompdf', $packages);
+        $this->assertStringNotContainsString('laravel/pail', $packages);
+        $installed = json_decode((string) $zip->getFromName('vendor/composer/installed.json'), true);
+        $this->assertSame([], $installed['dev-package-names'] ?? []);
+        // Te same wersje co w composer.lock (instalacja z pliku blokady, nie liczenie od nowa).
+        $lock = collect(json_decode(file_get_contents(base_path('composer.lock')), true)['packages'])->pluck('version', 'name');
+        $shipped = collect($installed['packages'])->pluck('version', 'name');
+        $this->assertSame($lock->sortKeys()->all(), $shipped->sortKeys()->all());
+
         // Sekrety/deweloperskie pliki nie mają prawa się tam znaleźć.
         $this->assertFalse($zip->locateName('.env'));
         $this->assertFalse($zip->locateName('.git'));

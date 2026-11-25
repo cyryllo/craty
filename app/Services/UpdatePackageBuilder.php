@@ -50,6 +50,36 @@ class UpdatePackageBuilder
     }
 
     /**
+     * Kopia drzewa katalogów z tymi samymi wykluczeniami co build() (np. bez
+     * node_modules), jako katalog roboczy release:build, w którym composer
+     * usuwa narzędzia programistyczne z vendor/, zanim całość trafi do zipa.
+     *
+     * @param  array<int, string>  $excludes
+     */
+    public function copyTree(string $sourceDir, string $targetDir, array $excludes = []): void
+    {
+        $sourceDir = rtrim($sourceDir, '/');
+
+        $filter = new RecursiveCallbackFilterIterator(
+            new RecursiveDirectoryIterator($sourceDir, \FilesystemIterator::SKIP_DOTS),
+            fn (SplFileInfo $current) => ! $this->isExcluded($this->relativePath($sourceDir, $current), $excludes)
+        );
+
+        foreach (new RecursiveIteratorIterator($filter, RecursiveIteratorIterator::SELF_FIRST) as $file) {
+            $target = $targetDir.'/'.$this->relativePath($sourceDir, $file);
+            if ($file->isLink()) {
+                continue; // jedyny symlink w repo to "storage", i tak wykluczony
+            }
+            if ($file->isDir()) {
+                is_dir($target) || mkdir($target, 0755, true);
+            } else {
+                is_dir(dirname($target)) || mkdir(dirname($target), 0755, true);
+                copy($file->getPathname(), $target);
+            }
+        }
+    }
+
+    /**
      * Dopisuje obok paczki plik `<nazwa>.sha256` w formacie zgodnym z
      * `sha256sum -c` (hash + dwie spacje + nazwa pliku), żeby admin mógł
      * zweryfikować pobraną paczkę bez przepisywania hasha z konsoli. Tylko

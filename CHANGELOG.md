@@ -3,6 +3,14 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-25 (1.5.4)
+
+- Mniejsze paczki aktualizacji (około 13 MB zamiast 26 MB): bez narzędzi
+  programistycznych i zbędnych tłumaczeń Laravela w vendor/.
+- Po wgraniu aktualizacji Craty czyści pamięć OPcache, więc nowe strony nie
+  zwracają przez chwilę błędów 500/404 (działa od następnej aktualizacji po
+  tej).
+
 ## 2026-11-25 (1.5.3)
 
 - Kopie zapasowe (Ustawienia → Kopie zapasowe, tylko administrator): baza

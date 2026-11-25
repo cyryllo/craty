@@ -113,6 +113,13 @@ class UpdateService
             // 2. Podmiana plików "na żywo", z pominięciem chronionych ścieżek.
             $this->copyInto($extractDir, $root, UpdatePaths::PROTECTED_PATHS);
 
+            // OPcache trzyma skompilowane stare pliki PHP. Bez resetu kolejne
+            // żądania przez chwilę (albo, przy opcache.validate_timestamps=0,
+            // aż do restartu serwera) mieszają stary kod z nowym: znalezione
+            // w teście aktualizacji jako 404/500 na nowych stronach tuż po
+            // wgraniu paczki. Reset przed migracjami, żeby i one widziały nowy kod.
+            self::resetOpcache();
+
             // 3. Migracje z paczki (nowe zostaną wykonane, reszta pominięta).
             Artisan::call('migrate', ['--force' => true]);
 
@@ -122,6 +129,13 @@ class UpdateService
             Artisan::call('view:clear');
         } finally {
             $this->deleteDirectory($extractDir);
+        }
+    }
+
+    public static function resetOpcache(): void
+    {
+        if (function_exists('opcache_reset') && ! in_array('opcache_reset', array_map('trim', explode(',', (string) ini_get('disable_functions'))), true)) {
+            @opcache_reset();
         }
     }
 
