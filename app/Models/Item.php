@@ -22,6 +22,8 @@ class Item extends Model
         'warranty_until', 'inspection_interval_months', 'next_inspection_at',
         // Maszyna na stałe w pracowni: nie wypożycza się (patrz unavailableReason()).
         'stationary',
+        // Osoba odpowiedzialna z Kontaktów (właściciel albo opiekun).
+        'responsible_contact_id', 'responsible_role',
         // 'needs_completion' celowo pominięte — ustawia je tylko
         // ScanController::quickAddStore() (przez forceFill), nigdy zwykły
         // formularz, tak samo jak 'protected' na User.
@@ -51,6 +53,12 @@ class Item extends Model
         'nowy' => 'New',
         'uzywany' => 'Used',
         'uszkodzony' => 'Damaged',
+    ];
+
+    /** Rodzaj osoby odpowiedzialnej (kontakt z modułu Kontakty), np. w makerspace. */
+    public const RESPONSIBLE_ROLES = [
+        'opiekun' => 'Caretaker',
+        'wlasciciel' => 'Owner',
     ];
 
     public function category(): BelongsTo
@@ -95,6 +103,22 @@ class Item extends Model
     public function attachments(): HasMany
     {
         return $this->hasMany(ItemAttachment::class);
+    }
+
+    /** Właściciel albo opiekun przedmiotu (patrz responsible_role). */
+    public function responsibleContact(): BelongsTo
+    {
+        return $this->belongsTo(Contact::class, 'responsible_contact_id');
+    }
+
+    /** "Opiekun" / "Właściciel"; null bez przypisanej osoby. */
+    public function responsibleRoleLabel(): ?string
+    {
+        if (! $this->responsible_contact_id) {
+            return null;
+        }
+
+        return __(self::RESPONSIBLE_ROLES[$this->responsible_role] ?? self::RESPONSIBLE_ROLES['opiekun']);
     }
 
     public function histories(): HasMany

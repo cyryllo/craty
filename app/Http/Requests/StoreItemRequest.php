@@ -29,6 +29,10 @@ class StoreItemRequest extends FormRequest
         }
         // Checkbox: niezaznaczony nie przychodzi wcale, więc jawne false.
         $this->merge(['stationary' => $this->boolean('stationary')]);
+        // Bez osoby odpowiedzialnej nie ma też jej rodzaju.
+        if (Modules::isEnabled('contacts') && ! $this->filled('responsible_contact_id')) {
+            $this->merge(['responsible_contact_id' => null, 'responsible_role' => null]);
+        }
     }
 
     public function rules(): array
@@ -37,6 +41,11 @@ class StoreItemRequest extends FormRequest
             // Moduł Serwis: pola tylko przy włączonym module. Bez nich w regułach
             // validated() ich nie zwraca, więc zapis formularza przy wyłączonym
             // module nie kasuje wcześniej wpisanych dat.
+            // Moduł Kontakty: osoba odpowiedzialna, z tego samego powodu tylko przy włączonym module.
+            ...(Modules::isEnabled('contacts') ? [
+                'responsible_contact_id' => ['nullable', 'integer', 'exists:contacts,id'],
+                'responsible_role' => ['nullable', 'required_with:responsible_contact_id', Rule::in(array_keys(Item::RESPONSIBLE_ROLES))],
+            ] : []),
             ...(Modules::isEnabled('service') ? [
                 'warranty_until' => ['nullable', 'date'],
                 'inspection_interval_months' => ['nullable', 'integer', 'min:1', 'max:120'],

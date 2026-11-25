@@ -92,6 +92,32 @@
                     </label>
                 </div>
 
+                @if (\App\Support\Modules::isEnabled('contacts'))
+                    {{-- Osoba odpowiedzialna (właściciel albo opiekun), tylko z Kontaktów. --}}
+                    <div class="sm:col-span-2 grid sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <div class="sm:col-span-2">
+                            <x-input-label for="responsible_contact_id" :value="__('Responsible person')" />
+                            <select id="responsible_contact_id" name="responsible_contact_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600">
+                                <option value="">{{ __('none') }}</option>
+                                @foreach ($contacts as $contact)
+                                    <option value="{{ $contact->id }}" @selected((string) old('responsible_contact_id', $item->responsible_contact_id) === (string) $contact->id)>{{ $contact->name }}</option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('responsible_contact_id')" class="mt-1" />
+                        </div>
+                        <div>
+                            <x-input-label for="responsible_role" :value="__('Role')" />
+                            <select id="responsible_role" name="responsible_role" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600">
+                                @foreach (\App\Models\Item::RESPONSIBLE_ROLES as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('responsible_role', $item->responsible_role ?: 'opiekun') === $value)>{{ __($label) }}</option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('responsible_role')" class="mt-1" />
+                        </div>
+                        <p class="sm:col-span-3 -mt-2 text-xs text-gray-500 dark:text-gray-400">{{ __('Who owns this item or looks after it, e.g. a member who brought their machine to the makerspace. Pick someone from Contacts; add them there first if they are missing.') }} <a href="{{ route('contacts.create') }}" target="_blank" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ __('Add a contact') }}</a></p>
+                    </div>
+                @endif
+
                 @if (\App\Support\Modules::isEnabled('service'))
                     {{-- Moduł Serwis: gwarancja i przeglądy okresowe. --}}
                     <div class="sm:col-span-2 grid sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">

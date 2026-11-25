@@ -161,7 +161,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 <div class="wrap intro">
     <span class="eyebrow">Instrukcja użytkownika</span>
     <h1>Craty krok po kroku</h1>
-    <p class="lead">Wszystkie funkcje programu na przykładzie jednej pracowni: od dodania pierwszego przedmiotu, przez wypożyczenia i serwis, po inwentaryzację. Instrukcja dotyczy wersji 1.6.0.</p>
+    <p class="lead">Wszystkie funkcje programu na przykładzie jednej pracowni: od dodania pierwszego przedmiotu, przez wypożyczenia i serwis, po inwentaryzację. Instrukcja dotyczy wersji 1.7.0.</p>
 </div>
 
 <div class="wrap layout">
@@ -270,7 +270,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <h2>Przedmioty</h2>
     <h3>Dodawanie przedmiotu</h3>
     <p>W zakładce <span class="ui">Przedmioty</span> kliknij <span class="ui">+ Dodaj przedmiot</span>. Wymagana jest tylko nazwa, ale im więcej wpiszesz, tym łatwiej będzie potem szukać.</p>
-    <figure><a href="img/przedmiot-nowy.jpg"><img src="img/przedmiot-nowy.jpg" width="1280" height="1276" alt="Formularz nowego przedmiotu: nazwa, numer seryjny, kod EAN, kategoria, lokalizacja, wartość, data zakupu, stan, status, gwarancja, przegląd, opis, zdjęcia i załączniki." loading="lazy"></a><figcaption>Formularz nowego przedmiotu. Pola gwarancji i przeglądów są widoczne przy włączonym module Serwis.</figcaption></figure>
+    <figure><a href="img/przedmiot-nowy.jpg"><img src="img/przedmiot-nowy.jpg" width="1280" height="1415" alt="Formularz nowego przedmiotu: nazwa, numer seryjny, kod EAN, kategoria, lokalizacja, wartość, data zakupu, stan, status, gwarancja, przegląd, opis, zdjęcia i załączniki." loading="lazy"></a><figcaption>Formularz nowego przedmiotu. Pola gwarancji i przeglądów są widoczne przy włączonym module Serwis.</figcaption></figure>
     <div class="example">
         <span class="tag">Przykład</span>
         <h4>Nowa wkrętarka w hali</h4>
@@ -461,6 +461,16 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <p>W formularzu przedmiotu (<span class="ui">Edytuj</span>) zaznacz pole <b>Stacjonarny</b>. Takiego przedmiotu nie da się wypożyczyć, zarezerwować na dni ani dodać do zestawu. Na jego karcie przy statusie widać dopisek „stacjonarny”, a zamiast formularza wypożyczenia informację, że zostaje w pracowni.</p>
     <figure style="max-width: 680px"><a href="img/stacjonarny-pole.jpg"><img src="img/stacjonarny-pole.jpg" width="680" height="76" alt="Zaznaczone pole Stacjonarny w formularzu przedmiotu z opisem." loading="lazy"></a><figcaption>Pole „Stacjonarny” w formularzu przedmiotu.</figcaption></figure>
 
+    <h3>Właściciel albo opiekun</h3>
+    <p>W makerspace maszyna często należy do jednego z członków albo ktoś się nią opiekuje: zna ją, szkoli innych i wie, kiedy trzeba ją wyczyścić. W formularzu przedmiotu wybierz tę osobę w polu <b>Osoba odpowiedzialna</b> i ustaw jej rolę: <b>Opiekun</b> albo <b>Właściciel</b>. Osobę wybiera się z <a href="#kontakty">Kontaktów</a>, więc najpierw musi tam być (link <span class="ui">Dodaj kontakt</span> jest pod polem). Pole działa przy każdym przedmiocie, nie tylko przy maszynach.</p>
+    <figure style="max-width: 680px"><a href="img/osoba-odpowiedzialna.jpg"><img src="img/osoba-odpowiedzialna.jpg" width="680" height="147" alt="Pola Osoba odpowiedzialna (Piotr Lis) i Rola (Właściciel) w formularzu przedmiotu." loading="lazy"></a><figcaption>Osoba odpowiedzialna w formularzu przedmiotu.</figcaption></figure>
+    <ul>
+        <li>Na karcie przedmiotu widać np. „Właściciel: Piotr Lis” z klikalnym telefonem i e-mailem.</li>
+        <li>W grafiku maszyn pod nazwą maszyny jest „Opiekun: Kasia Wójcik”, więc członkowie z rolą Użytkownik wiedzą, kogo pytać.</li>
+        <li>Na karcie kontaktu jest lista przedmiotów, których ta osoba jest właścicielem albo opiekunem.</li>
+        <li>Zmiana osoby trafia do historii przedmiotu.</li>
+    </ul>
+
     <h3>Grafik maszyn</h3>
     <p>Rezerwacje czasu to moduł <b>Rezerwacje maszyn</b>, domyślnie wyłączony. Po włączeniu w <span class="path">Ustawienia → Moduły</span> w menu pojawia się zakładka <span class="ui">Maszyny</span> z grafikiem tygodnia. Wiersze to maszyny (wszystkie przedmioty stacjonarne), kolumny to dni, a każda rezerwacja ma godziny, osobę i kolor rodzaju użycia:</p>
     <div class="scroll"><table class="plain">
@@ -472,7 +482,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
             <tr><td><b>Konserwacja</b></td><td>Maszyna wyłączona z użycia na czas przeglądu albo czyszczenia. Wybiera ją tylko obsługa.</td></tr>
         </tbody>
     </table></div>
-    <figure><a href="img/maszyny-grafik.jpg"><img src="img/maszyny-grafik.jpg" width="1280" height="982" alt="Grafik maszyn na tydzień: drukarka 3D i ploter laserowy z kolorowymi rezerwacjami, pod spodem formularz nowej rezerwacji i lista moich rezerwacji." loading="lazy"></a><figcaption>Grafik tygodnia z formularzem i listą „Moje rezerwacje”.</figcaption></figure>
+    <figure><a href="img/maszyny-grafik.jpg"><img src="img/maszyny-grafik.jpg" width="1280" height="998" alt="Grafik maszyn na tydzień: drukarka 3D (właściciel Piotr Lis) i ploter laserowy (opiekunka Kasia Wójcik) z kolorowymi rezerwacjami, pod spodem formularz nowej rezerwacji i lista moich rezerwacji." loading="lazy"></a><figcaption>Grafik tygodnia z formularzem i listą „Moje rezerwacje”.</figcaption></figure>
     <p>Strzałki przy datach przełączają tygodnie, a lista <span class="ui">Pokaż</span> zawęża grafik do jednej maszyny. Kliknięcie rezerwacji pokazuje jej opis i, jeśli wolno, przycisk odwołania.</p>
 
     <div class="example">
@@ -572,6 +582,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <ul>
         <li>Nowy kontakt dodasz tutaj (<span class="ui">+ Nowy kontakt</span>) albo w biegu, przy wypożyczeniu.</li>
         <li>Usunięcie kontaktu nie kasuje jego wypożyczeń: zostają w historii pod tą samą nazwą.</li>
+        <li>Kontakt może być właścicielem albo opiekunem przedmiotów (opisane w rozdziale <a href="#maszyny">Rezerwacje maszyn</a>). Jego karta pokazuje wtedy listę tych przedmiotów.</li>
         <li>Po wyłączeniu modułu pole „komu” przy wypożyczeniu jest zwykłym tekstem. Protokoły działają tak samo.</li>
     </ul>
 </section>
@@ -670,7 +681,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 <section id="import">
     <h2>Import i eksport</h2>
     <p>Stronę <span class="path">Ustawienia → Import i eksport</span> widzą administrator i magazynier. Wszystkie pliki są w formacie CSV ze średnikiem jako separatorem, który Excel, LibreOffice i Arkusze Google otwierają od razu z polskimi znakami. Po zmianach zapisz plik znowu jako CSV (w Excelu: <span class="ui">Zapisz jako → CSV (rozdzielany średnikami)</span>), bo pliki .xlsx nie są przyjmowane.</p>
-    <figure><a href="img/import-eksport.jpg"><img src="img/import-eksport.jpg" width="1280" height="1772" alt="Strona Import i eksport: przedmioty z eksportem i importem, kontakty, materiały i raporty." loading="lazy"></a><figcaption>Import i eksport.</figcaption></figure>
+    <figure><a href="img/import-eksport.jpg"><img src="img/import-eksport.jpg" width="1280" height="1832" alt="Strona Import i eksport: przedmioty z eksportem i importem, kontakty, materiały i raporty." loading="lazy"></a><figcaption>Import i eksport.</figcaption></figure>
 
     <h3>Eksport przedmiotów</h3>
     <p>Wybierz kategorię i status (domyślnie wszystko, co jest na stanie, albo „Wszystkie, także sprzedane i wycofane”) i kliknij <span class="ui">Eksportuj przedmioty</span>. W pliku są wszystkie pola przedmiotu, a na końcu cztery kolumny tylko do wglądu: nazwa kategorii, pełne miejsce, komu jest wypożyczony i do kiedy.</p>
@@ -738,7 +749,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 
     <h3>Kopie zapasowe</h3>
     <p>W <span class="path">Ustawienia → Kopie zapasowe</span> (tylko administrator) przycisk <span class="ui">Zrób kopię zapasową</span> zapisuje w jednym pliku .zip całą bazę danych i wszystkie wgrane pliki: zdjęcia, załączniki, kody QR i logo. Kopia działa także na hostingach, które nie pozwalają uruchamiać zewnętrznych programów.</p>
-    <figure><a href="img/kopie-zapasowe.jpg"><img src="img/kopie-zapasowe.jpg" width="1280" height="1025" alt="Kopie zapasowe: przycisk kopii, ustawienia kopii automatycznych, lista kopii z typem i rozmiarem." loading="lazy"></a><figcaption>Kopie zapasowe.</figcaption></figure>
+    <figure><a href="img/kopie-zapasowe.jpg"><img src="img/kopie-zapasowe.jpg" width="1280" height="1086" alt="Kopie zapasowe: przycisk kopii, ustawienia kopii automatycznych, lista kopii z typem i rozmiarem." loading="lazy"></a><figcaption>Kopie zapasowe.</figcaption></figure>
     <ul>
         <li><b>Automatycznie</b>: codziennie albo co tydzień. Wymaga harmonogramu zadań (cron) na hostingu, w wersji Docker działa samo.</li>
         <li><b>Przechowywanie</b>: kopie leżą na serwerze w katalogu niedostępnym z internetu i usuwają się po wybranym czasie (7, 14, 30 albo 90 dni, albo bez limitu). Najnowsza zostaje zawsze.</li>
@@ -804,7 +815,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 
 <footer>
     <div class="wrap">
-        <p>Craty, darmowy program do ewidencji rzeczy. Licencja MIT. Zrzuty ekranu pochodzą z wersji 1.6.0 i z danych przykładowych.</p>
+        <p>Craty, darmowy program do ewidencji rzeczy. Licencja MIT. Zrzuty ekranu pochodzą z wersji 1.7.0 i z danych przykładowych.</p>
         <p><a href="../">Strona projektu</a> · <a href="https://github.com/cyryllo/craty">GitHub</a></p>
     </div>
 </footer>

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Category;
+use App\Models\Contact;
 use App\Models\Item;
 use App\Models\StorageLocation;
 use App\Models\User;
@@ -32,6 +33,8 @@ class ItemImporter
     public const IMPORT_COLUMNS = [
         'nazwa', 'kategoria_kod', 'lokalizacja_kod', 'stan', 'status', 'wartosc', 'nr_seryjny', 'ean',
         'data_zakupu', 'gwarancja_do', 'przeglad_co_miesiecy', 'nastepny_przeglad', 'stacjonarny', 'opis',
+        // Na końcu, żeby pliki z wcześniejszych wersji miały kolumny na tych samych miejscach.
+        'osoba_odpowiedzialna', 'rola_osoby',
     ];
 
     /** Kolumny eksportu: najpierw te z importu, na końcu informacyjne (import je pomija). */
@@ -49,6 +52,7 @@ class ItemImporter
         'ean' => 'ean', 'data_zakupu' => 'purchased_at', 'gwarancja_do' => 'warranty_until',
         'przeglad_co_miesiecy' => 'inspection_interval_months', 'nastepny_przeglad' => 'next_inspection_at',
         'stacjonarny' => 'stationary', 'opis' => 'description',
+        'osoba_odpowiedzialna' => 'responsible_contact_id', 'rola_osoby' => 'responsible_role',
     ];
 
     public function __construct(
@@ -78,6 +82,8 @@ class ItemImporter
             $item->next_inspection_at?->format('Y-m-d'),
             $item->stationary ? 'tak' : 'nie',
             $item->description,
+            $item->responsibleContact?->name,
+            $item->responsible_contact_id ? $item->responsible_role : null,
             $item->category?->name,
             $item->storageLocation?->label(),
             $item->currentLoan?->borrowerLabel(),
@@ -192,6 +198,10 @@ class ItemImporter
             }
         }
 
+        if (isset($values['responsible_contact_id']) && ! isset($values['responsible_role']) && ! $item?->responsible_role) {
+            $values['responsible_role'] = 'opiekun';
+        }
+
         $name = (string) ($values['name'] ?? $item?->name ?? '');
         if ($errors) {
             return [$this->row($line, 'error', $name, $item?->inventory_no, [], $errors), null];
@@ -261,6 +271,17 @@ class ItemImporter
                 }
 
                 return '__skip';
+            case 'osoba_odpowiedzialna':
+                // Tylko istniejący kontakt: osoby dodaje się w Kontaktach, import ich nie tworzy.
+                $contact = Contact::query()->whereRaw('LOWER(name) = ?', [mb_strtolower($raw)])->first();
+                if ($contact) {
+                    return $contact->id;
+                }
+                $errors[] = __('There is no contact named ":name". Add them in Contacts first.', ['name' => $raw]);
+
+                return '__skip';
+            case 'rola_osoby':
+                return $this->option($raw, Item::RESPONSIBLE_ROLES, __('Unknown role of the responsible person: :value (use opiekun or wlasciciel)', ['value' => $raw]), $errors);
             case 'stan':
                 return $this->option($raw, Item::CONDITIONS, __('Unknown condition value: :value', ['value' => $raw]), $errors);
             case 'status':
@@ -332,7 +353,7 @@ class ItemImporter
             $value instanceof \DateTimeInterface => $value->format('Y-m-d'),
             $attribute === 'value' => $value === null ? null : round((float) $value, 2),
             $attribute === 'stationary' => (bool) $value,
-            $attribute === 'inspection_interval_months', $attribute === 'category_id', $attribute === 'storage_location_id' => $value === null ? null : (int) $value,
+            $attribute === 'inspection_interval_months', $attribute === 'category_id', $attribute === 'storage_location_id', $attribute === 'responsible_contact_id' => $value === null ? null : (int) $value,
             default => $value,
         };
     }
@@ -344,6 +365,8 @@ class ItemImporter
             $value === null || $value === '' => '',
             $attribute === 'category_id' => (string) Category::find($value)?->code,
             $attribute === 'storage_location_id' => (string) StorageLocation::find($value)?->code,
+            $attribute === 'responsible_contact_id' => (string) Contact::find($value)?->name,
+            $attribute === 'responsible_role' => __(Item::RESPONSIBLE_ROLES[$value] ?? (string) $value),
             $attribute === 'condition' => __(Item::CONDITIONS[$value] ?? (string) $value),
             $attribute === 'status' => __(Item::STATUSES[$value] ?? (string) $value),
             $attribute === 'stationary' => $value ? __('yes') : __('no'),

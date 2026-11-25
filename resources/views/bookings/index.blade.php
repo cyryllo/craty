@@ -83,6 +83,9 @@
                                     @else
                                         {{ $machine->name }}
                                     @endif
+                                    @if ($machine->responsibleContact)
+                                        <span class="block text-xs font-normal text-gray-500 dark:text-gray-400">{{ $machine->responsibleRoleLabel() }}: {{ $machine->responsibleContact->name }}</span>
+                                    @endif
                                     @if ($machine->status === 'w_naprawie')
                                         <span class="block text-xs font-normal text-red-600 dark:text-red-400">{{ __('Under repair') }}</span>
                                     @endif

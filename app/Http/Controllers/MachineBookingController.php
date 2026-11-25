@@ -124,7 +124,8 @@ class MachineBookingController extends Controller
     /** Maszyny do rezerwacji: przedmioty stacjonarne, bez sprzedanych i wycofanych. */
     public static function machines()
     {
-        return Item::where('stationary', true)->whereNotIn('status', Item::OUT_OF_STOCK_STATUSES)->orderBy('name')->get(['id', 'name', 'status']);
+        return Item::where('stationary', true)->whereNotIn('status', Item::OUT_OF_STOCK_STATUSES)->with('responsibleContact:id,name')
+            ->orderBy('name')->get(['id', 'name', 'status', 'responsible_contact_id', 'responsible_role']);
     }
 
     /** @return array<string, string> */

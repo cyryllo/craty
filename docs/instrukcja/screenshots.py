@@ -242,6 +242,7 @@ with sync_playwright() as p:
         printer = item_url(page, "Drukarka 3D Prusa")
         page.goto(printer + "/edit")
         save(page, "stacjonarny-pole", locator=page.locator("label:has(input[name=stationary])"))
+        save(page, "osoba-odpowiedzialna", locator=page.locator("div.grid:has(> div > #responsible_contact_id)"))
         page.goto(f"{BASE}/bookings?week={week}")
         save(page, "maszyny-grafik", full=True)
         page.goto(printer)

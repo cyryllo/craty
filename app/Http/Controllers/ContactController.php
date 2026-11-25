@@ -54,7 +54,9 @@ class ContactController extends Controller
             ? Repair::where('contact_id', $contact->id)->with('item')->latest('sent_at')->get()
             : collect();
 
-        return view('contacts.show', compact('contact', 'loans', 'repairs'));
+        $responsibleItems = $contact->responsibleItems()->with('storageLocation.warehouse', 'storageLocation.room')->orderBy('name')->get();
+
+        return view('contacts.show', compact('contact', 'loans', 'repairs', 'responsibleItems'));
     }
 
     public function edit(Contact $contact)

@@ -74,6 +74,7 @@
                     <li>{{ __('A row without an inventory number adds a new item; "nazwa" is required then.') }}</li>
                     <li>{{ __('A row with an inventory number changes that item. Export, edit in a spreadsheet and import the file back to change many items at once. Empty cells and missing columns leave the values as they are.') }}</li>
                     <li>{{ __('Category and location are given by their code (e.g. :category, :location). Status and condition accept their names or codes, "stacjonarny" accepts tak/nie, dates are YYYY-MM-DD or DD.MM.YYYY.', ['category' => 'NAR', 'location' => 'M1-R3-P2']) }}</li>
+                    <li>{{ __('"osoba_odpowiedzialna" is the name of an existing contact (owner or caretaker of the item), "rola_osoby" is opiekun or wlasciciel.') }}</li>
                     <li>{{ __('Before anything is saved you see a preview with every change, and only "Confirm import" writes it.') }}</li>
                 </ul>
                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Columns') }}: <code>{{ implode('; ', \App\Services\ItemImporter::EXPORT_COLUMNS) }}</code>. {{ __('The last four are for information only and are skipped on import.') }}</p>

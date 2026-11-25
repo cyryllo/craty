@@ -5,7 +5,7 @@
 Prosta aplikacja do ewidencji sprzętu i magazynu w warsztacie/pracowni:
 kategorie, lokalizacje (magazyn → regał → półka → pojemnik), automatyczne
 numery ewidencyjne z kodami QR, kartoteka przedmiotu (zdjęcia, specyfikacja,
-wartość, stan), wypożyczenia (także zestawy i rezerwacje) z bazą kontaktów i protokołami wydania/zwrotu w PDF, inwentaryzacja, materiały eksploatacyjne, serwis (naprawy, przeglądy okresowe, gwarancje), rezerwacje maszyn stacjonarnych na godziny (np. drukarek 3D w makerspace, z osobną rolą dla osób, które tylko rezerwują), historia zmian, import i eksport CSV (także masowa zmiana przedmiotów), kopie zapasowe z przywracaniem, dziennik aktywności i na razie uproszczony eksport
+wartość, stan), wypożyczenia (także zestawy i rezerwacje) z bazą kontaktów i protokołami wydania/zwrotu w PDF, inwentaryzacja, materiały eksploatacyjne, serwis (naprawy, przeglądy okresowe, gwarancje), rezerwacje maszyn stacjonarnych na godziny (np. drukarek 3D w makerspace, z osobną rolą dla osób, które tylko rezerwują, i właścicielem albo opiekunem każdej maszyny), historia zmian, import i eksport CSV (także masowa zmiana przedmiotów), kopie zapasowe z przywracaniem, dziennik aktywności i na razie uproszczony eksport
 ofert sprzedaży do CSV. Do tego publiczna strona „pchli targ” dla wystawionych ofert,
 webowy instalator i moduł samo-aktualizacji przez panel administratora.
 

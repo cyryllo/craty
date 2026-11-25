@@ -112,5 +112,19 @@
                 </table>
             </div>
         @endif
+
+        @if ($responsibleItems->isNotEmpty())
+            <div class="lg:col-start-2 lg:col-span-2 bg-white rounded-lg shadow overflow-x-auto dark:bg-gray-800" data-responsible-items>
+                <h3 class="px-5 pt-5 pb-3 text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Owner or caretaker of') }}</h3>
+                <ul class="divide-y divide-gray-100 text-sm dark:divide-gray-700">
+                    @foreach ($responsibleItems as $responsibleItem)
+                        <li class="px-5 py-2 flex flex-wrap items-baseline justify-between gap-x-4">
+                            <a href="{{ route('items.show', $responsibleItem) }}" class="text-gray-900 hover:underline dark:text-gray-100">{{ $responsibleItem->name }}</a>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $responsibleItem->responsibleRoleLabel() }}@if ($responsibleItem->storageLocation) · {{ $responsibleItem->storageLocation->label() }}@endif</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </div>
 </x-app-layout>

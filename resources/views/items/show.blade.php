@@ -61,6 +61,24 @@
                         <dt class="text-gray-500 dark:text-gray-400">{{ __('Status') }}</dt>
                         <dd class="text-gray-900 dark:text-gray-100">{{ $item->statusLabel() }}@if ($item->stationary) <span class="ms-1 text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200">{{ __('stationary') }}</span>@endif</dd>
                     </div>
+                    @if ($item->responsibleContact)
+                        <div class="sm:col-span-2" data-responsible>
+                            <dt class="text-gray-500 dark:text-gray-400">{{ $item->responsibleRoleLabel() }}</dt>
+                            <dd class="text-gray-900 dark:text-gray-100">
+                                @if (\App\Support\Modules::isEnabled('contacts') && auth()->user()->isMagazynier())
+                                    <a href="{{ route('contacts.show', $item->responsibleContact) }}" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ $item->responsibleContact->name }}</a>
+                                @else
+                                    {{ $item->responsibleContact->name }}
+                                @endif
+                                @if ($item->responsibleContact->phone)
+                                    · <a href="tel:{{ $item->responsibleContact->phone }}" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ $item->responsibleContact->phone }}</a>
+                                @endif
+                                @if ($item->responsibleContact->email)
+                                    · <a href="mailto:{{ $item->responsibleContact->email }}" class="text-indigo-600 hover:underline break-all dark:text-indigo-400">{{ $item->responsibleContact->email }}</a>
+                                @endif
+                            </dd>
+                        </div>
+                    @endif
                 </dl>
 
                 @if ($item->description)
@@ -94,6 +112,7 @@
                                 @elseif ($history->action === 'returned') {{ __('returned by') }} <b>{{ $history->old_value }}</b>
                                 @elseif ($history->action === 'repair_sent') {{ __('sent for repair to') }} <b>{{ $history->new_value }}</b>
                                 @elseif ($history->action === 'repair_returned') {{ __('returned from repair at') }} <b>{{ $history->old_value }}</b>
+                                @elseif ($history->action === 'responsible_changed') {{ __('responsible person') }}: @if ($history->old_value){{ $history->old_value }} → @endif<b>{{ $history->new_value ?: __('none') }}</b>
                                 @elseif ($history->action === 'inspected') {{ __('inspection') }}: <b>{{ $history->new_value }}</b>
                                 @elseif ($history->field) {{ __('changed') }} <b>{{ $history->field }}</b>: {{ $history->old_value ?: '—' }} → {{ $history->new_value ?: '—' }}
                                 @else {{ $history->action }}

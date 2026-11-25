@@ -205,8 +205,11 @@ class ManualDemoSeeder extends Seeder
         $this->at($today->copy()->subDays(20));
         $machinesCategory = Category::create(['name' => 'Maszyny', 'code' => 'MAS']);
         $hallRoom = StorageLocation::where('room_id', $hallShelf->room_id)->whereNull('rack')->firstOrFail();
-        $printer = $this->item(['name' => 'Drukarka 3D Prusa MK4', 'category_id' => $machinesCategory->id, 'value' => 4200, 'condition' => 'uzywany', 'stationary' => true, 'description' => 'Pole robocze 25x21x22 cm, PLA, PETG, ASA. Filament z szafki obok.'], $hallRoom);
-        $laserCutter = $this->item(['name' => 'Ploter laserowy CO2 60 W', 'category_id' => $machinesCategory->id, 'value' => 9800, 'condition' => 'uzywany', 'stationary' => true, 'description' => 'Pole 60x40 cm. Cięcie sklejki do 6 mm i pleksi, grawer. Tylko po szkoleniu BHP.'], $hallRoom);
+        // Właściciel i opiekun maszyn (osoba odpowiedzialna z Kontaktów).
+        $piotr = Contact::create(['name' => 'Piotr Lis', 'type' => 'osoba', 'phone' => '603 456 789', 'email' => 'piotr.lis@example.com', 'notes' => 'Członek pracowni, przyniósł swoją drukarkę 3D.']);
+        $kasia = Contact::create(['name' => 'Kasia Wójcik', 'type' => 'osoba', 'phone' => '604 567 890', 'notes' => 'Prowadzi szkolenia BHP z plotera.']);
+        $printer = $this->item(['name' => 'Drukarka 3D Prusa MK4', 'category_id' => $machinesCategory->id, 'value' => 4200, 'condition' => 'uzywany', 'stationary' => true, 'description' => 'Pole robocze 25x21x22 cm, PLA, PETG, ASA. Filament z szafki obok.', 'responsible_contact_id' => $piotr->id, 'responsible_role' => 'wlasciciel'], $hallRoom);
+        $laserCutter = $this->item(['name' => 'Ploter laserowy CO2 60 W', 'category_id' => $machinesCategory->id, 'value' => 9800, 'condition' => 'uzywany', 'stationary' => true, 'description' => 'Pole 60x40 cm. Cięcie sklejki do 6 mm i pleksi, grawer. Tylko po szkoleniu BHP.', 'responsible_contact_id' => $kasia->id, 'responsible_role' => 'opiekun'], $hallRoom);
 
         $member = User::factory()->create(['name' => 'Ola Mazur', 'email' => 'uzytkownik@craty.test', 'role' => 'uzytkownik']);
         $this->at($today->copy()->subDays(2));

@@ -5,7 +5,7 @@
 A simple inventory/asset management app for a workshop: categories,
 locations (warehouse → rack → shelf → bin), auto-generated inventory
 numbers with QR codes, item records (photos, specs, value, condition),
-loans (including kits and reservations) with a contacts list and PDF issue/return protocols, stocktaking, consumables, service (repairs, periodic inspections, warranties), hourly booking of stationary machines (e.g. 3D printers in a makerspace, with a separate role for people who only book), change history, CSV import and export (including bulk item changes), backups with restore, an activity log, and (for now) a simplified CSV export of sale
+loans (including kits and reservations) with a contacts list and PDF issue/return protocols, stocktaking, consumables, service (repairs, periodic inspections, warranties), hourly booking of stationary machines (e.g. 3D printers in a makerspace, with a separate role for people who only book and an owner or caretaker for each machine), change history, CSV import and export (including bulk item changes), backups with restore, an activity log, and (for now) a simplified CSV export of sale
 listings. Also includes
 a public "flea market" page for listed items, a web-based installer, and a
 self-update module via the admin panel.

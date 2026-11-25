@@ -222,6 +222,7 @@ class ActivityLog extends Model
             'locale' => 'Language', 'mail_password' => 'Mail password', 'status' => 'Status', 'condition' => 'Condition',
             'value' => 'Value', 'category_id' => 'Category', 'storage_location_id' => 'Location', 'quantity' => 'Quantity',
             'protected' => 'Main administrator account', 'returned_at' => 'Returned', 'due_at' => 'Due date', 'stationary' => 'Stationary', 'parent_id' => 'Parent category',
+            'responsible_contact_id' => 'Responsible person', 'responsible_role' => 'Role of the responsible person',
             // Ustawienia (AppSetting): te same nazwy co na stronach ustawień.
             'activity_log_all_enabled' => 'Also record data changes', 'activity_log_retention_days' => 'Keep activity log entries for (days)', 'password_reset_enabled' => 'Self-service password reset',
             'loan_due_notifications_enabled' => 'Email a daily summary of overdue loans', 'service_reminders_enabled' => 'Weekly service reminder',
@@ -242,6 +243,8 @@ class ActivityLog extends Model
             $field === 'role' => __(User::ROLES[$value] ?? (string) $value),
             $field === 'status' => __(Item::STATUSES[$value] ?? (string) $value),
             $field === 'condition' => __(Item::CONDITIONS[$value] ?? (string) $value),
+            $field === 'responsible_role' => __(Item::RESPONSIBLE_ROLES[$value] ?? (string) $value),
+            $field === 'responsible_contact_id' => Contact::find($value)?->name ?? '#'.$value,
             default => (string) $value,
         };
     }

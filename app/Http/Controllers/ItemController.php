@@ -120,7 +120,7 @@ class ItemController extends Controller
     public function export(Request $request)
     {
         $rows = $request->boolean('wzor') ? [] : (function () use ($request) {
-            $query = $this->listQuery($request)->with(['category', 'storageLocation.warehouse', 'storageLocation.room', 'currentLoan']);
+            $query = $this->listQuery($request)->with(['category', 'storageLocation.warehouse', 'storageLocation.room', 'currentLoan', 'responsibleContact']);
             foreach ($query->lazy(500) as $item) {
                 yield \App\Services\ItemImporter::exportRow($item);
             }
@@ -180,6 +180,7 @@ class ItemController extends Controller
             'item' => new Item,
             'categories' => Category::orderBy('name')->get(),
             'locations' => $this->locationOptions(),
+            'contacts' => \App\Support\Modules::isEnabled('contacts') ? \App\Models\Contact::orderBy('name')->get(['id', 'name']) : collect(),
         ]);
     }
 
@@ -237,6 +238,7 @@ class ItemController extends Controller
             'item' => $item,
             'categories' => Category::orderBy('name')->get(),
             'locations' => $this->locationOptions(),
+            'contacts' => \App\Support\Modules::isEnabled('contacts') ? \App\Models\Contact::orderBy('name')->get(['id', 'name']) : collect(),
         ]);
     }
 

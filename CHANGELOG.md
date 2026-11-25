@@ -3,6 +3,14 @@
 Krótki, chronologiczny zapis tego, co się zmieniło w projekcie. Szerszy
 opis funkcji — [README.md](README.md).
 
+## 2026-11-26 (1.7.0)
+
+- Osoba odpowiedzialna za przedmiot: właściciel albo opiekun wybierany z
+  Kontaktów (np. członek makerspace'u, który przyniósł swoją maszynę).
+  Widoczna na karcie przedmiotu z telefonem i e-mailem, w grafiku maszyn,
+  na karcie kontaktu i w historii przedmiotu; kolumny
+  `osoba_odpowiedzialna` i `rola_osoby` w imporcie i eksporcie CSV.
+
 ## 2026-11-25 (1.6.0)
 
 - Import i eksport CSV na nowej stronie Ustawienia → Import i eksport

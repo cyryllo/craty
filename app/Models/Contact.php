@@ -29,6 +29,12 @@ class Contact extends Model
         return $this->hasMany(Loan::class);
     }
 
+    /** Przedmioty, których ten kontakt jest właścicielem albo opiekunem. */
+    public function responsibleItems(): HasMany
+    {
+        return $this->hasMany(Item::class, 'responsible_contact_id');
+    }
+
     public function activeLoans(): HasMany
     {
         return $this->loans()->whereNull('returned_at');

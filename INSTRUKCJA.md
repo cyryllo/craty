@@ -158,6 +158,8 @@ Zakładka **Wypożyczenia** w menu zbiera w jednym miejscu: co jest teraz wypoż
 
 **Przedmiot stacjonarny** to maszyna, która zostaje w pracowni (drukarka 3D, ploter laserowy, stanowisko lutownicze). Zaznaczasz go polem „Stacjonarny” w formularzu przedmiotu. Takiego przedmiotu nie da się wypożyczyć, zarezerwować na dni ani dodać do zestawu; na karcie przedmiotu zamiast formularza wypożyczenia jest informacja, że zostaje w pracowni.
 
+**Właściciel albo opiekun**: w formularzu przedmiotu pole „Osoba odpowiedzialna” (przy włączonym module Kontakty) wskazuje osobę z Kontaktów i jej rolę: opiekun albo właściciel, np. członek makerspace'u, który przyniósł swoją drukarkę albo szkoli innych z plotera. Osobę najpierw dodaje się w Kontaktach. Widać ją na karcie przedmiotu (z telefonem i e-mailem), w grafiku maszyn pod nazwą maszyny i na karcie kontaktu; zmiana trafia do historii przedmiotu. W imporcie CSV to kolumny `osoba_odpowiedzialna` (nazwa kontaktu) i `rola_osoby` (opiekun albo wlasciciel).
+
 **Rezerwacje maszyn** (moduł opcjonalny, domyślnie wyłączony, Ustawienia → Moduły) pozwalają rezerwować czas na przedmiotach stacjonarnych, np. w makerspace: kto i kiedy korzysta z drukarki albo plotera. W menu pojawia się zakładka **Maszyny** z grafikiem tygodnia: wiersze to maszyny, kolumny to dni, a każda rezerwacja ma godziny, osobę i kolor rodzaju użycia. Kliknięcie rezerwacji pokazuje jej opis. Na telefonie grafik jest listą dzień po dniu.
 
 - **Nowa rezerwacja**: maszyna, dzień, godziny od–do (co 15 minut), rodzaj użycia (użytek prywatny, zajęcia, warsztaty; obsługa może też zablokować maszynę na konserwację) i opcjonalny opis, np. nazwa projektu. Rezerwacja jest ważna od razu. Nakładające się rezerwacje tej samej maszyny nie przejdą, Craty pokaże, kto ma już ten termin.
@@ -193,7 +195,9 @@ Zakładka **Kontakty** w menu to lista osób, firm i serwisów, którym wypożyc
 
 Karta kontaktu pokazuje całą **historię jego wypożyczeń**: co, kiedy, czy wróciło (albo czy jest po terminie), z linkami do protokołów. Kontakty typu „serwis” przydadzą się w planowanym module Serwis (wysyłka sprzętu do naprawy).
 
-Usunięcie kontaktu nie kasuje jego wypożyczeń: zostają w historii pod tą samą nazwą. Po aktualizacji do wersji z Kontaktami dotychczasowe wpisy „komu” z wcześniejszych wypożyczeń zamieniły się w kontakty automatycznie (te same imiona i nazwy połączone w jeden kontakt), więc ich historia jest od razu kompletna.
+Kontakt może też być właścicielem albo opiekunem przedmiotów (patrz „Przedmioty stacjonarne i rezerwacje maszyn”); jego karta pokazuje wtedy ich listę.
+
+Usunięcie kontaktu nie kasuje jego wypożyczeń: zostają w historii pod tą samą nazwą, a przedmioty, którymi się opiekował, zostają bez osoby odpowiedzialnej. Po aktualizacji do wersji z Kontaktami dotychczasowe wpisy „komu” z wcześniejszych wypożyczeń zamieniły się w kontakty automatycznie (te same imiona i nazwy połączone w jeden kontakt), więc ich historia jest od razu kompletna.
 
 Moduł można wyłączyć w Ustawienia → Moduły: znika wtedy zakładka Kontakty, a „komu” przy wypożyczeniu znów wpisuje się zwykłym tekstem. Protokoły PDF działają w obu przypadkach.
 
