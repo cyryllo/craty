@@ -161,7 +161,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 <div class="wrap intro">
     <span class="eyebrow">Instrukcja użytkownika</span>
     <h1>Craty krok po kroku</h1>
-    <p class="lead">Wszystkie funkcje programu na przykładzie jednej pracowni: od dodania pierwszego przedmiotu, przez wypożyczenia i serwis, po inwentaryzację. Instrukcja dotyczy wersji 1.5.</p>
+    <p class="lead">Wszystkie funkcje programu na przykładzie jednej pracowni: od dodania pierwszego przedmiotu, przez wypożyczenia i serwis, po inwentaryzację. Instrukcja dotyczy wersji 1.5.2.</p>
 </div>
 
 <div class="wrap layout">
@@ -488,7 +488,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 
     <h3>Rezerwacja z karty maszyny</h3>
     <p>Na karcie przedmiotu stacjonarnego jest ramka <b>Rezerwacje maszyny</b>: najbliższe rezerwacje, link do grafiku tej maszyny i formularz <span class="ui">Zarezerwuj czas</span>.</p>
-    <figure class="narrow"><a href="img/maszyna-karta.jpg"><img src="img/maszyna-karta.jpg" width="328" height="723" alt="Ramka Rezerwacje maszyny na karcie drukarki 3D: trzy nadchodzące rezerwacje i formularz z dniem, godzinami 10:00–12:00 i opisem." loading="lazy"></a><figcaption>Rezerwacje na karcie drukarki i szybki formularz.</figcaption></figure>
+    <figure class="narrow"><a href="img/maszyna-karta.jpg"><img src="img/maszyna-karta.jpg" width="328" height="655" alt="Ramka Rezerwacje maszyny na karcie drukarki 3D: trzy nadchodzące rezerwacje i formularz z dniem, godzinami 10:00–12:00 i opisem." loading="lazy"></a><figcaption>Rezerwacje na karcie drukarki i szybki formularz.</figcaption></figure>
 
     <h3>Rola Użytkownik</h3>
     <p>Osoby, które tylko korzystają z maszyn, nie potrzebują dostępu do magazynu. Administrator zakłada im konto z rolą <b>Użytkownik</b> w <span class="path">Ustawienia → Użytkownicy</span>. Użytkownik po zalogowaniu trafia od razu do grafiku maszyn: rezerwuje, widzi, kto i kiedy zajął maszyny, i odwołuje swoje rezerwacje. Magazynu, wypożyczeń, kontaktów ani ustawień nie widzi wcale.</p>
@@ -670,7 +670,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 <section id="ustawienia">
     <h2>Ustawienia</h2>
     <p>Ustawienia otwierasz z menu z Twoim imieniem (prawy górny róg). Część podstawowa jest dla wszystkich, zaawansowana tylko dla administratora.</p>
-    <figure><a href="img/ustawienia.jpg"><img src="img/ustawienia.jpg" width="1280" height="922" alt="Strona Ustawienia z kafelkami: kategorie, struktura magazynu, ustawienia aplikacji, opcje sprzedaży, użytkownicy, poczta, powiadomienia, moduły, aktualizacje." loading="lazy"></a><figcaption>Ustawienia.</figcaption></figure>
+    <figure><a href="img/ustawienia.jpg"><img src="img/ustawienia.jpg" width="1280" height="942" alt="Strona Ustawienia z kafelkami: kategorie, struktura magazynu, ustawienia aplikacji, opcje sprzedaży, użytkownicy, poczta, powiadomienia, moduły, aktualizacje." loading="lazy"></a><figcaption>Ustawienia.</figcaption></figure>
     <div class="scroll"><table class="plain">
         <thead><tr><th>Ustawienie</th><th>Co tam jest</th></tr></thead>
         <tbody>
@@ -680,6 +680,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
             <tr><td><b>Użytkownicy</b></td><td>Konta, role (Administrator, Magazynier, Użytkownik), wyłączanie kont. Wyłączone konto nie zaloguje się, a zalogowana osoba zostaje wylogowana przy następnym kliknięciu.</td></tr>
             <tr><td><b>Poczta</b></td><td>Własny serwer SMTP do wysyłki e-maili, z przyciskiem wiadomości testowej.</td></tr>
             <tr><td><b>Powiadomienia</b></td><td>Samodzielny reset hasła, codzienny e-mail o przeterminowanych wypożyczeniach i cotygodniowe przypomnienie serwisowe.</td></tr>
+            <tr><td><b>Dziennik aktywności</b></td><td>Kto, co i kiedy zrobił: logowania, zmiany kont i ustawień, aktualizacje, opcjonalnie zmiany danych. Opis niżej.</td></tr>
             <tr><td><b>Moduły</b></td><td>Włączanie i wyłączanie Wypożyczeń, Sprzedaży, Kontaktów, Serwisu, Materiałów i Rezerwacji maszyn.</td></tr>
             <tr><td><b>Aktualizacje</b></td><td>Aktualizacja przez wgranie paczki <code>.zip</code> z nową wersją (w wersji Docker: pobranie nowego obrazu).</td></tr>
         </tbody>
@@ -700,6 +701,26 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
         <li>W <span class="path">Ustawienia → Aktualizacje</span> potwierdź hasło, wybierz paczkę i opcjonalnie wklej sumę kontrolną SHA-256 z opisu wydania.</li>
         <li>Po wgraniu Craty sam wprowadza zmiany w bazie i pokazuje nową wersję w stopce.</li>
     </ol>
+
+    <h3>Dziennik aktywności</h3>
+    <p>Administrator widzi w <span class="path">Ustawienia → Dziennik aktywności</span>, kto, co i kiedy zrobił, z adresem IP. Zawsze zapisują się:</p>
+    <ul>
+        <li>logowania i wylogowania, także <b>nieudane logowania</b> (z wpisanym e-mailem) i blokady po zbyt wielu próbach,</li>
+        <li>zakładanie, zmiany i usuwanie kont, np. zmiana roli albo wyłączenie konta,</li>
+        <li>zmiany ustawień i modułów, z wartością przed i po zmianie,</li>
+        <li>wgrane i nieudane aktualizacje.</li>
+    </ul>
+    <p>Po zaznaczeniu <span class="ui">Zapisuj też zmiany danych</span> dochodzi dodawanie, zmiany i usuwanie przedmiotów, kategorii, miejsc, kontaktów, wypożyczeń i innych danych. Hasła nigdy nie trafiają do dziennika, zapisuje się tylko informacja, że je zmieniono. Wpisy starsze niż rok usuwają się same.</p>
+    <figure><a href="img/dziennik.jpg"><img src="img/dziennik.jpg" width="1280" height="1172" alt="Dziennik aktywności: zmiana wartości drabiny, włączenie zapisu zmian danych, logowania Ewy i Oli, nieudane logowanie wyróżnione na czerwono, zmiany ustawień i kont." loading="lazy"></a><figcaption>Dziennik aktywności. Nieudane logowanie jest wyróżnione na czerwono.</figcaption></figure>
+    <div class="example">
+        <span class="tag">Przykład</span>
+        <h4>Ktoś próbuje zgadnąć hasło</h4>
+        <ol>
+            <li>Ewa widzi na liście kilka czerwonych wpisów „Nieudane logowanie” z tym samym e-mailem i adresem IP.</li>
+            <li>Wybiera w filtrze „bezpieczeństwo i administracja” i wpisuje adres IP w wyszukiwarkę, żeby zobaczyć wszystkie próby z tego adresu.</li>
+            <li>Jeśli to nie pomyłka kogoś z zespołu, zmienia hasło tego konta w <span class="path">Ustawienia → Użytkownicy</span>, a po pięciu nieudanych próbach Craty i tak sam blokuje logowanie na chwilę.</li>
+        </ol>
+    </div>
 
     <h3>Twój profil</h3>
     <p>W <span class="ui">Profil</span> każdy zmienia swoje imię, e-mail, hasło i język. Jasny albo ciemny motyw przełącza ikona księżyca w górnym pasku; wybór zapamiętuje przeglądarka.</p>
@@ -727,7 +748,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 
 <footer>
     <div class="wrap">
-        <p>Craty, darmowy program do ewidencji rzeczy. Licencja MIT. Zrzuty ekranu pochodzą z wersji 1.5 i z danych przykładowych.</p>
+        <p>Craty, darmowy program do ewidencji rzeczy. Licencja MIT. Zrzuty ekranu pochodzą z wersji 1.5.2 i z danych przykładowych.</p>
         <p><a href="../">Strona projektu</a> · <a href="https://github.com/cyryllo/craty">GitHub</a></p>
     </div>
 </footer>

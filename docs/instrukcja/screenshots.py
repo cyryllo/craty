@@ -80,6 +80,13 @@ with sync_playwright() as p:
     page.click("text=Więcej informacji")
     save(page, "pchli-targ-oferta", full=True)
 
+    # Nieudane logowanie przed właściwym, żeby było co pokazać w dzienniku aktywności.
+    page.goto(f"{BASE}/login")
+    page.fill("#email", "admin@craty.test")
+    page.fill("#password", "zle-haslo")
+    page.click("button[type=submit]")
+    page.wait_for_load_state()
+
     login(page)
     save(page, "panel", full=True)
 
@@ -282,6 +289,21 @@ with sync_playwright() as p:
         save(page, "sprzedaz-wystawione")
     except Exception as e:  # noqa: BLE001
         errors.append("sprzedaż: " + str(e).splitlines()[0])
+
+    # ---------- dziennik aktywności ----------
+    try:
+        page.goto(f"{BASE}/ustawienia/dziennik")
+        page.check("input[name=activity_log_all_enabled][type=checkbox]")
+        page.locator("main form[method=POST] button").first.click()
+        page.wait_for_load_state()
+        page.goto(item_url(page, "Drabina aluminiowa") + "/edit")
+        page.fill("#value", "800")
+        page.locator("main form button[type=submit]").last.click()
+        page.wait_for_load_state()
+        page.goto(f"{BASE}/ustawienia/dziennik")
+        save(page, "dziennik", full=True)
+    except Exception as e:  # noqa: BLE001
+        errors.append("dziennik: " + str(e).splitlines()[0])
 
     # ---------- ustawienia ----------
     try:

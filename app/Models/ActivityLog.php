@@ -192,7 +192,7 @@ class ActivityLog extends Model
             'name' => 'Name or title', 'email' => 'Email', 'role' => 'Role', 'active' => 'Active', 'password' => 'Password',
             'locale' => 'Language', 'mail_password' => 'Mail password', 'status' => 'Status', 'condition' => 'Condition',
             'value' => 'Value', 'category_id' => 'Category', 'storage_location_id' => 'Location', 'quantity' => 'Quantity',
-            'returned_at' => 'Returned', 'due_at' => 'Due date', 'stationary' => 'Stationary', 'parent_id' => 'Parent category',
+            'protected' => 'Main administrator account', 'returned_at' => 'Returned', 'due_at' => 'Due date', 'stationary' => 'Stationary', 'parent_id' => 'Parent category',
             // Ustawienia (AppSetting): te same nazwy co na stronach ustawień.
             'activity_log_all_enabled' => 'Also record data changes', 'password_reset_enabled' => 'Self-service password reset',
             'loan_due_notifications_enabled' => 'Email a daily summary of overdue loans', 'service_reminders_enabled' => 'Weekly service reminder',

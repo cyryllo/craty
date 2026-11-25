@@ -256,7 +256,8 @@ class ManualDemoSeeder extends Seeder
         ItemHistory::whereNull('user_id')->update(['user_id' => $this->admin->id]);
 
         Carbon::setTestNow();
-        auth()->logout();
+        // Bez zdarzenia wylogowania (nie ma czego zapisywać w dzienniku aktywności).
+        auth()->forgetUser();
     }
 
     /** Cofnięcie zegara: wszystko, co zapisze się dalej, ma tę datę. */
